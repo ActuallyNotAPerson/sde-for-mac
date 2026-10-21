@@ -262,6 +262,36 @@ public sealed partial class SdeStore
 		return e;
 	}
 
+	/// <summary>
+	/// Records a compliance letter just written: in the letter log (for an SD case, which has an assessment) and as a
+	/// Letter line on the case's timeline, together.
+	/// </summary>
+	public ComplianceEntryRecord LogComplianceLetter(Guid caseId, string kind, string fileName, SaveContext context = null)
+	{
+		SaveContext ctx = context ?? SaveContext.App;
+		return Database.InTransaction((c, tx) =>
+		{
+			ComplianceCaseRecord cc = TableMap<ComplianceCaseRecord>.Get(c, new { CaseID = caseId }, tx) ?? throw new ArgumentException("That case no longer exists.");
+			string letterId = null;
+			if (cc.AssessmentID is Guid assessmentId && c.ExecuteScalar<int>("SELECT COUNT(*) FROM Assessment WHERE AssessmentID = @assessmentId", new { assessmentId }, tx) > 0)
+			{
+				LetterLogRecord l = new LetterLogRecord
+				{
+					LetterID = Guid.NewGuid(),
+					AssessmentID = assessmentId,
+					Kind = kind,
+					Template = null,
+					GeneratedOn = Clock(),
+					FileName = fileName,
+				};
+				TableMap<LetterLogRecord>.Insert(c, l, tx);
+				WriteEvent(c, tx, cc.PropertyID, assessmentId, $"Letter written: {kind ?? "letter"} ({Path.GetFileName(fileName ?? "")})", ctx);
+				letterId = l.LetterID.ToString("D");
+			}
+			return AddEntry(c, tx, caseId, "Letter", "Letter written: " + (kind ?? "letter"), letterId, ctx);
+		});
+	}
+
 	/// <summary>A case's timeline, oldest first.</summary>
 	public List<ComplianceEntryRecord> GetComplianceEntries(Guid caseId) =>
 		Database.Read(c => TableMap<ComplianceEntryRecord>.Select(c, "CaseID = @caseId", new { caseId }, orderBy: "EntryOn, rowid").ToList());

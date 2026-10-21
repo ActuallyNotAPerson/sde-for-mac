@@ -12,6 +12,18 @@ public static class LetterKinds
 	public const string NotSubstantiallyDamaged = "Not substantially damaged";
 	public const string SubstantialImprovement = "Substantial improvement";
 
+	/// <summary>A substantial damage notice that sets out the ways to comply and the deadline (compliance case).</summary>
+	public const string ComplianceOptions = "Compliance options";
+
+	/// <summary>A letter confirming the determination, for the owner's Increased Cost of Compliance claim.</summary>
+	public const string IccSupport = "ICC support";
+
+	/// <summary>A reminder that the compliance deadline is near or has passed.</summary>
+	public const string DeadlineReminder = "Deadline reminder";
+
+	/// <summary>The compliance letters, in the order they are offered.</summary>
+	public static readonly IReadOnlyList<string> Compliance = new[] { ComplianceOptions, IccSupport, DeadlineReminder };
+
 	/// <summary>
 	/// The damage letter for an assessment's stored FEMA result: <see cref="SubstantialDamage"/> or
 	/// <see cref="NotSubstantiallyDamaged"/>, or null when there is no determination yet (incomplete or undetermined).
@@ -25,7 +37,7 @@ public static class LetterKinds
 }
 
 /// <summary>
-/// Writes the three starter letter templates as editable Word documents. Communities change them in Word (or
+/// Writes the starter letter templates as editable Word documents: three owner letters and three compliance letters. Communities change them in Word (or
 /// Pages, saving as .docx) to suit their ordinance and letterhead; the app fills in the «Field» placeholders
 /// (see <see cref="LetterFields"/>).
 /// <para>
@@ -40,6 +52,9 @@ public static class LetterTemplates
 	public const string SubstantialDamageFile = "Substantial damage notice.docx";
 	public const string NotSubstantiallyDamagedFile = "Not substantially damaged notice.docx";
 	public const string SubstantialImprovementFile = "Substantial improvement determination.docx";
+	public const string ComplianceOptionsFile = "Substantial damage options and deadline.docx";
+	public const string IccSupportFile = "ICC support letter.docx";
+	public const string DeadlineReminderFile = "Compliance deadline reminder.docx";
 
 	private const string ReviewNote = "Starter letter from Substantial Damage Estimator. Review and adapt it with your community's counsel before use.";
 
@@ -49,6 +64,9 @@ public static class LetterTemplates
 		LetterKinds.SubstantialDamage => SubstantialDamageFile,
 		LetterKinds.NotSubstantiallyDamaged => NotSubstantiallyDamagedFile,
 		LetterKinds.SubstantialImprovement => SubstantialImprovementFile,
+		LetterKinds.ComplianceOptions => ComplianceOptionsFile,
+		LetterKinds.IccSupport => IccSupportFile,
+		LetterKinds.DeadlineReminder => DeadlineReminderFile,
 		_ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown letter kind."),
 	};
 
@@ -56,17 +74,30 @@ public static class LetterTemplates
 	/// Writes the three starter templates into <paramref name="folder"/> (created if needed) and returns their paths.
 	/// An existing template is kept, so a community's edits are never lost, unless <paramref name="overwrite"/> is true.
 	/// </summary>
-	public static IReadOnlyList<string> WriteStarterTemplates(string folder, bool overwrite = false)
+	public static IReadOnlyList<string> WriteStarterTemplates(string folder, bool overwrite = false) => WriteAll(folder, overwrite, new (string, Action<Body>)[]
+	{
+		(SubstantialDamageFile, SubstantialDamageBody),
+		(NotSubstantiallyDamagedFile, NotSubstantiallyDamagedBody),
+		(SubstantialImprovementFile, SubstantialImprovementBody),
+	});
+
+	/// <summary>
+	/// Writes the three compliance starter templates (options and deadline, ICC support, deadline reminder) into
+	/// <paramref name="folder"/>, keeping existing ones unless <paramref name="overwrite"/> is true, and returns their paths.
+	/// </summary>
+	public static IReadOnlyList<string> WriteComplianceTemplates(string folder, bool overwrite = false) => WriteAll(folder, overwrite, new (string, Action<Body>)[]
+	{
+		(ComplianceOptionsFile, ComplianceOptionsBody),
+		(IccSupportFile, IccSupportBody),
+		(DeadlineReminderFile, DeadlineReminderBody),
+	});
+
+	private static IReadOnlyList<string> WriteAll(string folder, bool overwrite, (string File, Action<Body> Body)[] templates)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(folder);
 		Directory.CreateDirectory(folder);
 		List<string> paths = new();
-		foreach ((string file, Action<Body> body) in new (string, Action<Body>)[]
-		{
-			(SubstantialDamageFile, SubstantialDamageBody),
-			(NotSubstantiallyDamagedFile, NotSubstantiallyDamagedBody),
-			(SubstantialImprovementFile, SubstantialImprovementBody),
-		})
+		foreach ((string file, Action<Body> body) in templates)
 		{
 			string path = Path.Combine(folder, file);
 			if (overwrite || !File.Exists(path))
@@ -148,6 +179,75 @@ public static class LetterTemplates
 		P(b, "If you believe the cost or the market value we used is not correct, you may give us more information, such as an appraisal of the "
 			+ "building by a licensed appraiser or a detailed cost estimate from a licensed contractor. We will review it and let you know whether "
 			+ "the determination changes.");
+		Closing(b);
+	}
+
+	private static void ComplianceOptionsBody(Body b)
+	{
+		Opening(b, "Substantial damage: how to comply, and the deadline");
+		P(b, "On «InspectionDate», «CommunityName» inspected the building at «PropertyAddress» for damage from the «CauseOfDamage» event of «DamageDate». "
+			+ "Based on that inspection, we have determined that the building is substantially damaged: the estimated cost of repairs is «PercentDamaged» "
+			+ "of the building's market value before the damage.");
+		Facts(b, true);
+		P(b, "Because the building is substantially damaged, it must be brought into compliance with the community's current floodplain management "
+			+ "requirements before it is repaired or rebuilt. You may choose one of these ways to comply:");
+		H(b, "Ways to comply");
+		P(b, "1. Elevate: raise the building so that its lowest floor is at or above the elevation our regulations require for its flood zone.");
+		P(b, "2. Relocate: move the building to a site outside the floodplain, or to a higher part of the lot that meets the requirements.");
+		P(b, "3. Demolish: remove the building. A new building on the site must meet the current requirements.");
+		P(b, "4. Floodproof: for a non-residential building only, make the building watertight below the required elevation, with a design "
+			+ "certified by a registered professional engineer or architect.");
+		P(b, "Whichever you choose, you need a permit from us before you start any work, including work you do yourself.");
+		H(b, "Deadline");
+		P(b, "Please apply for a permit and tell us which way you have chosen by «ComplianceDeadline». If you need more time, contact us "
+			+ "before that date.");
+		H(b, "Flood insurance");
+		P(b, "If the building has a National Flood Insurance Program (NFIP) policy, its Increased Cost of Compliance (ICC) coverage may help pay "
+			+ "for elevating, relocating, demolishing or floodproofing. Ask your insurance agent or claims adjuster about ICC and give them a copy "
+			+ "of this letter. We can also write a letter for your ICC claim.");
+		H(b, "If you disagree");
+		P(b, "If you believe our estimate of the market value or the cost of repairs is not correct, you may give us more information, such as an "
+			+ "appraisal of the building (not including the land) by a licensed appraiser, or a detailed repair estimate from a licensed contractor. "
+			+ "We will review it and let you know whether the determination changes.");
+		Closing(b);
+	}
+
+	private static void IccSupportBody(Body b)
+	{
+		Opening(b, "Substantial damage determination for an Increased Cost of Compliance (ICC) claim");
+		P(b, "This letter confirms that «CommunityName» has determined that the building at «PropertyAddress» is substantially damaged under "
+			+ "the community's floodplain management regulations, which the community adopted to take part in the National Flood Insurance Program (NFIP).");
+		Facts(b, true);
+		Table t = NewTable();
+		Row(t, "ICC claim number", "«IccClaimNumber»");
+		Row(t, "Way the owner will comply", "«CompliancePath»");
+		Row(t, "Permit number", "«CompliancePermitNumber»");
+		Row(t, "Compliance deadline", "«ComplianceDeadline»");
+		b.AppendChild(t);
+		P(b, "");
+		P(b, "The building must be brought into compliance with the community's current floodplain management requirements before it is repaired "
+			+ "or rebuilt. Please give a copy of this letter to your flood insurance claims adjuster with your ICC claim.");
+		P(b, "If the adjuster or the NFIP needs more information from us, such as the substantial damage estimate or the permit, they may contact "
+			+ "«OfficialName» at «OfficePhone» or «OfficeEmail».");
+		Closing(b);
+	}
+
+	private static void DeadlineReminderBody(Body b)
+	{
+		Opening(b, "Reminder: compliance deadline for a substantially damaged building");
+		P(b, "We wrote to you earlier that the building at «PropertyAddress» is substantially damaged and must be brought into compliance with "
+			+ "the community's current floodplain management requirements before it is repaired or rebuilt.");
+		Table t = NewTable();
+		Row(t, "Property", "«PropertyAddress», «PropertyCityStateZip»");
+		Row(t, "Parcel number", "«ParcelNumber»");
+		Row(t, "Way you chose to comply", "«CompliancePath»");
+		Row(t, "Permit number", "«CompliancePermitNumber»");
+		Row(t, "Deadline", "«ComplianceDeadline»");
+		b.AppendChild(t);
+		P(b, "");
+		P(b, "Our records show that the work is not finished yet. Please contact us by «ComplianceDeadline» to tell us how the work is going, "
+			+ "or to ask for more time. If you have finished the work, please ask us for a final inspection.");
+		P(b, "If you have not yet chosen how to comply, or applied for a permit, please do so now. We are glad to talk through the options with you.");
 		Closing(b);
 	}
 

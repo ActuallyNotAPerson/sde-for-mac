@@ -3,6 +3,7 @@ using Sde.Core;
 using Sde.Core.Assessments;
 using Sde.Core.Improvements;
 using Sde.Core.Records;
+using Sde.Data;
 using Sde.Reports.Internal;
 
 namespace Sde.Reports.Letters;
@@ -43,6 +44,9 @@ public sealed class LetterContext
 	/// <summary>The SI calculation, for a substantial improvement letter.</summary>
 	public SiResult Improvement { get; init; }
 
+	/// <summary>The compliance case, for a compliance letter (options, ICC support, deadline reminder).</summary>
+	public ComplianceCaseRecord Compliance { get; init; }
+
 	/// <summary>More fields, or replacements for built-in ones (for a community's own templates).</summary>
 	public IReadOnlyDictionary<string, string> Extra { get; init; }
 }
@@ -64,6 +68,7 @@ public sealed class LetterContext
 /// <item><term>BuildingValue, BuildingValueBasis, RepairCost, RepairCostBasis</term><description>The amounts and bases behind the percentage.</description></item>
 /// <item><term>Status</term><description>The review status.</description></item>
 /// <item><term>ProjectDescription, PermitNumber, ProjectDate, ImprovementCost, MarketValue, ImprovementPercent, SIThreshold, LookbackPeriod, SIDetermination, SIDeterminationWording</term><description>Substantial improvement.</description></item>
+/// <item><term>CompliancePath, ComplianceDeadline, CompliancePermitNumber, IccClaimNumber, IccStatus, IccAmount, EcReceivedDate, FinalInspectionDate</term><description>The compliance case.</description></item>
 /// </list>
 /// docs/LETTERS.md lists the same fields for users.
 /// </summary>
@@ -86,6 +91,7 @@ public static class LetterFields
 		"Status",
 		"ProjectDescription", "PermitNumber", "ProjectDate", "ImprovementCost", "MarketValue", "ImprovementPercent",
 		"SIThreshold", "LookbackPeriod", "SIDetermination", "SIDeterminationWording",
+		"CompliancePath", "ComplianceDeadline", "CompliancePermitNumber", "IccClaimNumber", "IccStatus", "IccAmount", "EcReceivedDate", "FinalInspectionDate",
 	};
 
 	/// <summary>The fields for an assessment (and its structure).</summary>
@@ -184,6 +190,16 @@ public static class LetterFields
 			: !si.CanDetermine ? "cannot be determined until the market value of the structure is known"
 			: si.IsSubstantialImprovement ? "is a substantial improvement"
 			: "is not a substantial improvement";
+
+		ComplianceCaseRecord cc = context.Compliance;
+		f["CompliancePath"] = cc?.Path == null ? "" : CompliancePaths.Label(cc.Path);
+		f["ComplianceDeadline"] = LongDate(cc?.Deadline);
+		f["CompliancePermitNumber"] = Clean(cc?.PermitNumber);
+		f["IccClaimNumber"] = Clean(cc?.IccClaimNumber);
+		f["IccStatus"] = cc == null ? "" : IccStatuses.Label(cc.IccStatus);
+		f["IccAmount"] = Fmt.Money(cc?.IccAmount);
+		f["EcReceivedDate"] = LongDate(cc?.EcReceivedOn);
+		f["FinalInspectionDate"] = LongDate(cc?.FinalInspectionOn);
 
 		foreach (KeyValuePair<string, string> kv in context.Extra ?? new Dictionary<string, string>())
 		{
