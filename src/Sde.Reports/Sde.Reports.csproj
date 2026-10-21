@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="PDFsharp-MigraDoc" />
+    <PackageReference Include="QRCoder" />
     <!-- Upright, print-sized photos (Internal/PhotoPrep.cs). MIT; the same version Avalonia 12 uses. -->
     <PackageReference Include="SkiaSharp" />
     <!-- Owner letters (Letters/): reads and writes .docx. MIT. -->
