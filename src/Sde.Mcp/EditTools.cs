@@ -13,7 +13,7 @@ namespace Sde.Mcp;
 /// The edit tools. They work only while the database's "Mcp.AllowEdits" switch is on (read again on every call), check
 /// values exactly as the phone form does (<see cref="FieldInput"/>), save through <see cref="SdeStore.Apply"/>, and
 /// record each call as one batch in edit history under the AI assistant's name, so SDE can revert it. Final and
-/// Letter sent assessments are refused; nothing can be deleted.
+/// Letter sent assessments, and ones checked out to another Mac, are refused; nothing can be deleted.
 /// </summary>
 [McpServerToolType]
 public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
@@ -61,6 +61,10 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 		{
 			throw Locked(ex.Status);
 		}
+		catch (AssessmentCheckedOutException ex)
+		{
+			throw CheckedOut(ex);
+		}
 		ReferenceData r = store.Reference;
 		List<FieldChanged> changed = store.GetBatch(ctx.BatchId).Where(h => h.Field != null).Select(h => new FieldChanged(h.Field, h.Label,
 			Describe.History(h.Field, h.OldValue, r), Describe.History(h.Field, h.NewValue, r))).ToList();
@@ -104,6 +108,10 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 		catch (ArgumentException)
 		{
 			throw Locked(store.GetStatus(id).Value);
+		}
+		catch (AssessmentCheckedOutException ex)
+		{
+			throw CheckedOut(ex);
 		}
 		catch (InvalidOperationException ex)
 		{
@@ -150,7 +158,10 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 		return resolved;
 	}
 
-	/// <summary>The assessment's status; a tool error when it is Final or Letter sent.</summary>
+	/// <summary>
+	/// The assessment's status; a tool error when it is Final or Letter sent, or checked out to another Mac in a work
+	/// package (checked before the backup, so a refusal takes none).
+	/// </summary>
 	private static AssessmentStatusRecord RefuseLocked(SdeStore store, Guid id)
 	{
 		AssessmentStatusRecord status = store.GetStatus(id);
@@ -158,8 +169,14 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 		{
 			throw Locked(status.Value);
 		}
+		if (store.GetCheckOut(id) is CheckOutRecord checkOut)
+		{
+			throw CheckedOut(new AssessmentCheckedOutException(id, checkOut));
+		}
 		return status;
 	}
+
+	private static McpException CheckedOut(AssessmentCheckedOutException ex) => new McpException(ex.Message + " Nothing was changed.");
 
 	private static McpException Locked(AssessmentStatus status) => new McpException(
 		$"This assessment is {AssessmentStatuses.Label(status)}, so SDE won't let an AI assistant change it, and nothing was changed. Only a person can reopen it, in SDE (Status, then Reopen, with a reason).");

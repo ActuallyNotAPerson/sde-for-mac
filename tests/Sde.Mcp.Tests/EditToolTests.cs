@@ -168,6 +168,22 @@ public sealed class EditToolTests
 	}
 
 	[Fact]
+	public async Task An_assessment_checked_out_to_another_mac_is_refused_without_a_backup()
+	{
+		await using McpSession s = await McpSession.StartAsync(allowEdits: true);
+		AssessmentFile ranch = SampleCases.RanchFlood(s.Store);
+		string id = ranch.Id().ToString();
+		WorkPackages.CheckOut(s.Store, new[] { ranch.Id() }, Path.Combine(Path.GetDirectoryName(s.Store.Database.FilePath), "out" + WorkPackages.Extension), "Team 1");
+
+		string refused = await s.CallErrorAsync("update_fields", Changes(id, ("Assessment.InspectorName", "B")));
+		Assert.Contains("checked out to Team 1", refused);
+		Assert.Contains("Nothing was changed", refused);
+		Assert.Contains("checked out to Team 1", await s.CallErrorAsync("set_status", new { assessmentId = id, status = "Reviewed" }));
+		Assert.Equal("Inspector A", s.Store.LoadAssessment(ranch.Id()).Assessment.InspectorName);
+		Assert.Equal(0, BackupsBeforeAiEdits(s.Store));
+	}
+
+	[Fact]
 	public async Task Set_status_allows_draft_reviewed_and_appeal_only()
 	{
 		await using McpSession s = await McpSession.StartAsync(allowEdits: true);
