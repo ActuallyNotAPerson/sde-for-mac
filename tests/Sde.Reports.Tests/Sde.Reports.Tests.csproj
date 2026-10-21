@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     <!-- SkiaSharp's own package carries only the macOS and Windows natives; this lets the tests run on Linux CI too. -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
   </ItemGroup>
