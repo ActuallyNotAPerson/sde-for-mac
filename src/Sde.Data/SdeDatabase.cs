@@ -45,18 +45,27 @@ public sealed class SdeDatabase
 
 	static SdeDatabase() => SqliteTypeHandlers.Register();
 
-	private SdeDatabase(string path)
+	private SdeDatabase(string path, bool readOnly = false)
 	{
 		FilePath = Path.GetFullPath(path);
-		_connectionString = new SqliteConnectionStringBuilder
+		IsReadOnly = readOnly;
+		SqliteConnectionStringBuilder builder = new SqliteConnectionStringBuilder
 		{
 			DataSource = FilePath,
 			ForeignKeys = true,
 			Pooling = false,
-		}.ToString();
+		};
+		if (readOnly)
+		{
+			builder.Mode = SqliteOpenMode.ReadOnly;
+		}
+		_connectionString = builder.ToString();
 	}
 
 	public string FilePath { get; }
+
+	/// <summary>True when every connection is opened read-only (see <see cref="OpenReadOnly"/>): any write fails.</summary>
+	public bool IsReadOnly { get; }
 
 	/// <summary>Photos and other attachments, next to the database file (FEMA used "&lt;db parent&gt;/attachments").</summary>
 	public string AttachmentsFolder => Path.Combine(Path.GetDirectoryName(FilePath)!, "attachments");
@@ -110,6 +119,19 @@ public sealed class SdeDatabase
 		}
 		EnsureSchema(c);
 		return db;
+	}
+
+	/// <summary>
+	/// Opens an existing, up-to-date database for reading only (the AI assistant server's read tools). Its tables are
+	/// never updated: check <see cref="NeedsUpgrade"/> first.
+	/// </summary>
+	public static SdeDatabase OpenReadOnly(string path)
+	{
+		if (!File.Exists(path))
+		{
+			throw new FileNotFoundException("SDE database not found", path);
+		}
+		return new SdeDatabase(path, readOnly: true);
 	}
 
 	/// <summary>
@@ -196,7 +218,7 @@ public sealed class SdeDatabase
 		SqliteConnection c = new SqliteConnection(_connectionString);
 		c.Open();
 		Interlocked.Increment(ref _connections);
-		c.Execute("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;");
+		c.Execute(IsReadOnly ? "PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;" : "PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;");
 		return c;
 	}
 

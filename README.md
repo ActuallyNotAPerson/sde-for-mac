@@ -177,6 +177,7 @@ unedited as the tests' answer key. Those folders are ignored by git and must nev
 | `src/Sde.Reports` | PDF reports, the submission folder, letters, event summary, SI determination |
 | `src/Sde.Interop` | Excel, KMZ, GIS, imports, online look-ups, photo metadata |
 | `src/Sde.Field` | The phone form's local web server |
+| `src/Sde.Mcp` | The server for AI assistants (`SDE mcp`, see [MCP.md](docs/MCP.md)) |
 | `src/Sde.Cli` | The `sde` command-line tool |
 | `tests/` | Tests and synthetic fixtures |
 | `tools/` | The answer-key setup, packaging, fixture generators |

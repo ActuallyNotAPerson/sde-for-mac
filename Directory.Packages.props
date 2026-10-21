@@ -37,6 +37,13 @@
     <PackageVersion Include="QRCoder" Version="1.6.0" />
     <!-- Pinned where it comes in indirectly (through PDFsharp): 8.0.1 has known vulnerabilities (fixed in 8.0.2). -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
+    <!--
+      Track B, the AI assistant server (SDE mcp): the MCP SDK and the .NET generic host it runs in. The
+      Microsoft.Extensions.* versions match the ASP.NET Core shared framework the phone form runs on (10.0.13), so the
+      app ships one copy of each.
+    -->
+    <PackageVersion Include="ModelContextProtocol" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
