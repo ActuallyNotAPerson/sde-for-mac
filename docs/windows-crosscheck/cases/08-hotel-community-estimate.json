@@ -1,0 +1,10 @@
+{
+  "Property": { "OwnerFirstName": "Riverfront", "OwnerLastName": "Hospitality Inc.", "StreetNumber": "1", "StreetName": "Riverfront", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43702", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 2, "StoryTypeID": 103, "StructureUseID": 123, "SprinklerSystem": 99, "Conveyance": 2, "StructureQualityID": 54,
+    "YearOfConstruction": 2001, "SquareFootage": 86500 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "BaseCost": 248.75, "GeographicAdjustment": 1.02,
+    "CommunityEstimate": 3250000, "CostOfRepairsID": 395, "ValueOfBuildingID": 390 },
+  "DepreciationRating": 387,
+  "ElementDamage": { "Interiors": 30, "Electrical": 25, "HVAC": 40, "Plumbing": 10 }
+}

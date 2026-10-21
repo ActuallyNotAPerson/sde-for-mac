@@ -1,0 +1,231 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Typography -->
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="24" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="17" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.h3">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.secondary">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+  <Style Selector="TextBlock.eyebrow">
+    <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="0.6" />
+  </Style>
+  <Style Selector="TextBlock.money">
+    <Setter Property="FontFeatures" Value="+tnum" />
+    <Setter Property="TextAlignment" Value="Right" />
+  </Style>
+
+  <!-- Cards -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{DynamicResource CardBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="20,16" />
+  </Style>
+  <Style Selector="Border.subtle">
+    <Setter Property="Background" Value="{DynamicResource SubtleBg}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="12,10" />
+  </Style>
+
+  <!-- Form fields -->
+  <Style Selector="StackPanel.field">
+    <Setter Property="Width" Value="240" />
+    <Setter Property="Spacing" Value="4" />
+    <Setter Property="Margin" Value="0,0,16,14" />
+  </Style>
+  <Style Selector="StackPanel.field.wide">
+    <Setter Property="Width" Value="496" />
+  </Style>
+  <Style Selector="TextBlock.fieldLabel">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector="TextBox.multiline">
+    <Setter Property="MinHeight" Value="64" />
+  </Style>
+  <Style Selector="TextBlock.help">
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.issue">
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.issue.required">
+    <Setter Property="Foreground" Value="{DynamicResource RequiredFg}" />
+  </Style>
+  <Style Selector="TextBlock.issue.recommended">
+    <Setter Property="Foreground" Value="{DynamicResource RecommendedFg}" />
+  </Style>
+  <Style Selector="TextBlock.issue.suggested">
+    <Setter Property="Foreground" Value="{DynamicResource SuggestedFg}" />
+  </Style>
+  <Style Selector="TextBlock.adorn">
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+  </Style>
+  <Style Selector="NumericUpDown.number /template/ TextBox">
+    <Setter Property="TextAlignment" Value="Right" />
+  </Style>
+
+  <!-- Buttons -->
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{DynamicResource Accent}" />
+    <Setter Property="Foreground" Value="{DynamicResource OnAccent}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="14,7" />
+    <Setter Property="CornerRadius" Value="7" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Accent}" />
+    <Setter Property="Foreground" Value="{DynamicResource OnAccent}" />
+    <Setter Property="Opacity" Value="0.9" />
+  </Style>
+  <Style Selector="Button.subtle">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="CornerRadius" Value="7" />
+  </Style>
+  <Style Selector="Button.link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.link:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+  </Style>
+  <!-- The small round "?" beside a field's label. -->
+  <Style Selector="Button.help">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="MinHeight" Value="20" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.chip">
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="MinWidth" Value="38" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+  </Style>
+  <!-- The report-photo star: a toggle that looks like a link; on means "this photo is on the reports". -->
+  <Style Selector="ToggleButton.star">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="ToggleButton.star:checked /template/ ContentPresenter, ToggleButton.star:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+  </Style>
+
+  <Style Selector="Button.danger">
+    <Setter Property="Foreground" Value="{DynamicResource RequiredFg}" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <!-- Sidebar navigation -->
+  <Style Selector="Button.nav">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="Button.nav.active">
+    <Setter Property="Background" Value="{DynamicResource CardBg}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Summary tiles on the Structures page: coloured border when their filter is on -->
+  <Style Selector="Border.tile.active">
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Border.tile.substantial.active">
+    <Setter Property="BorderBrush" Value="{DynamicResource StatusSubstantialFg}" />
+  </Style>
+  <Style Selector="Border.tile.close.active">
+    <Setter Property="BorderBrush" Value="{DynamicResource StatusCloseFg}" />
+  </Style>
+  <Style Selector="Border.tile.below.active">
+    <Setter Property="BorderBrush" Value="{DynamicResource StatusNotSubstantialFg}" />
+  </Style>
+  <Style Selector="Border.tile.incomplete.active">
+    <Setter Property="BorderBrush" Value="{DynamicResource StatusIncompleteFg}" />
+  </Style>
+
+  <!-- Status pills -->
+  <Style Selector="Border.pill">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <!-- Lists -->
+  <Style Selector="ListBox.rows">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBox.rows ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+  <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SelectedRow}" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem">
+    <Setter Property="Padding" Value="10,8" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="CornerRadius" Value="8" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource CardBg}" />
+  </Style>
+  <Style Selector="ListBox.steps">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <!-- Accessibility: macOS exposes the text box inside a NumericUpDown / CalendarDatePicker, not the control itself,
+       so it gets the control's name (AutomationProperties.Name is set on the control in the templates). -->
+  <Style Selector="NumericUpDown /template/ TextBox">
+    <Setter Property="AutomationProperties.Name" Value="{Binding $parent[NumericUpDown].(AutomationProperties.Name)}" />
+  </Style>
+  <Style Selector="CalendarDatePicker /template/ TextBox">
+    <Setter Property="AutomationProperties.Name" Value="{Binding $parent[CalendarDatePicker].(AutomationProperties.Name)}" />
+  </Style>
+</Styles>

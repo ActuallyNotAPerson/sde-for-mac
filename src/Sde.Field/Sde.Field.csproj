@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The phone form: a small web server (Kestrel, part of the shared ASP.NET Core framework) that the Mac app runs on
+    the local network so an inspector can fill in fields and add photos from a phone. No Avalonia here: the app hands
+    it an IFieldWriter and an IPhotoConverter. The web page (wwwroot) is plain HTML, CSS and JavaScript, embedded.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Field</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot/*" LogicalName="Sde.Field.wwwroot.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Core/Sde.Core.csproj" />
+    <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Field.Tests" />
+  </ItemGroup>
+
+</Project>

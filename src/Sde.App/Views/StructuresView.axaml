@@ -1,0 +1,338 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:app="using:Sde.App"
+             x:Class="Sde.App.Views.StructuresView"
+             x:DataType="vm:StructuresViewModel">
+
+  <DockPanel Margin="28,22,28,18">
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="h1" Text="Structures" />
+        <TextBlock Classes="secondary" Text="Every structure you've assessed, with its latest result." />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <Button Classes="primary" Content="New residential" Command="{Binding NewStructureCommand}" CommandParameter="1" />
+        <Button Content="New non-residential" Command="{Binding NewStructureCommand}" CommandParameter="2" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Summary tiles: click to filter -->
+    <UniformGrid DockPanel.Dock="Top" Columns="4" Margin="-6,0,-6,14">
+      <Button Margin="6" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="Transparent"
+              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:StructureFilter.Substantial}"
+              AutomationProperties.Name="{Binding SubstantialCount, StringFormat='Show substantially damaged: {0}'}">
+        <Border Classes="card tile substantial" Padding="16,12"
+                Classes.active="{Binding Filter, Converter={x:Static app:Converters.FilterIs}, ConverterParameter=Substantial}">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding SubstantialCount}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource StatusSubstantialFg}" />
+            <TextBlock Text="Substantially damaged" FontWeight="Medium" />
+            <TextBlock Classes="muted" Text="50% or more" />
+          </StackPanel>
+        </Border>
+      </Button>
+      <Button Margin="6" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="Transparent"
+              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:StructureFilter.Close}"
+              AutomationProperties.Name="{Binding CloseCount, StringFormat='Show close to the threshold: {0}'}">
+        <Border Classes="card tile close" Padding="16,12"
+                Classes.active="{Binding Filter, Converter={x:Static app:Converters.FilterIs}, ConverterParameter=Close}">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding CloseCount}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource StatusCloseFg}" />
+            <TextBlock Text="Close to the threshold" FontWeight="Medium" />
+            <TextBlock Classes="muted" Text="40% to 50%" />
+          </StackPanel>
+        </Border>
+      </Button>
+      <Button Margin="6" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="Transparent"
+              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:StructureFilter.Below}"
+              AutomationProperties.Name="{Binding BelowCount, StringFormat='Show not substantially damaged: {0}'}">
+        <Border Classes="card tile below" Padding="16,12"
+                Classes.active="{Binding Filter, Converter={x:Static app:Converters.FilterIs}, ConverterParameter=Below}">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding BelowCount}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource StatusNotSubstantialFg}" />
+            <TextBlock Text="Not substantially damaged" FontWeight="Medium" />
+            <TextBlock Classes="muted" Text="Under 40%" />
+          </StackPanel>
+        </Border>
+      </Button>
+      <Button Margin="6" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="Transparent"
+              Command="{Binding SetFilterCommand}" CommandParameter="{x:Static vm:StructureFilter.Incomplete}"
+              AutomationProperties.Name="{Binding IncompleteCount, StringFormat='Show incomplete or undetermined: {0}'}">
+        <Border Classes="card tile incomplete" Padding="16,12"
+                Classes.active="{Binding Filter, Converter={x:Static app:Converters.FilterIs}, ConverterParameter=Incomplete}">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding IncompleteCount}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource StatusIncompleteFg}" />
+            <TextBlock Text="Incomplete or undetermined" FontWeight="Medium" />
+            <TextBlock Classes="muted" Text="Still needs data" />
+          </StackPanel>
+        </Border>
+      </Button>
+    </UniformGrid>
+
+    <!-- Toolbar -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+      <WrapPanel Orientation="Horizontal">
+        <CheckBox IsChecked="{Binding AllChecked}" Margin="6,0,8,6" VerticalAlignment="Center" AutomationProperties.Name="Check or uncheck all shown" ToolTip.Tip="Check or uncheck all shown" />
+        <TextBox Name="SearchBox" Width="300" Margin="0,0,10,6" PlaceholderText="Search address, owner, parcel, record…" Text="{Binding Search}" AutomationProperties.Name="Search structures" />
+        <ComboBox SelectedIndex="{Binding TypeFilter}" Width="160" Margin="0,0,10,6" AutomationProperties.Name="Structure type filter">
+          <ComboBoxItem Content="All types" />
+          <ComboBoxItem Content="Residential" />
+          <ComboBoxItem Content="Non-residential" />
+        </ComboBox>
+        <ComboBox SelectedIndex="{Binding SourceFilter}" Width="160" Margin="0,0,10,6" IsVisible="{Binding HasImported}" AutomationProperties.Name="Source filter">
+          <ComboBoxItem Content="All sources" />
+          <ComboBoxItem Content="Imported" />
+          <ComboBoxItem Content="Entered in SDE" />
+        </ComboBox>
+        <Button Content="{Binding FiltersButtonText}" Margin="0,0,10,6" AutomationProperties.Name="More filters">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft">
+              <StackPanel Spacing="10" Width="420" Margin="4">
+                <TextBlock Classes="h3" Text="Show only structures…" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+                  <TextBlock Classes="fieldLabel" Text="Inspected from" />
+                  <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Inspected to" />
+                  <CalendarDatePicker Grid.Row="1" SelectedDate="{Binding InspectedFrom}" HorizontalAlignment="Stretch" AutomationProperties.Name="Inspected from" />
+                  <CalendarDatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding InspectedTo}" HorizontalAlignment="Stretch" AutomationProperties.Name="Inspected to" />
+                </Grid>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+                  <TextBlock Classes="fieldLabel" Text="Damaged at least (%)" />
+                  <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Damaged at most (%)" />
+                  <NumericUpDown Grid.Row="1" Value="{Binding MinPercent}" Minimum="0" Maximum="100" Increment="5" FormatString="0.#" AutomationProperties.Name="Damaged at least, percent" />
+                  <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding MaxPercent}" Minimum="0" Maximum="100" Increment="5" FormatString="0.#" AutomationProperties.Name="Damaged at most, percent" />
+                </Grid>
+                <Grid ColumnDefinitions="2*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+                  <TextBlock Classes="fieldLabel" Text="Street" />
+                  <TextBlock Grid.Column="1" Classes="fieldLabel" Text="ZIP code" />
+                  <TextBox Grid.Row="1" Text="{Binding StreetFilter}" AutomationProperties.Name="Street name filter" />
+                  <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ZipFilter}" AutomationProperties.Name="ZIP code filter" />
+                </Grid>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+                  <TextBlock Classes="fieldLabel" Text="Parcel number" />
+                  <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Status" />
+                  <TextBox Grid.Row="1" Text="{Binding ParcelFilter}" AutomationProperties.Name="Parcel number filter" />
+                  <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{x:Static vm:StructuresViewModel.StatusChoices}" SelectedIndex="{Binding StatusFilter}" HorizontalAlignment="Stretch" AutomationProperties.Name="Status filter" />
+                </Grid>
+                <Button Classes="link" Content="Clear these filters" Command="{Binding ClearFiltersCommand}" />
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+        <Button Content="Views ▾" Margin="0,0,10,6" AutomationProperties.Name="Saved views">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft">
+              <StackPanel Spacing="4" MinWidth="260">
+                <TextBlock Classes="muted" Text="No saved views yet." IsVisible="{Binding !HasSavedViews}" Margin="4" />
+                <ItemsControl ItemsSource="{Binding SavedViews}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                      <DockPanel>
+                        <Button DockPanel.Dock="Right" Classes="subtle" Content="×" ToolTip.Tip="Delete this view"
+                                Command="{Binding $parent[UserControl].((vm:StructuresViewModel)DataContext).DeleteViewCommand}" CommandParameter="{Binding}"
+                                AutomationProperties.Name="{Binding StringFormat='Delete view {0}'}" />
+                        <Button Classes="subtle" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding}"
+                                Command="{Binding $parent[UserControl].((vm:StructuresViewModel)DataContext).ApplyViewCommand}" CommandParameter="{Binding}" />
+                      </DockPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Separator />
+                <Button Classes="subtle" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Save this view…" Command="{Binding SaveViewCommand}" />
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+        <Button Content="Columns ▾" Margin="0,0,10,6" AutomationProperties.Name="Choose columns">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft">
+              <ItemsControl ItemsSource="{Binding Columns}" MinWidth="200">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ColumnChoice">
+                    <CheckBox Content="{Binding Header}" IsChecked="{Binding IsVisible}" Margin="2" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+        <Button Classes="chip" IsVisible="{Binding HasOnly}" Command="{Binding ClearOnlyCommand}" VerticalAlignment="Top" Margin="0,0,10,6"
+                ToolTip.Tip="Show every structure again" AutomationProperties.Name="{Binding OnlyLabel, StringFormat='Showing {0}. Show all structures'}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding OnlyLabel}" VerticalAlignment="Center" />
+            <TextBlock Text="×" FontWeight="SemiBold" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </WrapPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+        <TextBlock VerticalAlignment="Center" Classes="secondary" FontSize="12"
+                   Text="{Binding CheckedCount, StringFormat='{}{0} checked'}" IsVisible="{Binding CheckedCount, Converter={x:Static app:Converters.IsPositive}}" />
+        <Button Content="Change ▾" ToolTip.Tip="The checked structures, or the whole list when none are checked">
+          <Button.Flyout>
+            <MenuFlyout>
+              <MenuItem Header="Set a field on these…" Command="{Binding BulkEditCommand}" />
+              <MenuItem Header="Search and replace…" Command="{Binding SearchReplaceCommand}" />
+              <Separator />
+              <MenuItem Header="Look up flood data online…" Command="{Binding LookUpFloodDataCommand}" ToolTip.Tip="Coordinates (Census geocoder) and flood zone (FEMA NFHL) for the checked structures, for you to review" />
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+        <Button Content="Reports ▾">
+          <Button.Flyout>
+            <MenuFlyout>
+              <MenuItem Header="Summary report" Command="{Binding PrintCommand}" CommandParameter="Summary" />
+              <MenuItem Header="Summary report (no photos)" Command="{Binding PrintCommand}" CommandParameter="Summary-NoPhotos" />
+              <MenuItem Header="Detailed report" Command="{Binding PrintCommand}" CommandParameter="Detail" />
+              <MenuItem Header="Detailed report (no photos)" Command="{Binding PrintCommand}" CommandParameter="Detail-NoPhotos" />
+              <Separator />
+              <MenuItem Header="Structure &amp; percent damaged list" Command="{Binding PrintCommand}" CommandParameter="PercentDamaged" />
+              <MenuItem Header="Community report" Command="{Binding PrintCommand}" CommandParameter="Community" />
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+        <Button Content="Export ▾" ToolTip.Tip="The checked structures, or the whole list when none are checked">
+          <Button.Flyout>
+            <MenuFlyout>
+              <MenuItem Header="To FEMA SDE (export folder)…" Command="{Binding ExportCheckedCommand}" />
+              <MenuItem Header="To Excel…" Command="{Binding ExportCheckedToExcelCommand}" />
+              <Separator />
+              <MenuItem Header="Submission folder (reports + FEMA package)…" Command="{Binding OpenSubmissionCommand}" />
+              <Separator />
+              <MenuItem Header="Owner letters…" Command="{Binding OwnerLettersCommand}" />
+            </MenuFlyout>
+          </Button.Flyout>
+        </Button>
+      </StackPanel>
+    </Grid>
+    <TextBlock DockPanel.Dock="Top" Classes="muted" Text="{Binding SortText}" Margin="2,0,0,8" />
+
+    <!-- Submission folder (Export ▾) -->
+    <Border DockPanel.Dock="Top" Classes="card" Margin="0,0,0,10" IsVisible="{Binding Submission.IsOpen}">
+      <StackPanel Spacing="10">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="h3" Text="Submission folder" />
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="One folder with a PDF report for each assessment, the percent damaged list and community report, the FEMA SDE package (SDE_1) for FEMA or your state, and results.csv for entering the determinations back into the system the inspections came from." />
+        </StackPanel>
+        <TextBlock Text="{Binding Submission.Count}" FontWeight="SemiBold" />
+        <StackPanel Orientation="Horizontal" Spacing="16" IsEnabled="{Binding !Submission.IsWriting}">
+          <TextBlock Text="Report for each" VerticalAlignment="Center" />
+          <ComboBox SelectedIndex="{Binding Submission.ReportIndex}" Width="210" AutomationProperties.Name="Report for each assessment">
+            <ComboBoxItem Content="Summary (one page)" />
+            <ComboBoxItem Content="Detailed report" />
+          </ComboBox>
+          <CheckBox Content="With photos" IsChecked="{Binding Submission.IncludePhotos}" />
+          <CheckBox Content="Include incomplete assessments" IsChecked="{Binding Submission.IncludeIncomplete}" />
+        </StackPanel>
+        <StackPanel Spacing="4" IsVisible="{Binding Submission.ProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <ProgressBar Value="{Binding Submission.ProgressValue}" Maximum="100" Height="6" IsVisible="{Binding Submission.IsWriting}" AutomationProperties.Name="Progress" />
+          <TextBlock Classes="muted" Text="{Binding Submission.ProgressText}" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="primary" Content="Choose a folder and write…" Command="{Binding Submission.WriteCommand}" IsEnabled="{Binding Submission.CanWrite}" />
+          <Button Content="{Binding Submission.CancelText}" Command="{Binding Submission.CancelCommand}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <!-- List -->
+    <Border Classes="card" Padding="0">
+      <Grid>
+        <DataGrid Name="Grid" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}" IsVisible="{Binding HasRows}"
+                  IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="False" CanUserResizeColumns="True" SelectionMode="Single"
+                  GridLinesVisibility="None" HeadersVisibility="Column" Background="Transparent" BorderThickness="0" FontSize="13"
+                  AutomationProperties.Name="Structures" Sorting="OnSorting" DoubleTapped="OnRowDoubleTapped" KeyDown="OnListKeyDown">
+          <DataGrid.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Open" Command="{Binding OpenCommand}" CommandParameter="{Binding Selected}" />
+              <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" CommandParameter="{Binding Selected}" />
+              <MenuItem Header="Set a field on the checked structures…" Command="{Binding BulkEditCommand}" />
+              <Separator />
+              <MenuItem Header="Move to Recently Deleted" Command="{Binding TrashCommand}" CommandParameter="{Binding Selected}" />
+            </ContextMenu>
+          </DataGrid.ContextMenu>
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Width="44" CanUserSort="False" CanUserResize="False">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <CheckBox IsChecked="{Binding IsChecked}" HorizontalAlignment="Center" AutomationProperties.Name="{Binding Address, StringFormat='Include {0}'}" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Structure" SortMemberPath="Address" Width="2.4*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <StackPanel VerticalAlignment="Center" Margin="4,8">
+                    <TextBlock Text="{Binding Address}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" IsVisible="{Binding Detail, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Community" SortMemberPath="Community" Width="1.6*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <StackPanel VerticalAlignment="Center" Margin="4,0">
+                    <TextBlock Classes="secondary" Text="{Binding Place}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted" Text="{Binding CommunityId}" IsVisible="{Binding CommunityId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="Type" SortMemberPath="Type" Binding="{Binding Type}" Width="1.1*" MinWidth="124" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTemplateColumn Header="Inspected" SortMemberPath="Inspected" Width="1*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <StackPanel VerticalAlignment="Center" Margin="4,0">
+                    <TextBlock Classes="secondary" Text="{Binding Inspected}" />
+                    <TextBlock Classes="muted" Text="{Binding Inspector}" TextTrimming="CharacterEllipsis" IsVisible="{Binding Inspector, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="Status" SortMemberPath="Status" Binding="{Binding Status}" Width="0.9*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="ZIP" SortMemberPath="Zip" Binding="{Binding Zip}" Width="0.7*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="Parcel" SortMemberPath="Parcel" Binding="{Binding Parcel}" Width="1*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="FIRM zone" SortMemberPath="FirmZone" Binding="{Binding FirmZone}" Width="0.8*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="Source record" SortMemberPath="Source" Binding="{Binding Source}" Width="1.2*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTextColumn FontSize="13" Foreground="{DynamicResource TextSecondary}" Header="Last changed" SortMemberPath="Updated" Binding="{Binding Updated}" Width="1*" x:DataType="vm:StructureRowViewModel" />
+            <DataGridTemplateColumn Header="Damaged" SortMemberPath="Damaged" Width="118">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <TextBlock Text="{Binding PercentText}" HorizontalAlignment="Right" FontSize="15" FontWeight="SemiBold" Classes="money" VerticalAlignment="Center" Margin="4,0,12,0"
+                             Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Result" SortMemberPath="Result" Width="1.6*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:StructureRowViewModel">
+                  <Border Classes="pill" Margin="4,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                          Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}">
+                    <TextBlock Text="{Binding Result}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis"
+                               Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Empty states -->
+        <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="460">
+          <TextBlock Classes="h2" Text="No structures yet" HorizontalAlignment="Center" />
+          <TextBlock Classes="secondary" TextWrapping="Wrap" TextAlignment="Center"
+                     Text="Start a new residential or non-residential assessment, or bring in data from FEMA's SDE on the Import &amp; export page." />
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,6,0,0">
+            <Button Classes="primary" Content="New residential" Command="{Binding NewStructureCommand}" CommandParameter="1" />
+            <Button Content="New non-residential" Command="{Binding NewStructureCommand}" CommandParameter="2" />
+          </StackPanel>
+        </StackPanel>
+        <StackPanel IsVisible="{Binding NoMatches}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+          <TextBlock Classes="h3" Text="Nothing matches" HorizontalAlignment="Center" />
+          <TextBlock Classes="secondary" Text="Try a different search or clear the filters." HorizontalAlignment="Center" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </DockPanel>
+</UserControl>

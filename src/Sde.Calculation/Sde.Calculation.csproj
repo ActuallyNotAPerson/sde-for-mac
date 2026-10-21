@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Faithful macOS port of FEMA SDE 3.0's CalculationEngine.dll.
+    Arithmetic is copied verbatim from decomp/CalculationEngine; only data loading changed
+    (embedded compact tables instead of JSON\\*.json next to the .exe). See docs/PORTING-NOTES.md.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Calculation</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data/residential.tsv.gz" LogicalName="Sde.Calculation.residential.tsv.gz" />
+    <EmbeddedResource Include="Data/commercial.tsv.gz" LogicalName="Sde.Calculation.commercial.tsv.gz" />
+    <EmbeddedResource Include="Data/lookup.json" LogicalName="Sde.Calculation.lookup.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+</Project>

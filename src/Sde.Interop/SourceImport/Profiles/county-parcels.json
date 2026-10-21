@@ -1,0 +1,41 @@
+{
+  "Name": "County parcels",
+  "SourceName": "County parcels",
+  "Mode": "Structures",
+  "MatchBy": "Parcel",
+  "ParcelIgnoreLeadingZeros": false,
+  "AddressMatchUnit": false,
+  "ValueIsBuildingOnly": false,
+  "Layout": "OneRowPerInspection",
+  "RecordIdColumn": "Parcel ID",
+  "FilterValues": [],
+  "FirstNameParsing": "LastCommaFirst",
+  "LastNameParsing": "LastCommaFirst",
+  "StreetNumberParsing": "None",
+  "StreetNameParsing": "NumberNameSuffix",
+  "SuffixParsing": "None",
+  "UseDefaultValues": true,
+  "RecordIdCustomField": 0,
+  "Fields": {
+    "StreetName": { "Column": "Site Address", "Translate": {} },
+    "City": { "Column": "Site City", "Translate": {} },
+    "Zip": { "Column": "Site ZIP", "Translate": {} },
+    "OwnerFirstName": { "Column": "Owner Name", "Translate": {} },
+    "OwnerLastName": { "Column": "Owner Name", "Translate": {} },
+    "ParcelNumber": { "Column": "Parcel ID", "Translate": {} },
+    "StructureType": {
+      "Column": "Property Class",
+      "Translate": {
+        "Single Family": "Residential",
+        "Two Family": "Residential",
+        "Condominium": "Residential",
+        "Mobile Home": "Residential",
+        "Commercial": "Non-Residential",
+        "Industrial": "Non-Residential"
+      }
+    },
+    "Stories": { "Column": "Stories", "Translate": {} },
+    "YearOfConstruction": { "Column": "Year Built", "Translate": {} },
+    "TotalSquareFootage": { "Column": "Living Area", "Translate": {} }
+  }
+}

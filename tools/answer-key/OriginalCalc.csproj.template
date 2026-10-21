@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The ANSWER KEY. Compiles FEMA's decompiled CalculationEngine source *in place*
+    (linked from decomp/, never copied or edited) so tests can compare the Mac port
+    against the original arithmetic. Not shipped in the app.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>CalculationEngine.Original</AssemblyName>
+    <RootNamespace>CalculationEngine</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- NU1903: Newtonsoft 10.0.3 deep-nesting DoS advisory. Test-only project reading FEMA's own JSON; kept for fidelity. -->
+    <NoWarn>$(NoWarn);CS8632;CS0168;NU1903</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../decomp/CalculationEngine/CalculationEngine/**/*.cs" LinkBase="Original" />
+    <Compile Include="../../decomp/CalculationEngine/CalculationEngine.Models/**/*.cs" LinkBase="Original/Models" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Same major version FEMA shipped (Newtonsoft.Json 10.0.3). -->
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+</Project>

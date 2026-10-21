@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    PDF versions of FEMA SDE's 12 RDLC reports (Microsoft ReportViewer is Windows-only). MigraDoc/PDFsharp, MIT.
+    Fonts/: Public Sans (USWDS), SIL Open Font License 1.1 (see Fonts/OFL.txt), embedded so no system fonts are needed.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Reports</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
+    <!-- Upright, print-sized photos (Internal/PhotoPrep.cs). MIT; the same version Avalonia 12 uses. -->
+    <PackageReference Include="SkiaSharp" Version="3.119.4" />
+    <!-- Owner letters (Letters/): reads and writes .docx. MIT. -->
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts/*.ttf" LogicalName="Sde.Reports.Fonts.%(Filename)%(Extension)" />
+    <None Include="Fonts/OFL.txt;Fonts/LICENSE-PublicSans.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Reports.Tests" />
+  </ItemGroup>
+
+</Project>

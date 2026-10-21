@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>SDE phone form</title>
+<link rel="stylesheet" href="/app.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <h1 id="title">SDE phone form</h1>
+  <p class="who" id="who" hidden></p>
+</header>
+
+<p class="notice" role="note">This connection is not encrypted. Use it only on a network you trust.</p>
+
+<div id="message" class="message" role="alert" aria-live="assertive" hidden></div>
+
+<main>
+  <!-- Pairing -->
+  <section id="pair" hidden aria-labelledby="pair-heading">
+    <h2 id="pair-heading">Pair this phone</h2>
+    <p id="pair-help">Type the 6-digit PIN shown on the Mac (Settings, Phone form), or scan its QR code with the camera.</p>
+    <form id="pair-form" novalidate>
+      <label for="pair-name">Your name</label>
+      <input id="pair-name" name="name" type="text" autocomplete="name" maxlength="40" required>
+      <p class="hint">Edit history on the Mac shows this name next to each change from this phone.</p>
+      <div id="pin-row">
+        <label for="pair-pin">PIN</label>
+        <input id="pair-pin" name="pin" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6">
+      </div>
+      <button type="submit" class="primary">Pair</button>
+    </form>
+  </section>
+
+  <!-- Search and add -->
+  <section id="find" hidden aria-labelledby="find-heading">
+    <h2 id="find-heading">Find a structure</h2>
+    <form id="search-form" role="search">
+      <label for="search">Address, owner, parcel or record ID</label>
+      <div class="row">
+        <input id="search" type="search" autocomplete="off" enterkeyhint="search">
+        <button type="submit">Search</button>
+      </div>
+    </form>
+    <ul id="results" class="results" aria-label="Search results"></ul>
+    <button type="button" id="show-add" class="secondary">Add a structure</button>
+
+    <form id="add-form" hidden aria-labelledby="add-heading" novalidate>
+      <h2 id="add-heading">Add a structure</h2>
+      <fieldset>
+        <legend>Structure type</legend>
+        <label class="choice"><input type="radio" name="type" value="1" checked> Residential</label>
+        <label class="choice"><input type="radio" name="type" value="2"> Non-residential</label>
+      </fieldset>
+      <label for="add-number">Street number</label>
+      <input id="add-number" data-key="Property.StreetNumber" type="text" inputmode="numeric">
+      <label for="add-street">Street name</label>
+      <input id="add-street" data-key="Property.StreetName" type="text" autocomplete="off">
+      <label for="add-city">City</label>
+      <input id="add-city" data-key="Property.City" type="text">
+      <label for="add-zip">ZIP code</label>
+      <input id="add-zip" data-key="Property.ZipCode" type="text" inputmode="numeric" maxlength="10">
+      <label for="add-first">Owner first name</label>
+      <input id="add-first" data-key="Property.OwnerFirstName" type="text">
+      <label for="add-last">Owner last name</label>
+      <input id="add-last" data-key="Property.OwnerLastName" type="text">
+      <label for="add-parcel">Parcel number</label>
+      <input id="add-parcel" data-key="Property.ParcelNumber" type="text">
+      <div class="row">
+        <button type="submit" class="primary">Add and open</button>
+        <button type="button" id="cancel-add" class="secondary">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- One assessment -->
+  <section id="edit" hidden aria-labelledby="edit-heading">
+    <button type="button" id="back" class="secondary">Back to search</button>
+    <h2 id="edit-heading"></h2>
+    <p id="edit-summary" class="summary"></p>
+    <p id="locked" class="locked" hidden></p>
+    <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+
+    <section class="photos" aria-labelledby="photos-heading">
+      <h3 id="photos-heading">Photos</h3>
+      <p id="photo-count"></p>
+      <form id="photo-form" novalidate>
+        <label for="photo">Take or choose a photo</label>
+        <input id="photo" name="photo" type="file" accept="image/*" capture="environment">
+        <label for="photo-description">Description (optional)</label>
+        <input id="photo-description" name="description" type="text" maxlength="200">
+        <button type="submit" class="primary">Add photo</button>
+      </form>
+    </section>
+
+    <div id="steps"></div>
+  </section>
+</main>
+</body>
+</html>

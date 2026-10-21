@@ -1,0 +1,12 @@
+{
+  "displayFieldName": "FLD_ZONE",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 1002, "FLD_ZONE": "AE", "ZONE_SUBTY": "FLOODWAY", "SFHA_TF": "T", "STATIC_BFE": -9999, "V_DATUM": null
+      }
+    }
+  ]
+}

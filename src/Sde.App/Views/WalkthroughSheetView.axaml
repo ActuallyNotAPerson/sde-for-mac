@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.WalkthroughSheetView"
+             x:DataType="sh:WalkthroughSheetViewModel">
+  <StackPanel Spacing="14" Width="560">
+    <StackPanel Spacing="8" MinHeight="150" DataContext="{Binding Current}" x:DataType="sh:WalkthroughPage">
+      <TextBlock Classes="h2" Text="{Binding Heading}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Body}" TextWrapping="Wrap" />
+    </StackPanel>
+    <TextBlock Classes="muted" Text="{Binding PositionText}" />
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Classes="link" Content="Open the sample database" Command="{Binding OpenSampleCommand}" VerticalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Back" Command="{Binding BackCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="{Binding NextText}" Command="{Binding NextCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

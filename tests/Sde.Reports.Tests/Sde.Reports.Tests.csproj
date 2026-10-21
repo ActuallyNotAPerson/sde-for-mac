@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Renders every report to PDF and checks the text with poppler (pdftotext/pdfinfo/pdfimages, from Homebrew). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- xUnit v3: a test project is an executable. -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <!-- SkiaSharp's own package carries only the macOS and Windows natives; this lets the tests run on Linux CI too. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sde.Reports/Sde.Reports.csproj" />
+    <ProjectReference Include="../Sde.TestSupport/Sde.TestSupport.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Synthetic photos (generated, no third-party content). -->
+    <None Include="Assets/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Sde.TestSupport" />
+  </ItemGroup>
+
+</Project>

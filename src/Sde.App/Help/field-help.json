@@ -1,0 +1,397 @@
+{
+	"Property.StreetNumber": {
+		"text": "The house or building number, without the street name, for example 412. Leave it blank if the structure has no posted number and describe where it is in the structure notes. Reports, the map and letters all use the address, so type it the way the county or post office writes it.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.StreetName": {
+		"text": "The street name without the number or suffix, for example Maple. SDE keeps the number, name and suffix in separate boxes because FEMA's files do. Use the name shown on the county's records, not a nickname.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.StreetSuffixID": {
+		"text": "The street type, such as St, Ave, Rd or Ln. Pick from the list so exports match FEMA's choices. Leave it empty for a street with no suffix.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.City": {
+		"text": "The city or town where the structure stands. Use the mailing city that appears on the property record.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.StateID": {
+		"text": "The state or territory where the structure stands. Choosing it filters the county list and, if the coordinate check is on in Settings, lets SDE warn when the latitude and longitude fall outside the state.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.CountyID": {
+		"text": "The county or parish. The list shows only counties in the state you chose, so pick the state first.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.ZipCode": {
+		"text": "The 5 digit ZIP code of the structure. The extra 4 digits are optional.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.OwnerFirstName": {
+		"text": "The owner's first name. Owner details are suggested rather than required, but they are needed to address determination letters.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.OwnerLastName": {
+		"text": "The owner's last name, or the business name if the owner is a company. Use the name on the county's property records.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.PhoneNumber": {
+		"text": "A phone number for the owner. It helps when you need to schedule an inspection or answer questions about the determination.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.CellPhone": {
+		"text": "A cell phone number for the owner, if different from the main number.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingOwnerFirstName": {
+		"text": "First name for the mailing address, when letters about this structure should go to someone other than the person who lives there, or to a different address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingOwnerLastName": {
+		"text": "Last name or business name for the mailing address. Leave the mailing section empty if letters go to the structure's own address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingCareOf": {
+		"text": "An optional \"care of\" line, for example a property manager or an owner's representative. This line is only in the mailing address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingStreetNumber": {
+		"text": "The street number of the mailing address. Use a PO box number here if the owner receives mail at a box.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingStreetName": {
+		"text": "The street name of the mailing address, without the number or suffix.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingStreetSuffixID": {
+		"text": "The street type of the mailing address (St, Ave, Rd and so on).",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingCity": {
+		"text": "The city of the mailing address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingStateID": {
+		"text": "The state of the mailing address. Choose it before the mailing county.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingCountyID": {
+		"text": "The county or parish of the mailing address. The list follows the mailing state.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingZipCode": {
+		"text": "The ZIP code of the mailing address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.MailingPhoneNumber": {
+		"text": "A phone number for the person named in the mailing address.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.ParcelNumber": {
+		"text": "The county's parcel or tax identification number for the lot. It is the most reliable way to match a structure to tax and permit records, so copy it exactly, including dashes, from the county's records.",
+		"page": 142,
+		"label": "9-4"
+	},
+	"Property.LotNumber": {
+		"text": "The lot number from the plat or tax record, if there is one.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.Subdivision": {
+		"text": "The subdivision, neighborhood or community name. It is handy for sorting and for finding all the structures in one flooded area.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.Latitude": {
+		"text": "Latitude in decimal degrees, for example 39.103118. Take it at the structure itself, not the street, to about 4 decimal places or better, so the point belongs to one building. FEMA suggests a GPS unit or phone checked against a known spot. Latitude and longitude put the structure on the map and in GIS files.",
+		"page": 42,
+		"label": "3-16"
+	},
+	"Property.Longitude": {
+		"text": "Longitude in decimal degrees. In the United States it is negative, for example -84.512020. Leave off the degree sign and any letters, and check that the point lands on the map where you expect.",
+		"page": 42,
+		"label": "3-16"
+	},
+	"Property.StructureTypeID": {
+		"text": "Residential or non-residential. Houses, duplexes, town houses and manufactured homes are residential, even if a small business operates inside. Apartment buildings, condominiums with units above and below each other, and commercial buildings are non-residential. Changing it later changes which building details are asked for.",
+		"page": 49,
+		"label": "3-23"
+	},
+	"Property.StoryTypeID": {
+		"text": "How many stories the building has. SDE has no half-story choice. For a one and a half story building choose the two or more stories option, then enter the lower floor's size in the square foot calculator with 1.5 stories.",
+		"page": 57,
+		"label": "3-31"
+	},
+	"Property.ResidenceTypeID": {
+		"text": "The kind of home, such as single family, manufactured house or town house. This choice decides which foundation, superstructure, roof and other choices are offered, and which cost breakdown SDE uses.",
+		"page": 153,
+		"label": "10-1"
+	},
+	"Property.FoundationTypeID": {
+		"text": "What the building rests on, such as slab, crawl space, basement or piers. Foundation type changes how much of the building's cost is in the foundation, so it affects the result. Pick what you see or what the records say.",
+		"page": 155,
+		"label": "10-3"
+	},
+	"Property.SuperStructureTypeID": {
+		"text": "The main structural frame and walls, such as wood frame or masonry. Pick the system that carries the roof, not the siding.",
+		"page": 156,
+		"label": "10-4"
+	},
+	"Property.RoofCoveringTypeID": {
+		"text": "The roof material, such as shingles, tile or metal. This is the covering only, not the rafters or trusses.",
+		"page": 160,
+		"label": "10-8"
+	},
+	"Property.ExteriorFinishTypeID": {
+		"text": "What covers the outside walls, such as siding, brick or stucco. Choose the main material if there is more than one.",
+		"page": 161,
+		"label": "10-9"
+	},
+	"Property.HVACTypeID": {
+		"text": "The heating and cooling system, such as forced air or a heat pump. Choose what was installed before the damage.",
+		"page": 163,
+		"label": "10-11"
+	},
+	"Property.StructureUseID": {
+		"text": "What the building is used for, such as office, retail or warehouse. For non-residential buildings the use and number of stories decide the cost breakdown, so choose the closest match to how the building is built and used. For example, a medical office building is closer to an office building than a hospital.",
+		"page": 164,
+		"label": "10-12"
+	},
+	"Property.SprinklerSystem": {
+		"text": "Whether the building has a fire sprinkler system. The answer slightly changes the share of cost that is plumbing, so answer from what you see or the plans.",
+		"page": 170,
+		"label": "10-18"
+	},
+	"Property.Conveyance": {
+		"text": "Whether the building has an elevator or escalator. This adds to the electrical share of the building's cost.",
+		"page": 170,
+		"label": "10-18"
+	},
+	"Property.YearOfConstruction": {
+		"text": "The year the building was originally built. Use the county record or the owner's answer. It is required for a valid assessment and helps reviewers judge condition and age.",
+		"page": 57,
+		"label": "3-31"
+	},
+	"Property.StructureQualityID": {
+		"text": "The quality of the original construction, not its current condition. Choose from low to excellent. If you cannot tell, choose between budget, average and good unless you see clear signs of very low or custom work. It does not change the damage percent directly, but it should match the cost table you use for the base cost.",
+		"page": 58,
+		"label": "3-32"
+	},
+	"Property.StructureInformation": {
+		"text": "Free notes about this building, for example unusual features, additions, or the height of the lowest floor above the ground if it is more than 3 feet up. Notes are printed on the detailed report.",
+		"page": 59,
+		"label": "3-33"
+	},
+	"Assessment.InspectorName": {
+		"text": "The person who inspected the structure. This is suggested rather than required, and it is printed on reports so a reviewer knows who to ask.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.InspectorPhoneNumber": {
+		"text": "A phone number for the inspector. It is printed on reports.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.DateofInspection": {
+		"text": "The day the structure was inspected. It is required to save the assessment.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.DateDamageOccurred": {
+		"text": "The date of the event that caused the damage. It is needed for a valid assessment, and cumulative damage tracking counts each event once by this date.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.CauseofDamageID": {
+		"text": "The event that caused the damage, such as flood, wind or fire. Choosing a flood cause shows the flood duration and depth boxes. Choose Other and describe it if none fits.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.CauseOfDamageDescription": {
+		"text": "A short description of the cause when you chose Other. This is recommended so a reviewer understands the event.",
+		"page": 59,
+		"label": "3-33"
+	},
+	"Assessment.DurationOfFlood": {
+		"text": "How long water stood at the structure. Duration matters because a long soak damages a building more than a short, deeper flood. Estimate it from what residents tell you and what the community recorded.",
+		"page": 118,
+		"label": "7-4"
+	},
+	"Assessment.DurationOfFloodUnitsID": {
+		"text": "Whether the duration is in hours or days.",
+		"page": 118,
+		"label": "7-4"
+	},
+	"Assessment.DepthOfFlood": {
+		"text": "The height of the flood in feet at the structure, judged from high water marks on the outside walls or debris lines on a fence or plants. Check the units your community uses and keep them the same on every structure.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Assessment.DepthOfFloodAboveFFE": {
+		"text": "How deep the water was inside, in feet above the lowest floor. Look for a water line on the walls inside. Compare similar buildings nearby: structures with about the same depth above the floor should look similarly damaged.",
+		"page": 118,
+		"label": "7-4"
+	},
+	"Assessment.PhysicalDamage": {
+		"text": "Tick this when you cannot assess the damage, for example there is no visible damage, the lot is vacant, the owner refused entry, or the address does not exist. The structure then counts as 0 percent damaged and needs less information, but still appears in reports as part of the inventory.",
+		"page": 59,
+		"label": "3-33"
+	},
+	"Assessment.UndeterminedDamageTypeID": {
+		"text": "Why damage could not be assessed. Choose the closest reason. If you choose Other, write the reason in the notes.",
+		"page": 59,
+		"label": "3-33"
+	},
+	"Property.NFIPCID": {
+		"text": "The six digit National Flood Insurance Program community ID of the community the structure is in. It is on the community's flood map and in FEMA's community status book. It is required to save an assessment.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.NFIPCommunityName": {
+		"text": "The name of the community that matches the NFIP community ID, as it appears on the flood map.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.CommunityInformation": {
+		"text": "Notes that apply to the community or the event, for example the disaster number, or a note that newer flood data than the printed map was used. Reports print it with the assessment.",
+		"page": 59,
+		"label": "3-33"
+	},
+	"Property.FIRMPanelNumber": {
+		"text": "The number of the Flood Insurance Rate Map panel covering the structure. Find it on the map or from FEMA's Map Service Center. It is needed for a valid assessment.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.PanelSuffix": {
+		"text": "The letter that follows the panel number on the map, if it has one. Leave it blank if there is none.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.FIRMPanelDate": {
+		"text": "The effective date printed on the map panel. It shows which edition of the map you used.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.FIRMZone": {
+		"text": "The flood zone that the map shows at the structure, such as AE, A, VE or X. The zone tells the community which rules apply. Check the map at the building, not the street.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.BFE": {
+		"text": "The base flood elevation in feet, from the map or the flood study. It is the level the 1 percent annual chance flood is expected to reach. Enter it in the same datum as the lowest floor. Zones with no BFE can be left empty.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.RegulatoryFloodway": {
+		"text": "Whether the structure is in the regulatory floodway shown on the map: yes, no or possible. Floodways have stricter rules, so choose Possible when the line is too close to call.",
+		"page": 56,
+		"label": "3-30"
+	},
+	"Property.FirstFloorElevation": {
+		"text": "The height of the lowest floor in feet, in the same datum as the BFE, from an elevation certificate if you have one. Without a certificate, an estimate of its height above the ground is better than leaving it blank. It is needed for a valid assessment.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Property.Datum": {
+		"text": "The vertical datum of the elevations, for example NAVD 88 or NGVD 29. The lowest floor and the BFE must use the same one, or the comparison between them is wrong.",
+		"page": 54,
+		"label": "3-28"
+	},
+	"Assessment.BaseCost": {
+		"text": "The cost per square foot to rebuild this kind of building new, from a residential or commercial cost guide, a contractor, or the community's own data. Pick the cost table that matches the building's quality. The result scales directly with this number, so keep a note of where it came from.",
+		"page": 62,
+		"label": "3-36"
+	},
+	"Assessment.GeographicAdjustment": {
+		"text": "A multiplier that adjusts the guide's national cost to your area. Above 1.00 means building here costs more than average, below 1.00 means less. If your base cost already came from local data, enter 1.00.",
+		"page": 62,
+		"label": "3-36"
+	},
+	"Assessment.CostData": {
+		"text": "The name of the cost guide, appraisal or local data you used, for example the guide's title and edition. This lets a reviewer or an appeals board see where the numbers came from.",
+		"page": 64,
+		"label": "3-38"
+	},
+	"Assessment.CostDataDate": {
+		"text": "The publication date of the cost source. Guides are updated every quarter or year, so the date matters when someone repeats your work.",
+		"page": 64,
+		"label": "3-38"
+	},
+	"Assessment.DepreciationRatingID": {
+		"text": "The building's condition just before the damage, from 1 (very poor, nearly abandoned) to 6 (like new). Most buildings are 3 to 5. Choose Other only if the ratings do not fit, and then give a percent and a reason.",
+		"page": 63,
+		"label": "3-37"
+	},
+	"Assessment.DepreciationValue": {
+		"text": "The percent depreciation when you chose Other as the condition. For ratings 1 to 6 SDE fills it in from FEMA's table and you cannot change it.",
+		"page": 64,
+		"label": "3-38"
+	},
+	"Assessment.DepreciationExplanation": {
+		"text": "Why you used Other depreciation instead of a rating from 1 to 6. A reason is required so the value can be defended later.",
+		"page": 64,
+		"label": "3-38"
+	},
+	"Assessment.ValueOfBuildingID": {
+		"text": "Which building value to use as the value before the damage: SDE's computed actual cash value, a professional appraisal, or the adjusted tax assessed value. The computed value is the default. Whatever you choose, use the same one across the community so determinations are consistent.",
+		"page": 67,
+		"label": "3-41"
+	},
+	"Assessment.CostOfRepairsID": {
+		"text": "Which repair cost to compare against the value: SDE's computed damage, a contractor's estimate, or the community's estimate. Use the same method across the community. Any structure between 35 and 65 percent deserves a second look because those are the ones most often appealed.",
+		"page": 67,
+		"label": "3-41"
+	},
+	"Assessment.MarketAppraisal": {
+		"text": "A professional appraisal of the building, in dollars. It must be the value of the structure only, so subtract the land value if the appraisal includes land. Use it by choosing it as the building value basis.",
+		"page": 69,
+		"label": "3-43"
+	},
+	"Assessment.TaxAssessedValue": {
+		"text": "The structure's value from the tax roll, in dollars, without land. Tax values are usually lower than market value, so apply your local adjustment factor below. Using unadjusted tax values pushes the percent damaged up.",
+		"page": 69,
+		"label": "3-43"
+	},
+	"Assessment.FactorAdjustment": {
+		"text": "The multiplier your county uses to bring tax values up to market value. For example enter 1.43 to raise the value by 43 percent. Leave it at 1.00 if none applies.",
+		"page": 69,
+		"label": "3-43"
+	},
+	"Assessment.ContractorEstimate": {
+		"text": "A contractor's total estimate to repair this specific building to its pre-damage condition, in dollars. It must include all labor and materials at fair market prices, even if work is donated or discounted. Choose it as the repair cost basis to use it.",
+		"page": 69,
+		"label": "3-43"
+	},
+	"Assessment.CommunityEstimate": {
+		"text": "The community's own estimate of repair costs, in dollars. It must be complete and reflect local labor and material prices, and the community must be able to justify it. Choose it as the repair cost basis to use it.",
+		"page": 69,
+		"label": "3-43"
+	},
+	"Assessment.ExistingImprovementPercent": {
+		"text": "If known, the percent of the building already repaired or improved before this event. SDE only records it, so officials can work out cumulative effects outside the tool. It does not change this result.",
+		"page": 68,
+		"label": "3-42"
+	}
+}

@@ -1,0 +1,13 @@
+extracted/
+installer/
+# FEMA's decompiled code and the answer-key project, made locally by tools/answer-key/setup.sh; never published.
+decomp/
+reference/OriginalCalc/
+bin/
+obj/
+*.user
+.DS_Store
+out/
+
+# Claude Code agent worktrees
+.claude/worktrees/

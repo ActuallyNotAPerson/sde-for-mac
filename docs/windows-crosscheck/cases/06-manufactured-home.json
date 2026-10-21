@@ -1,0 +1,11 @@
+{
+  "Property": { "OwnerFirstName": "Jo", "OwnerLastName": "Baker", "StreetNumber": "8", "StreetName": "Willow", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43733", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 94, "FoundationTypeID": 48, "SuperStructureTypeID": 130, "RoofCoveringTypeID": 98,
+    "ExteriorFinishTypeID": 25, "HVACTypeID": 49, "StoryTypeID": 104, "StructureQualityID": 52, "YearOfConstruction": 1994, "SquareFootage": 1216 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 21, "BaseCost": 68.50, "GeographicAdjustment": 0.93 },
+  "DepreciationRating": 384,
+  "ElementDamage": { "Skirting / Forms Piers": 100, "Superstructure": 5, "Floor Finish": 40, "Interior Finish": 20, "Doors and Windows": 10,
+                     "Plumbing": 10, "Electrical": 15, "HVAC": 50, "Appliances": 25 },
+  "CostAdjustments": { "Expando": [120, 45.00], "Skirting": [152, 9.50] }
+}

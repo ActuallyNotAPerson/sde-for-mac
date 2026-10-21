@@ -1,0 +1,4 @@
+CustomFieldID,CustomField,OriginalDatabaseID,IsDefault,isUnique,DateOfLastMod,zOrder
+"{1AF6E85E-1EBC-446A-88A520F4CE2850C1}","Custom Field 1","1",0,0,"2017-08-31 17:41:10",1
+"{29D73892-B61E-47D5-A2BDDC440CF85630}","Custom Field 2","1",0,0,"2017-08-31 17:41:11",2
+"{4E063D9F-17BA-4BDD-B1986EEC45246C88}","Custom Field 3","1",0,0,"2017-08-31 17:41:11",3

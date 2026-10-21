@@ -1,0 +1,4 @@
+InspectionStatusID,InspectionStatus
+1,"Ready     "
+2,"Complete  "
+3,"Uploaded  "

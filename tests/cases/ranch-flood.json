@@ -1,0 +1,21 @@
+{
+  "Property": {
+    "OwnerFirstName": "Pat", "OwnerLastName": "Example",
+    "StreetNumber": "123", "StreetName": "River", "StreetSuffixID": 172, "City": "Exampleville", "StateID": 36, "ZipCode": "43702",
+    "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 92, "FoundationTypeID": 45, "SuperStructureTypeID": 130,
+    "RoofCoveringTypeID": 95, "ExteriorFinishTypeID": 25, "HVACTypeID": 49, "StoryTypeID": 104,
+    "YearOfConstruction": 1962, "StructureQualityID": 54, "SquareFootage": 1450
+  },
+  "Assessment": {
+    "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20,
+    "DurationOfFlood": 2, "DurationOfFloodUnitsID": 359,
+    "BaseCost": 118.75, "GeographicAdjustment": 0.93
+  },
+  "DepreciationRating": 386,
+  "ElementDamage": { "Foundation": 10, "Superstructure": 20, "Exterior Finish": 35, "Interior Finish": 90,
+                     "Doors and Windows": 60, "Cabinets and Countertops": 100, "Floor Finish": 100,
+                     "Plumbing": 50, "Electrical": 70, "Appliances": 100, "HVAC": 100 },
+  "CostAdjustments": { "Garage": [240, 32.50] },
+  "AdditionalAdjustments": [ ["Shed", 1, 2500] ]
+}

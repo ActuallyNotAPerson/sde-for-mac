@@ -1,0 +1,34 @@
+name: Idea or request
+description: Something SDE for Mac should do, or do better.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. SDE for Mac is used by many different communities, so it can't build in anything
+        specific to one city, county, state or software vendor; that kind of thing belongs in a setting or an import
+        profile you create. FEMA's calculation and file formats can't change.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the task and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: How you imagine it working. Screenshots or sketches are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: who
+    attributes:
+      label: Who would use it?
+      description: For example a floodplain administrator after a large event, inspectors in the field, or a state reviewer.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How do you manage today?
+      description: Workarounds, or how FEMA's SDE or other tools handle it.

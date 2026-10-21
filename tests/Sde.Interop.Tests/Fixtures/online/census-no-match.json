@@ -1,0 +1,9 @@
+{
+  "result": {
+    "input": {
+      "address": { "address": "99999 Nowhere Rd" },
+      "benchmark": { "id": "4", "benchmarkName": "Public_AR_Current", "isDefault": false }
+    },
+    "addressMatches": []
+  }
+}

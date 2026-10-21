@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    SQLite storage and services for the SDE Mac port. Replaces FEMA's DAL.dll (Jet/OLEDB, Windows-only).
+    Seed/*.csv = FEMA's reference tables (tools/build_seed.sh); Schema.sql = the translated Access schema.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Data</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema.sql" LogicalName="Sde.Data.Schema.sql" />
+    <EmbeddedResource Include="Seed/*.csv" LogicalName="Sde.Data.Seed.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Core/Sde.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Tests" />
+  </ItemGroup>
+
+</Project>

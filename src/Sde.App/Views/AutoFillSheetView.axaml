@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.AutoFillSheetView"
+             x:DataType="sh:AutoFillSheetViewModel">
+  <StackPanel Spacing="12" Width="660">
+    <TextBlock Classes="secondary" TextWrapping="Wrap">
+      <Run Text="Coordinates from the U.S. Census Bureau geocoder and flood data from FEMA's National Flood Hazard Layer, for " /><Run Text="{Binding Address}" FontWeight="Medium" /><Run Text="." />
+    </TextBlock>
+    <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsBusy}">
+      <ProgressBar IsIndeterminate="True" Width="120" AutomationProperties.Name="Looking up" />
+      <TextBlock Classes="muted" Text="{Binding StatusText}" VerticalAlignment="Center" />
+    </StackPanel>
+    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" IsVisible="{Binding !IsBusy}" />
+    <Border Classes="subtle" Padding="12,8" IsVisible="{Binding HasError}">
+      <TextBlock Classes="issue required" Text="{Binding ErrorText}" TextWrapping="Wrap" />
+    </Border>
+
+    <StackPanel Spacing="6" IsVisible="{Binding HasRows}">
+      <Grid ColumnDefinitions="30,1.3*,1.3*,1.6*,1.1*">
+        <TextBlock Grid.Column="1" Classes="eyebrow" Text="FIELD" />
+        <TextBlock Grid.Column="2" Classes="eyebrow" Text="NOW" />
+        <TextBlock Grid.Column="3" Classes="eyebrow" Text="FOUND ONLINE" />
+        <TextBlock Grid.Column="4" Classes="eyebrow" Text="FROM" />
+      </Grid>
+      <ScrollViewer MaxHeight="400">
+        <ItemsControl ItemsSource="{Binding Rows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="sh:ProposalRowViewModel">
+              <Grid ColumnDefinitions="30,1.3*,1.3*,1.6*,1.1*" Margin="0,3">
+                <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding CanCheck}" AutomationProperties.Name="{Binding CheckLabel}" VerticalAlignment="Top" />
+                <TextBlock Grid.Column="1" Text="{Binding Label}" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
+                <TextBlock Grid.Column="2" Text="{Binding CurrentText}" Classes="secondary" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
+                <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="0,0,8,0">
+                  <TextBlock Text="{Binding ProposedText}" TextWrapping="Wrap" />
+                  <TextBlock Classes="issue recommended" FontSize="11" Text="{Binding Note}" IsVisible="{Binding HasNote}" />
+                </StackPanel>
+                <TextBlock Grid.Column="4" Text="{Binding SourceText}" Classes="muted" VerticalAlignment="Center" TextWrapping="Wrap" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding Caution}" />
+    </StackPanel>
+
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Content="Try again" Command="{Binding RetryCommand}" IsVisible="{Binding HasError}" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Apply ticked values" Command="{Binding ApplyCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

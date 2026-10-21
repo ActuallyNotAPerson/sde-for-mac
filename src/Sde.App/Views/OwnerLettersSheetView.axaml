@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.OwnerLettersSheetView"
+             x:DataType="sh:OwnerLettersSheetViewModel">
+  <StackPanel Spacing="12" Width="660">
+    <TextBlock Text="{Binding CountText}" FontWeight="Medium" TextWrapping="Wrap" />
+    <ItemsControl ItemsSource="{Binding Kinds}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="sh:LetterKindRowViewModel">
+          <Grid ColumnDefinitions="260,*" ColumnSpacing="10" Margin="0,0,0,6">
+            <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Templates}" SelectedItem="{Binding Template}" HorizontalAlignment="Stretch" PlaceholderText="Choose a template"
+                      AutomationProperties.Name="{Binding AccessibleName}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <TextBlock Classes="muted" Text="{Binding LeftOutText}" TextWrapping="Wrap" IsVisible="{Binding LeftOutText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding !HasTemplates}">
+      <TextBlock Text="There are no letter templates yet." VerticalAlignment="Center" />
+      <Button Content="Create starter templates" Command="{Binding CreateStarterTemplatesCommand}" />
+    </StackPanel>
+    <Button Classes="link" Content="Show the templates folder" Command="{Binding ShowTemplatesFolderCommand}" HorizontalAlignment="Left" Padding="0" />
+
+    <Border Classes="subtle">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="h3" Text="From" />
+        <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap" Text="Filled into the letters and remembered for this database. A community name left blank uses each structure's NFIP community name." />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4">
+          <TextBlock Classes="fieldLabel" Text="Community" />
+          <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Office" />
+          <TextBox Grid.Row="1" Text="{Binding CommunityName}" AutomationProperties.Name="Community name" />
+          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding OfficeName}" PlaceholderText="For example: Floodplain Management Office" AutomationProperties.Name="Office name" />
+          <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Classes="fieldLabel" Text="Office address" Margin="0,4,0,0" />
+          <TextBox Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding OfficeAddress}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="44" AutomationProperties.Name="Office address" />
+          <TextBlock Grid.Row="4" Classes="fieldLabel" Text="Phone" Margin="0,4,0,0" />
+          <TextBlock Grid.Row="4" Grid.Column="1" Classes="fieldLabel" Text="Email" Margin="0,4,0,0" />
+          <TextBox Grid.Row="5" Text="{Binding OfficePhone}" AutomationProperties.Name="Office phone" />
+          <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding OfficeEmail}" AutomationProperties.Name="Office email" />
+          <TextBlock Grid.Row="6" Classes="fieldLabel" Text="Signed by" Margin="0,4,0,0" />
+          <TextBlock Grid.Row="6" Grid.Column="1" Classes="fieldLabel" Text="Title" Margin="0,4,0,0" />
+          <TextBox Grid.Row="7" Text="{Binding OfficialName}" AutomationProperties.Name="Name of the official who signs" />
+          <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding OfficialTitle}" PlaceholderText="For example: Floodplain Administrator" AutomationProperties.Name="Title of the official who signs" />
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap"
+               Text="The letters use FEMA's result for each assessment. Review the templates with your community's counsel before sending any letters." />
+    <TextBlock Text="{Binding ResultText}" FontWeight="Medium" TextWrapping="Wrap" IsVisible="{Binding ResultText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <TextBlock Text="{Binding WarningText}" Foreground="{DynamicResource RequiredFg}" TextWrapping="Wrap" IsVisible="{Binding WarningText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Content="Mark as sent…" Command="{Binding MarkSentCommand}" IsVisible="{Binding HasWritten}"
+              ToolTip.Tip="Sets these assessments to Letter sent, which locks them" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Done" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Choose a folder and write…" Command="{Binding WriteCommand}" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

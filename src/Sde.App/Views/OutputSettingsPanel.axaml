@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             x:Class="Sde.App.Views.OutputSettingsPanel"
+             x:DataType="vm:OutputSettingsViewModel">
+  <StackPanel Spacing="16">
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="h2" Text="Substantial improvement" />
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="How improvement projects are counted for this database (in an assessment, ⋯ then Improvements and SI). The NFIP minimum is 50 percent of market value, counting each project on its own. Your ordinance may be stricter." />
+        </StackPanel>
+        <WrapPanel>
+          <StackPanel Classes="field">
+            <TextBlock Classes="fieldLabel" Text="Threshold" />
+            <NumericUpDown Value="{Binding SiThreshold}" Minimum="1" Maximum="100" FormatString="0.##" ShowButtonSpinner="False" Classes="number"
+                           AutomationProperties.Name="Substantial improvement threshold, percent of market value">
+              <NumericUpDown.InnerRightContent>
+                <TextBlock Classes="adorn" Text="% of market value" Margin="0,0,10,0" />
+              </NumericUpDown.InnerRightContent>
+            </NumericUpDown>
+          </StackPanel>
+          <StackPanel Classes="field">
+            <TextBlock Classes="fieldLabel" Text="Look-back period" />
+            <NumericUpDown Value="{Binding SiLookbackYears}" Minimum="0" Maximum="100" FormatString="0" Increment="1" ShowButtonSpinner="False" Classes="number"
+                           AutomationProperties.Name="Substantial improvement look-back period in years (0 counts this project only)">
+              <NumericUpDown.InnerRightContent>
+                <TextBlock Classes="adorn" Text="years" Margin="0,0,10,0" />
+              </NumericUpDown.InnerRightContent>
+            </NumericUpDown>
+            <TextBlock Classes="help" Text="0 counts each project on its own." />
+          </StackPanel>
+        </WrapPanel>
+        <CheckBox IsChecked="{Binding SiIncludePrior}" Content="Add earlier projects in the look-back period to the new one (cumulative substantial improvement)" />
+      </StackPanel>
+    </Border>
+
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="h2" Text="Owner letters" />
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="Word (.docx) templates for letters to owners (Structures, Export, then Owner letters). Edit them in Word or Pages. A placeholder such as «OwnerName» is filled in for each structure." />
+        </StackPanel>
+        <StackPanel Spacing="2">
+          <TextBlock Classes="fieldLabel" Text="Templates folder" />
+          <SelectableTextBlock Text="{Binding TemplatesFolder}" TextWrapping="Wrap" />
+          <TextBlock Classes="secondary" Text="{Binding TemplatesText}" TextWrapping="Wrap" Margin="0,4,0,0" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Content="Create starter templates" Command="{Binding CreateStarterTemplatesCommand}"
+                  ToolTip.Tip="Adds the three starter letters. Templates already in the folder are never overwritten." />
+          <Button Content="Show folder" Command="{Binding ShowTemplatesFolderCommand}" />
+        </StackPanel>
+        <Border Background="{DynamicResource AccentSoft}" CornerRadius="6" Padding="12,8">
+          <TextBlock TextWrapping="Wrap"
+                     Text="The starter letters are a plain-English starting point based on FEMA P-758's sample notice. They are not legal advice. Review and adapt them with your community's counsel before you send any letters." />
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="h2" Text="Cumulative damage" />
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="Off unless your ordinance counts damage from several events together. When on, an assessment's result panel also shows the cumulative total over the look-back period. This is a separate finding: each assessment keeps FEMA's own percent damaged and determination, and FEMA's reports and exports don't change." />
+        </StackPanel>
+        <ToggleSwitch IsChecked="{Binding CumulativeEnabled}" OnContent="" OffContent="" AutomationProperties.Name="Count damage cumulatively">
+          <ToggleSwitch.Content>
+            <TextBlock Text="Count damage from several events together" FontWeight="Medium" />
+          </ToggleSwitch.Content>
+        </ToggleSwitch>
+        <WrapPanel IsEnabled="{Binding CumulativeEnabled}">
+          <StackPanel Classes="field" Width="340">
+            <TextBlock Classes="fieldLabel" Text="Method" />
+            <ComboBox ItemsSource="{x:Static vm:OutputSettingsViewModel.CumulativeMethods}" SelectedIndex="{Binding CumulativeMethodIndex}" HorizontalAlignment="Stretch"
+                      AutomationProperties.Name="How cumulative damage is added up" />
+          </StackPanel>
+          <StackPanel Classes="field">
+            <TextBlock Classes="fieldLabel" Text="Look-back period" />
+            <NumericUpDown Value="{Binding CumulativeLookbackYears}" Minimum="0" Maximum="100" FormatString="0" Increment="1" ShowButtonSpinner="False" Classes="number"
+                           AutomationProperties.Name="Cumulative damage look-back period in years (0 counts every event)">
+              <NumericUpDown.InnerRightContent>
+                <TextBlock Classes="adorn" Text="years" Margin="0,0,10,0" />
+              </NumericUpDown.InnerRightContent>
+            </NumericUpDown>
+            <TextBlock Classes="help" Text="0 counts every event on record." />
+          </StackPanel>
+          <StackPanel Classes="field">
+            <TextBlock Classes="fieldLabel" Text="Threshold" />
+            <NumericUpDown Value="{Binding CumulativeThreshold}" Minimum="1" Maximum="1000" FormatString="0.##" ShowButtonSpinner="False" Classes="number"
+                           AutomationProperties.Name="Cumulative damage threshold, percent">
+              <NumericUpDown.InnerRightContent>
+                <TextBlock Classes="adorn" Text="%" Margin="0,0,10,0" />
+              </NumericUpDown.InnerRightContent>
+            </NumericUpDown>
+          </StackPanel>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

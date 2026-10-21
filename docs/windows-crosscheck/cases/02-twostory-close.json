@@ -1,0 +1,10 @@
+{
+  "Property": { "OwnerFirstName": "Dana", "OwnerLastName": "Rivera", "StreetNumber": "48", "StreetName": "Mill Creek", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43715", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 92, "FoundationTypeID": 47, "SuperStructureTypeID": 130, "RoofCoveringTypeID": 95,
+    "ExteriorFinishTypeID": 26, "HVACTypeID": 49, "StoryTypeID": 105, "YearOfConstruction": 1928, "StructureQualityID": 53, "SquareFootage": 2200 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "DurationOfFlood": 3, "DurationOfFloodUnitsID": 359,
+    "BaseCost": 132.40, "GeographicAdjustment": 0.93 },
+  "DepreciationRating": 385,
+  "ElementDamage": { "Foundation": 30, "Interior Finish": 60, "Doors and Windows": 30, "Floor Finish": 80, "Plumbing": 40, "Electrical": 50, "HVAC": 100, "Appliances": 60 }
+}

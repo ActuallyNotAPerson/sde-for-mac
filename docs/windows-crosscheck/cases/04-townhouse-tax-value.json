@@ -1,0 +1,12 @@
+{
+  "Property": { "OwnerFirstName": "Avery", "OwnerLastName": "Lin", "StreetNumber": "22", "StreetName": "Front", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43702", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 93, "FoundationTypeID": 45, "SuperStructureTypeID": 131, "RoofCoveringTypeID": 98,
+    "ExteriorFinishTypeID": 26, "HVACTypeID": 49, "StoryTypeID": 105, "StructureQualityID": 53, "YearOfConstruction": 1924, "SquareFootage": 1680 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "BaseCost": 142.30, "GeographicAdjustment": 0.97,
+    "TaxAssessedValue": 118400, "FactorAdjustment": 1.25, "ValueOfBuildingID": 392, "CostOfRepairsID": 393 },
+  "DepreciationRating": 385,
+  "ElementDamage": { "Foundation": 15, "Interior Finish": 70, "Floor Finish": 100, "Doors and Windows": 30, "Cabinets and Countertops": 100,
+                     "Plumbing": 40, "Electrical": 60, "Appliances": 100, "HVAC": 100 },
+  "CostAdjustments": { "Fireplaces": [1, 4200] }
+}

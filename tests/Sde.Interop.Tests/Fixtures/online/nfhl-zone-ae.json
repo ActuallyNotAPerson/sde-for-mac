@@ -1,0 +1,13 @@
+{
+  "displayFieldName": "FLD_ZONE",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 1001, "DFIRM_ID": "11001C", "FLD_ZONE": "AE", "ZONE_SUBTY": null,
+        "SFHA_TF": "T", "STATIC_BFE": 12.5, "V_DATUM": "NAVD88", "DEPTH": -9999, "LEN_UNIT": null
+      }
+    }
+  ]
+}

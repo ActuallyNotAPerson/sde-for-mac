@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.PhotoFolderSheetView"
+             x:DataType="sh:PhotoFolderSheetViewModel">
+  <StackPanel Spacing="12" Width="680">
+    <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" />
+    <TextBlock Classes="muted" TextWrapping="Wrap"
+               Text="Matched by a record ID, parcel number or address in the file name, otherwise by the photo's GPS position (within 40 m). Photos that match no structure, or two structures equally, are left out." />
+    <Grid ColumnDefinitions="30,1.4*,1.4*,1.6*,60">
+      <TextBlock Grid.Column="1" Classes="eyebrow" Text="PHOTO" />
+      <TextBlock Grid.Column="2" Classes="eyebrow" Text="STRUCTURE" />
+      <TextBlock Grid.Column="3" Classes="eyebrow" Text="WHY" />
+      <TextBlock Grid.Column="4" Classes="eyebrow" Text="DISTANCE" TextAlignment="Right" />
+    </Grid>
+    <ScrollViewer MaxHeight="360">
+      <ItemsControl ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sh:PhotoMatchRowViewModel">
+            <Grid ColumnDefinitions="30,1.4*,1.4*,1.6*,60" Margin="0,3">
+              <CheckBox IsChecked="{Binding Include}" IsEnabled="{Binding CanInclude}" AutomationProperties.Name="{Binding IncludeLabel}" />
+              <TextBlock Grid.Column="1" Text="{Binding FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+              <TextBlock Grid.Column="2" Text="{Binding Structure}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"
+                         FontWeight="Medium" Classes.muted="{Binding IsProblem}" />
+              <TextBlock Grid.Column="3" Text="{Binding Reason}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0"
+                         Classes="secondary" Classes.issue="{Binding IsProblem}" Classes.recommended="{Binding IsProblem}" />
+              <TextBlock Grid.Column="4" Text="{Binding Distance}" Classes="muted" VerticalAlignment="Center" TextAlignment="Right" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Attach ticked photos" Command="{Binding AttachCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

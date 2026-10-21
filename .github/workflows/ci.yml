@@ -1,0 +1,67 @@
+name: CI
+
+# Builds and tests on every push and pull request. Tests that compare against FEMA's installer skip themselves when
+# the installer has not been unpacked (tools/answer-key/setup.sh), so CI never needs it.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+
+jobs:
+  build-test:
+    name: Build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Check out
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.x
+
+      # poppler gives the report tests pdftotext and pdftoppm; mdbtools reads the .mdb fixtures; gdal-bin is for ogrinfo
+      # checks on the GeoPackage export.
+      - name: Install command-line tools (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils mdbtools gdal-bin
+
+      - name: Install command-line tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install poppler mdbtools
+
+      - name: Restore
+        run: dotnet restore Sde.sln
+
+      - name: Build
+        run: dotnet build Sde.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Sde.sln --configuration Release --no-build --logger "trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults/**/*.trx
+          if-no-files-found: warn

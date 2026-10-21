@@ -1,0 +1,10 @@
+{
+  "Property": { "OwnerFirstName": "Lee", "OwnerLastName": "Grant", "StreetNumber": "6", "StreetName": "Ferry", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43726", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 92, "FoundationTypeID": 44, "SuperStructureTypeID": 130, "RoofCoveringTypeID": 95,
+    "ExteriorFinishTypeID": 25, "HVACTypeID": 50, "StoryTypeID": 104, "StructureQualityID": 51, "YearOfConstruction": 1931, "SquareFootage": 860 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 21, "BaseCost": 96.00, "GeographicAdjustment": 0.93 },
+  "DepreciationRating": 383,
+  "ElementDamage": { "Foundation": 100, "Superstructure": 100, "Roof Covering": 100, "Exterior Finish": 100, "Interior Finish": 100, "Doors and Windows": 100,
+                     "Cabinets and Countertops": 100, "Floor Finish": 100, "Plumbing": 100, "Electrical": 100, "Appliances": 100 }
+}

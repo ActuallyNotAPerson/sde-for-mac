@@ -1,0 +1,77 @@
+name: Result differs from FEMA's SDE
+description: SDE for Mac gives a different percent damaged or result than FEMA's SDE on Windows for the same building.
+labels: ["calculation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        SDE for Mac must give exactly the same results as FEMA's SDE 3.0, so these reports come first.
+
+        Before you report, check that both programs have **the same inputs**: square footage, base cost per square
+        foot, geographic adjustment, cost adjustments, condition rating and depreciation, damage by element, and the
+        value and repair bases on the Result step. Most differences turn out to be one of these.
+
+        **Please don't include real owner names, addresses, parcel numbers or photos**: this page is public.
+  - type: input
+    id: version
+    attributes:
+      label: SDE for Mac version
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: input
+    id: fema-version
+    attributes:
+      label: FEMA SDE version on Windows
+      placeholder: "3.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Structure type
+      options:
+        - Residential
+        - Non-residential
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: The inputs
+      description: The values from each step that affect the result. A table or a list is fine.
+      placeholder: |
+        Building: One story, single family, slab on grade, wood frame...
+        Cost: 1,450 sq ft, $95.00/sq ft, geographic adjustment 1.02, condition 4 - Average...
+        Damage by element: foundation 0, superstructure 25, roof 0, interior finish 75...
+        Result: computed actual cash value, computed damages
+    validations:
+      required: true
+  - type: textarea
+    id: fema-result
+    attributes:
+      label: FEMA's SDE result
+      description: Percent damaged and result, plus the replacement cost, depreciation and actual cash value if shown.
+    validations:
+      required: true
+  - type: textarea
+    id: mac-result
+    attributes:
+      label: SDE for Mac result
+      description: The same numbers from the Mac.
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Files (optional, very helpful)
+      description: |
+        If you can, attach a zipped SDE export folder of a made-up copy of the building, with the owner and address
+        replaced. On the Mac: check the structure, then Export, then To FEMA SDE (export folder).
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Personal information
+      options:
+        - label: This report and its files contain no real owner names, addresses, parcel numbers or photos.
+          required: true

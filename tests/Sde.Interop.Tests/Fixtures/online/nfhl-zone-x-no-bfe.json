@@ -1,0 +1,12 @@
+{
+  "displayFieldName": "FLD_ZONE",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 1003, "FLD_ZONE": "X", "ZONE_SUBTY": "AREA OF MINIMAL FLOOD HAZARD", "SFHA_TF": "F", "STATIC_BFE": -9999, "V_DATUM": null
+      }
+    }
+  ]
+}

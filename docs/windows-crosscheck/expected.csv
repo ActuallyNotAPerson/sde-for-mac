@@ -1,0 +1,10 @@
+Case,Address,Type,SquareFootage,BaseCost,GeographicAdjustment,DepreciationPercent,TotalReplacementCost,ComputedDamages,ComputedActualCashValue,ValueBasis,RepairBasis,PercentDamaged,Determination
+01-ranch-flood,123 River Street,Residential,1450.00,118.75,0.93,24.20,170434.38,96900.46,129189.26,Computed Actual Cash Value,Computed Damages,75.0%,Substantially Damaged
+02-twostory-close,48 Mill Creek Street,Residential,2200.00,132.40,0.93,38.80,270890.40,82675.75,165784.92,Computed Actual Cash Value,Computed Damages,49.9%,Not Substantially Damaged
+03-office-minor,700 Riverside Street,Non-Residential,6400.00,185.00,0.93,21.10,1101120.00,179097.17,868783.68,Computed Actual Cash Value,Computed Damages,20.6%,Not Substantially Damaged
+04-townhouse-tax-value,22 Front Street,Residential,1680.00,142.30,0.97,38.80,236092.08,83458.55,144488.35,Adj. Tax Assessed Value,Computed Damages,56.4%,Substantially Damaged
+05-appraisal-contractor,315 Mill Street,Residential,1900.00,1.00,1.00,1.00,1900.00,0.00,1881.00,Professional Market Appraisal,Contractor Estimate,53.6%,Substantially Damaged
+06-manufactured-home,8 Willow Street,Residential,1216.00,68.50,0.93,66.50,84309.28,16145.23,28243.61,Computed Actual Cash Value,Computed Damages,57.2%,Substantially Damaged
+07-no-physical-damage,41 Hill Street,Residential,,,,,0.00,0.00,0.00,Computed Actual Cash Value,Computed Damages,0.0%,No Physical Damage Sustained
+08-hotel-community-estimate,1 Riverfront Street,Non-Residential,86500.00,248.75,1.02,13.20,21947212.50,4027313.49,19050180.45,Computed Actual Cash Value,Community Estimate,17.1%,Not Substantially Damaged
+09-very-poor-capped,6 Ferry Street,Residential,860.00,96.00,0.93,88.90,76780.80,76780.80,8522.67,Computed Actual Cash Value,Computed Damages,100.0%,Substantially Damaged

@@ -1,0 +1,146 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:ed="using:Sde.App.ViewModels.Editor"
+             xmlns:v="using:Sde.App.Views"
+             x:Class="Sde.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="ed:FieldGroupViewModel">
+      <StackPanel Spacing="8" Margin="0,0,0,10">
+        <TextBlock Classes="h3" Text="{Binding Title}" />
+        <ItemsControl ItemsSource="{Binding Fields}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="28,22,28,28" Spacing="16" MaxWidth="1000" HorizontalAlignment="Left">
+      <TextBlock Classes="h1" Text="Settings" />
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="Preferences" />
+          <StackPanel Classes="field">
+            <TextBlock Classes="fieldLabel" Text="Your name" />
+            <TextBox Text="{Binding YourName}" Width="320" HorizontalAlignment="Left" AutomationProperties.Name="Your name, shown in edit history" />
+            <TextBlock Classes="help" Text="Shown in each assessment's history next to the changes you make." />
+          </StackPanel>
+          <ToggleSwitch IsChecked="{Binding UseDefaults}" OnContent="" OffContent="">
+            <ToggleSwitch.Content>
+              <StackPanel>
+                <TextBlock Text="Fill new structures with my default values" FontWeight="Medium" />
+                <TextBlock Classes="muted" Text="Saves typing when assessing many buildings after one event." />
+              </StackPanel>
+            </ToggleSwitch.Content>
+          </ToggleSwitch>
+          <ToggleSwitch IsChecked="{Binding CheckLatLong}" OnContent="" OffContent="">
+            <ToggleSwitch.Content>
+              <StackPanel>
+                <TextBlock Text="Check that latitude and longitude are inside the structure's state" FontWeight="Medium" />
+                <TextBlock Classes="muted" Text="FEMA's “Lat/Long Validation”." />
+              </StackPanel>
+            </ToggleSwitch.Content>
+          </ToggleSwitch>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="Default values" />
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="Filled into new structures and assessments when the preference above is on (FEMA's “Enter Default Data”). Saved as you type." />
+          </StackPanel>
+          <ItemsControl ItemsSource="{Binding DefaultGroups}" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="Your fields" />
+            <TextBlock Classes="muted" Text="Three extra fields on every assessment. Name them for what your office tracks." />
+          </StackPanel>
+          <ItemsControl ItemsSource="{Binding CustomFieldNames}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CustomFieldNameViewModel">
+                <StackPanel Classes="field">
+                  <TextBlock Classes="fieldLabel" Text="{Binding Slot}" />
+                  <TextBox Text="{Binding Name}" MaxLength="50" AutomationProperties.Name="{Binding Slot, StringFormat='Custom {0} name'}" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <v:PhoneFormPanel DataContext="{Binding PhoneForm}" />
+
+      <v:OutputSettingsPanel DataContext="{Binding Outputs}" />
+      <v:DepthTablesPanel DataContext="{Binding DepthTables}" />
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="Note snippets" />
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="Text you type often. In an assessment, use Insert snippet above any notes box." />
+          </StackPanel>
+          <ItemsControl ItemsSource="{Binding Snippets}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:SnippetViewModel">
+                <Grid ColumnDefinitions="220,*,Auto" ColumnSpacing="10" Margin="0,0,0,8">
+                  <TextBox Text="{Binding Name}" MaxLength="50" AutomationProperties.Name="Snippet name" />
+                  <TextBox Grid.Column="1" Text="{Binding Text}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="34" AutomationProperties.Name="{Binding Name, StringFormat='Text of snippet {0}'}" />
+                  <Button Grid.Column="2" Content="Delete" VerticalAlignment="Top"
+                          Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).DeleteSnippetCommand}" CommandParameter="{Binding}"
+                          AutomationProperties.Name="{Binding Name, StringFormat='Delete snippet {0}'}" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Button Content="Add a snippet" Command="{Binding AddSnippetCommand}" HorizontalAlignment="Left" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="Database" />
+          <StackPanel Spacing="2">
+            <TextBlock Classes="fieldLabel" Text="File" />
+            <SelectableTextBlock Text="{Binding DatabasePath}" TextWrapping="Wrap" />
+            <TextBlock Classes="fieldLabel" Text="Photos folder" Margin="0,6,0,0" />
+            <SelectableTextBlock Text="{Binding AttachmentsPath}" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Show in Finder" Command="{Binding RevealDatabaseCommand}" />
+            <Button Content="Save a copy…" Command="{Binding BackUpCommand}" />
+            <Button Content="Restore from backup…" Command="{Binding RestoreBackupCommand}" />
+            <Button Content="Open another…" Command="{Binding OpenDatabaseCommand}" />
+            <Button Content="New empty database…" Command="{Binding NewDatabaseCommand}" />
+          </StackPanel>
+          <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding BackupsText}" />
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="Tip: keep one database per disaster event, and share data with colleagues through Import &amp; export rather than a shared network file." />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h2" Text="About" />
+          <TextBlock TextWrapping="Wrap">
+            <Run Text="Substantial Damage Estimator for Mac, version " /><Run Text="{Binding Version}" />
+          </TextBlock>
+          <TextBlock Classes="secondary" TextWrapping="Wrap"
+                     Text="An unofficial Mac port of FEMA's Substantial Damage Estimator (SDE) 3.0.0. It uses FEMA's calculation engine, cost tables and validation rules, and has been checked to give identical results to FEMA's engine for every building type FEMA's tables cover. It is not produced or endorsed by FEMA. Determinations remain the responsibility of the local floodplain administrator." />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Helpers shared by all test projects: repo paths, temporary databases, sample structures. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- For Assert.Skip when FEMA's installer files (the answer key) aren't set up. -->
+    <PackageReference Include="xunit.v3.assert" Version="3.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sde.Data/Sde.Data.csproj" />
+    <ProjectReference Include="../../src/Sde.Interop/Sde.Interop.csproj" />
+  </ItemGroup>
+
+</Project>

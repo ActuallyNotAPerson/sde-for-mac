@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    SDE's other import/export features: Excel export, Enterprise Import, Lat/Long spreadsheet, KMZ GeoFile,
+    SDE 2.x XML import, user-settings JSON. ClosedXML (MIT) replaces DevExpress / ACE OLEDB.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Interop</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+    <PackageReference Include="ExcelDataReader" Version="3.9.0" />
+    <PackageReference Include="MetadataExtractor" Version="2.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Interop.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+  </ItemGroup>
+
+  <!-- The KMZ GeoFile's legend and pin icons, from FEMA's SDE (extracted/images; US-government work, public domain). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Assets/*.png" LogicalName="Sde.Interop.Assets.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Example import profiles offered on the import page ("Start from an example"). -->
+  <ItemGroup>
+    <EmbeddedResource Include="SourceImport/Profiles/*.json" LogicalName="Sde.Interop.Profiles.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+{
+  "displayFieldName": "POL_NAME1",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 3001, "CID": "110001", "POL_NAME1": "DISTRICT OF COLUMBIA", "POL_NAME2": null, "STATE_FIPS": "11"
+      }
+    }
+  ]
+}

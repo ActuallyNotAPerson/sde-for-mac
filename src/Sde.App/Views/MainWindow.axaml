@@ -1,0 +1,400 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Sde.App.ViewModels"
+        xmlns:ed="using:Sde.App.ViewModels.Editor"
+        xmlns:v="using:Sde.App.Views"
+        xmlns:svc="using:Sde.App.Services"
+        xmlns:sh="using:Sde.App.ViewModels.Sheets"
+        xmlns:data="using:Sde.Data"
+        x:Class="Sde.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Substantial Damage Estimator"
+        Width="1440" Height="900" MinWidth="1100" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBg}">
+
+  <NativeMenu.Menu>
+    <NativeMenu>
+      <NativeMenuItem Header="File">
+        <NativeMenu>
+          <NativeMenuItem Header="New Residential Structure" Gesture="Cmd+N" Command="{Binding Structures.NewStructureCommand}" CommandParameter="1" />
+          <NativeMenuItem Header="New Non-Residential Structure" Gesture="Cmd+Shift+N" Command="{Binding Structures.NewStructureCommand}" CommandParameter="2" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Open Database…" Gesture="Cmd+O" Command="{Binding Settings.OpenDatabaseCommand}" />
+          <NativeMenuItem Header="Open Recent">
+            <NativeMenu />
+          </NativeMenuItem>
+          <NativeMenuItem Header="New Database…" Command="{Binding Settings.NewDatabaseCommand}" />
+          <NativeMenuItem Header="Save a Copy of the Database…" Command="{Binding Settings.BackUpCommand}" />
+          <NativeMenuItem Header="Restore from Backup…" Command="{Binding RestoreBackupCommand}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Save" Gesture="Cmd+S" Command="{Binding SaveCommand}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Import SDE Data…" Gesture="Cmd+I" Command="{Binding ImportExport.ChooseSdeFolderCommand}" />
+          <NativeMenuItem Header="Export All to SDE…" Gesture="Cmd+E" Command="{Binding ImportExport.ExportAllCommand}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Import Inspections or Parcels…" Gesture="Cmd+Shift+I" Command="{Binding OpenSourceImportCommand}" />
+        </NativeMenu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Edit">
+        <NativeMenu>
+          <NativeMenuItem Header="Undo" Gesture="Cmd+Z" Click="OnUndo" />
+          <NativeMenuItem Header="Redo" Gesture="Cmd+Shift+Z" Click="OnRedo" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Cut" Gesture="Cmd+X" Click="OnCut" />
+          <NativeMenuItem Header="Copy" Gesture="Cmd+C" Click="OnCopy" />
+          <NativeMenuItem Header="Paste" Gesture="Cmd+V" Click="OnPaste" />
+          <NativeMenuItem Header="Select All" Gesture="Cmd+A" Click="OnSelectAll" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Find" Gesture="Cmd+F" Command="{Binding FindCommand}" />
+          <NativeMenuItem Header="Search and Replace…" Command="{Binding Structures.SearchReplaceCommand}" />
+          <NativeMenuItem Header="Set a Field on Checked Structures…" Command="{Binding Structures.BulkEditCommand}" />
+        </NativeMenu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="View">
+        <NativeMenu>
+          <NativeMenuItem Header="Structures" Gesture="Cmd+1" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Structures}" />
+          <NativeMenuItem Header="Import &amp; Export" Gesture="Cmd+2" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" />
+          <NativeMenuItem Header="Settings" Gesture="Cmd+3" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Settings}" />
+          <NativeMenuItem Header="Map" Gesture="Cmd+4" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Map}" />
+          <NativeMenuItem Header="Event Dashboard" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Dashboard}" />
+          <NativeMenuItem Header="Recently Deleted" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Trash}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Previous Step" Gesture="Cmd+OemOpenBrackets" Command="{Binding PreviousStepCommand}" />
+          <NativeMenuItem Header="Next Step" Gesture="Cmd+OemCloseBrackets" Command="{Binding NextStepCommand}" />
+        </NativeMenu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Window">
+        <NativeMenu>
+          <NativeMenuItem Header="Minimize" Gesture="Cmd+M" Click="OnMinimize" />
+          <NativeMenuItem Header="Zoom" Click="OnZoom" />
+        </NativeMenu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Help">
+        <NativeMenu>
+          <NativeMenuItem Header="SDE Help" Command="{Binding ShowHelpCommand}" />
+          <NativeMenuItem Header="FEMA SDE User Manual" Command="{Binding OpenManualCommand}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Show the Walkthrough" Command="{Binding ShowWalkthroughCommand}" />
+          <NativeMenuItem Header="Open Sample Database" Command="{Binding OpenSampleDatabaseCommand}" />
+          <NativeMenuItemSeparator />
+          <NativeMenuItem Header="Keyboard Shortcuts" Command="{Binding ShowShortcutsCommand}" />
+          <NativeMenuItem Header="Show Log Folder" Command="{Binding ShowLogsCommand}" />
+        </NativeMenu>
+      </NativeMenuItem>
+    </NativeMenu>
+  </NativeMenu.Menu>
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="vm:StructuresViewModel"><v:StructuresView /></DataTemplate>
+    <DataTemplate DataType="ed:AssessmentEditorViewModel"><v:AssessmentEditorView /></DataTemplate>
+    <DataTemplate DataType="vm:ImportExportViewModel"><v:ImportExportView /></DataTemplate>
+    <DataTemplate DataType="vm:SourceImportViewModel"><v:SourceImportView /></DataTemplate>
+    <DataTemplate DataType="vm:SettingsViewModel"><v:SettingsView /></DataTemplate>
+    <DataTemplate DataType="vm:TrashViewModel"><v:TrashView /></DataTemplate>
+    <DataTemplate DataType="vm:MapViewModel"><v:MapView /></DataTemplate>
+    <DataTemplate DataType="vm:DashboardViewModel"><v:DashboardView /></DataTemplate>
+    <DataTemplate DataType="sh:ImprovementsSheetViewModel"><v:ImprovementsSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:AppealSheetViewModel"><v:AppealSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:OwnerLettersSheetViewModel"><v:OwnerLettersSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:FieldHelpSheetViewModel"><v:FieldHelpSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:HelpIndexSheetViewModel"><v:HelpIndexSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:WalkthroughSheetViewModel"><v:WalkthroughSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:ManualMissingSheetViewModel">
+      <StackPanel Spacing="12" Width="480">
+        <TextBlock Text="{Binding MissingMessage}" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Done" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          <Button Classes="primary" Content="Open FEMA's SDE page" Command="{Binding OpenFemaPageCommand}" IsDefault="True" />
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <!-- Field data sheets (photos, online look-up) -->
+    <DataTemplate DataType="sh:AutoFillSheetViewModel"><v:AutoFillSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:BulkAutoFillSheetViewModel"><v:BulkAutoFillSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:PhotoFolderSheetViewModel"><v:PhotoFolderSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:RestoreBackupSheetViewModel">
+      <StackPanel Spacing="12" Width="600">
+        <TextBlock Classes="secondary" Text="{Binding Intro}" TextWrapping="Wrap" />
+        <ListBox ItemsSource="{Binding Backups}" SelectedItem="{Binding Selected}" MaxHeight="320" IsVisible="{Binding HasBackups}" AutomationProperties.Name="Backups">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="sh:BackupRowViewModel">
+              <StackPanel Margin="4,2">
+                <TextBlock Text="{Binding When}" FontWeight="Medium" />
+                <TextBlock Classes="muted" Text="{Binding Detail}" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Classes="muted" Text="There are no backups yet." IsVisible="{Binding !HasBackups}" />
+        <DockPanel>
+          <Button DockPanel.Dock="Left" Classes="link" Content="Show the backups folder" Command="{Binding ShowFolderCommand}" />
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+            <Button Classes="danger" Content="Restore…" Command="{Binding RestoreCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          </StackPanel>
+        </DockPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:ReopenSheetViewModel">
+      <StackPanel Spacing="12" Width="520">
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <TextBox Text="{Binding Reason}" PlaceholderText="For example: the owner sent a contractor's estimate" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64"
+                 AutomationProperties.Name="Why it is being reopened" />
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          <Button Classes="primary" Content="Reopen" Command="{Binding ReopenCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:HistorySheetViewModel">
+      <StackPanel Spacing="12" Width="680">
+        <TextBlock Classes="muted" Text="Nothing has been recorded for this assessment yet." IsVisible="{Binding IsEmpty}" />
+        <ScrollViewer MaxHeight="420" IsVisible="{Binding !IsEmpty}">
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="sh:HistoryRowViewModel">
+                <Grid ColumnDefinitions="150,*" Margin="0,4">
+                  <StackPanel>
+                    <TextBlock Classes="secondary" Text="{Binding When}" FontSize="12" />
+                    <TextBlock Classes="muted" Text="{Binding Who}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding What}" FontWeight="Medium" TextWrapping="Wrap" />
+                    <TextBlock Classes="secondary" Text="{Binding Change}" IsVisible="{Binding HasChange}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+        <Button Classes="primary" Content="Done" IsDefault="True" HorizontalAlignment="Right" MinWidth="90" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}" />
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:NameSheetViewModel">
+      <StackPanel Spacing="10" Width="420">
+        <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        <TextBox Text="{Binding Name}" PlaceholderText="{Binding Placeholder}" AutomationProperties.Name="{Binding Label}" />
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          <Button Classes="primary" Content="Save" IsDefault="True" Command="{Binding OkCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:BulkEditSheetViewModel">
+      <StackPanel Spacing="12" Width="560">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="fieldLabel" Text="Field" />
+          <ComboBox ItemsSource="{Binding Fields}" SelectedItem="{Binding SelectedField}" HorizontalAlignment="Stretch" MaxDropDownHeight="420"
+                    PlaceholderText="Choose a field" AutomationProperties.Name="Field to set" />
+        </StackPanel>
+        <ContentControl Content="{Binding Input}" IsVisible="{Binding HasField}" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Classes="secondary" />
+        <TextBlock Text="{Binding ResultText}" TextWrapping="Wrap" FontWeight="Medium" IsVisible="{Binding ResultText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <DockPanel>
+          <Button DockPanel.Dock="Left" Content="Undo this change" Command="{Binding RevertCommand}" />
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Done" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+            <Button Classes="primary" Content="Apply" Command="{Binding ApplyCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          </StackPanel>
+        </DockPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:SearchReplaceSheetViewModel">
+      <StackPanel Spacing="12" Width="640">
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+          <TextBlock Classes="fieldLabel" Text="In" />
+          <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Find" />
+          <TextBlock Grid.Column="2" Classes="fieldLabel" Text="Replace with" />
+          <ComboBox Grid.Row="1" ItemsSource="{Binding Fields}" SelectedItem="{Binding SelectedField}" HorizontalAlignment="Stretch" MaxDropDownHeight="420" AutomationProperties.Name="Field to search">
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="data:SearchField"><TextBlock Text="{Binding Label}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Find}" AutomationProperties.Name="Find" />
+          <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding ReplaceWith}" AutomationProperties.Name="Replace with" />
+        </Grid>
+        <TextBlock Text="{Binding MatchText}" Classes="secondary" />
+        <ScrollViewer MaxHeight="280">
+          <ItemsControl ItemsSource="{Binding Matches}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="data:SearchMatch">
+                <Grid ColumnDefinitions="200,*" Margin="0,2">
+                  <TextBlock Text="{Binding Address}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis" Classes="secondary">
+                    <Run Text="{Binding Before}" /><Run Text=" → " /><Run Text="{Binding After}" />
+                  </TextBlock>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+        <TextBlock Text="{Binding ResultText}" TextWrapping="Wrap" FontWeight="Medium" IsVisible="{Binding ResultText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <DockPanel>
+          <Button DockPanel.Dock="Left" Content="Undo this change" Command="{Binding RevertCommand}" />
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Done" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+            <Button Classes="primary" Content="Replace all" Command="{Binding ReplaceAllCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          </StackPanel>
+        </DockPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:CopyFromSheetViewModel">
+      <StackPanel Spacing="12" Width="600">
+        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="Fills this assessment from one already entered. Location, owner and damage percentages are never copied." />
+        <TextBox Text="{Binding Search}" PlaceholderText="Search address or owner" AutomationProperties.Name="Search for the structure to copy from" />
+        <ListBox ItemsSource="{Binding Sources}" SelectedItem="{Binding Source}" Height="200" AutomationProperties.Name="Structure to copy from">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="data:StructureSummary">
+              <StackPanel Margin="2">
+                <TextBlock Text="{Binding Address}" FontWeight="Medium" />
+                <TextBlock Classes="muted" Text="{Binding Owner}" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Classes="fieldLabel" Text="Copy" />
+        <ItemsControl ItemsSource="{Binding Steps}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="sh:CopyStepViewModel">
+              <CheckBox Content="{Binding Title}" IsChecked="{Binding IsChecked}" Margin="0,2" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+          <Button Classes="primary" Content="Copy" Command="{Binding CopyCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="sh:ShortcutsSheetViewModel">
+      <StackPanel Spacing="12">
+        <ItemsControl ItemsSource="{Binding Shortcuts}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="sh:Shortcut">
+              <Grid ColumnDefinitions="130,*" Margin="0,3">
+                <TextBlock Text="{Binding Keys}" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{Binding Action}" TextWrapping="Wrap" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button Classes="primary" Content="Done" IsDefault="True" HorizontalAlignment="Right" MinWidth="90" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}" />
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="svc:ErrorSheetViewModel">
+      <StackPanel Spacing="14">
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <Button Classes="link" Content="{Binding ShowDetails, Converter={x:Static v:SheetConverters.DetailsToggle}}" Command="{Binding ToggleDetailsCommand}" AutomationProperties.Name="Show details" />
+        <TextBox Text="{Binding Details, Mode=OneWay}" IsReadOnly="True" IsVisible="{Binding ShowDetails}" TextWrapping="Wrap" MaxHeight="260"
+                 FontFamily="Menlo, Consolas, monospace" FontSize="11" AutomationProperties.Name="Error details" />
+        <Button Classes="primary" Content="OK" IsDefault="True" HorizontalAlignment="Right" MinWidth="90" HorizontalContentAlignment="Center" Command="{Binding CancelCommand}" />
+      </StackPanel>
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <!--
+    The menu's shortcuts again, for when there's no native menu bar (other platforms, and the headless tests). On macOS
+    the menu bar handles these keys first.
+  -->
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding Sheets.CancelCurrentCommand}" />
+    <KeyBinding Gesture="Cmd+S" Command="{Binding SaveCommand}" />
+    <KeyBinding Gesture="Cmd+Z" Command="{Binding UndoCommand}" />
+    <KeyBinding Gesture="Cmd+Shift+Z" Command="{Binding RedoCommand}" />
+    <KeyBinding Gesture="Cmd+F" Command="{Binding FindCommand}" />
+    <KeyBinding Gesture="Cmd+N" Command="{Binding Structures.NewStructureCommand}" CommandParameter="1" />
+    <KeyBinding Gesture="Cmd+Shift+N" Command="{Binding Structures.NewStructureCommand}" CommandParameter="2" />
+    <KeyBinding Gesture="Cmd+O" Command="{Binding Settings.OpenDatabaseCommand}" />
+    <KeyBinding Gesture="Cmd+OemOpenBrackets" Command="{Binding PreviousStepCommand}" />
+    <KeyBinding Gesture="Cmd+OemCloseBrackets" Command="{Binding NextStepCommand}" />
+    <KeyBinding Gesture="Cmd+D1" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Structures}" />
+    <KeyBinding Gesture="Cmd+D2" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" />
+    <KeyBinding Gesture="Cmd+D3" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Settings}" />
+    <KeyBinding Gesture="Cmd+D4" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Map}" />
+  </Window.KeyBindings>
+
+  <Panel>
+  <Grid ColumnDefinitions="208,*">
+    <!-- Sidebar -->
+    <Border Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,1,0">
+      <DockPanel Margin="12,18,12,14">
+        <StackPanel DockPanel.Dock="Top" Margin="8,0,8,22" Spacing="2">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="30" Height="30" CornerRadius="7" Background="{DynamicResource Accent}">
+              <TextBlock Text="SD" Foreground="White" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="Substantial Damage" FontWeight="SemiBold" FontSize="13" />
+              <TextBlock Text="Estimator" FontWeight="SemiBold" FontSize="13" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="8,0" Spacing="2">
+          <TextBlock Classes="eyebrow" Text="DATABASE" />
+          <TextBlock Text="{Binding DatabaseName}" FontSize="12" TextTrimming="CharacterEllipsis" />
+          <TextBlock Classes="muted" Text="{Binding CountsText}" />
+        </StackPanel>
+
+        <StackPanel Spacing="2">
+          <Button Classes="nav" Classes.active="{Binding IsStructuresPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Structures}" AutomationProperties.Name="Structures">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⌂" Width="16" TextAlignment="Center" /><TextBlock Text="Structures" /></StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsMapPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Map}" AutomationProperties.Name="Map">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="◉" Width="16" TextAlignment="Center" /><TextBlock Text="Map" /></StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsDashboardPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Dashboard}" AutomationProperties.Name="Event dashboard">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="▥" Width="16" TextAlignment="Center" /><TextBlock Text="Event dashboard" /></StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsImportExportPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" AutomationProperties.Name="Import and export">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⇅" Width="16" TextAlignment="Center" /><TextBlock Text="Import &amp; export" /></StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsSettingsPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Settings}" AutomationProperties.Name="Settings">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⚙" Width="16" TextAlignment="Center" /><TextBlock Text="Settings" /></StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsTrashPage}" Command="{Binding ShowCommand}" CommandParameter="{x:Static vm:Page.Trash}" AutomationProperties.Name="Recently deleted">
+            <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="⌫" Width="16" TextAlignment="Center" /><TextBlock Text="Recently deleted" /></StackPanel>
+          </Button>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <DockPanel Grid.Column="1">
+      <!-- The sample database is practice only: said on every page. -->
+      <Border DockPanel.Dock="Top" IsVisible="{Binding IsSampleDatabase}" Background="{DynamicResource StatusCloseBg}" Padding="16,8"
+              AutomationProperties.Name="Sample database notice">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="link" Content="Back to my database" Command="{Binding LeaveSampleDatabaseCommand}" Foreground="{DynamicResource StatusCloseFg}" />
+          <TextBlock Text="This is the sample database. Changes here are practice only." Foreground="{DynamicResource StatusCloseFg}" FontWeight="Medium" VerticalAlignment="Center" />
+        </DockPanel>
+      </Border>
+      <ContentControl Content="{Binding CurrentPage}" />
+    </DockPanel>
+  </Grid>
+
+  <!-- Sheets: the rest of the window is dimmed and can't be clicked. -->
+  <Border IsVisible="{Binding Sheets.HasSheet}" Background="#66000000" Name="SheetLayer">
+    <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="760" MinWidth="440" Margin="40" Padding="24,20"
+            BoxShadow="0 10 40 0 #40000000">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Classes="h2" Text="{Binding Sheets.CurrentTitle}" Margin="0,0,0,12" TextWrapping="Wrap" />
+        <ContentControl Content="{Binding Sheets.Current}" />
+      </DockPanel>
+    </Border>
+  </Border>
+  <!-- A long task: progress and Stop, over the bottom right corner, above any sheet so Stop can always be pressed. -->
+  <Border Classes="card" IsVisible="{Binding Jobs.IsBusy}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20" Width="340" Padding="16,12"
+          AutomationProperties.Name="Task in progress">
+    <StackPanel Spacing="6" DataContext="{Binding Jobs.Current}" x:DataType="svc:JobViewModel">
+      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+      <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsIndeterminate}" AutomationProperties.Name="Progress" />
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Classes="subtle" Content="Stop" IsVisible="{Binding CanStop}" IsEnabled="{Binding !IsStopping}" Command="{Binding StopCommand}" />
+        <TextBlock Classes="muted" Text="{Binding ProgressText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+      </DockPanel>
+    </StackPanel>
+  </Border>
+
+  </Panel>
+</Window>

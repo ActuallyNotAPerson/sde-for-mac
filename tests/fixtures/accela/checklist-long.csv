@@ -1,0 +1,84 @@
+Record ID,Inspection ID,Inspection Type,Inspection Status,Inspection Date,Inspector,Address,City,State,Zip,Parcel Number,Owner Name,Checklist Item,Checklist Item Value
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Structure Type,Residential
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Residence Type,Single Family Residence
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Number of Stories,1
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Foundation Type,Crawlspace
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Superstructure,Stud framed
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Roof Type,"Shingles - Asphalt, Wood"
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Exterior Finish,Siding or Stucco
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,HVAC Type,Heating and/or Cooling
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Quality,Good
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Year Built,1962
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Square Feet,"1,450"
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Cause of Damage,Flood
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Date of Damage,09/14/2026
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Flood Duration,2 days
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Water Depth,3 ft
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Condition,4 - Average
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Improved Value,"$145,000"
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Foundation % Damage,10%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Superstructure % Damage,20%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Roof Covering % Damage,0%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Exterior Finish % Damage,35%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Interior Finish % Damage,90%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Doors and Windows % Damage,60%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Cabinets and Countertops % Damage,100%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Floor Finish % Damage,100%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Plumbing % Damage,50%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Electrical % Damage,70%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Appliances % Damage,100%
+BLD-2026-00123,4471,Substantial Damage Assessment,Completed,10/07/2026 2:30 PM,Inspector A,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,HVAC % Damage,100%
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Structure Type,Residential
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Residence Type,Single Family
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Number of Stories,2 stories
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Foundation Type,Slab on grade
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Superstructure,Masonry
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Roof Type,Asphalt Shingles
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Exterior Finish,Brick Veneer
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,HVAC Type,Heating and/or Cooling
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Quality,Average
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Year Built,1978
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Square Feet,"2,100"
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Cause of Damage,Flood
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Date of Damage,09/14/2026
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Flood Duration,36 hrs
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Water Depth,18 in
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Condition,3
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Improved Value,"$210,000"
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Foundation % Damage,0
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Superstructure % Damage,10
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Roof Covering % Damage,0
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Exterior Finish % Damage,20
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Interior Finish % Damage,60
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Doors and Windows % Damage,40
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Cabinets and Countertops % Damage,50
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Floor Finish % Damage,80
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Plumbing % Damage,30
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Electrical % Damage,40
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Appliances % Damage,60
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,HVAC % Damage,100
+BLD-2026-00124,4472,Substantial Damage Assessment,Completed,10/07/2026 3:10 PM,Inspector A,45 Elm Street,Exampleville,OH,43703,0123-0045-0070-00,Jane Smith,Plumbing % Damage,35
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Structure Type,Non-Residential
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Number of Stories,1
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Occupancy,Office Building
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Year Built,1985
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Square Feet,"12,000"
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Cause of Damage,Flood
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Date of Damage,09/14/2026
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Flood Duration,1 day
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Water Depth,2 ft
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Condition,4
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Improved Value,"$1,250,000"
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Foundation % Damage,5
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Superstructure % Damage,10
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Roof Covering % Damage,0
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Plumbing % Damage,40
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Electrical % Damage,45
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,HVAC % Damage,60
+COM-2026-00031,4480,Substantial Damage Assessment,Completed,10/08/2026 9:00 AM,R. Diaz,800 Main St,Exampleville,OH,43702,0145-0001-0001-00,Main Street Holdings,Interiors % Damage,55
+,4490,Substantial Damage Assessment,Completed,10/08/2026 10:00 AM,R. Diaz,9 Oak Ave,Exampleville,OH,43702,,,Structure Type,Residential
+,4490,Substantial Damage Assessment,Completed,10/08/2026 10:00 AM,R. Diaz,9 Oak Ave,Exampleville,OH,43702,,,Residence Type,Single Family Residence
+,4490,Substantial Damage Assessment,Completed,10/08/2026 10:00 AM,R. Diaz,9 Oak Ave,Exampleville,OH,43702,,,Number of Stories,1
+,4490,Substantial Damage Assessment,Completed,10/08/2026 10:00 AM,R. Diaz,9 Oak Ave,Exampleville,OH,43702,,,Foundation Type,Crawlspace
+,4490,Substantial Damage Assessment,Completed,10/08/2026 10:00 AM,R. Diaz,9 Oak Ave,Exampleville,OH,43702,,,Cause of Damage,Flood
+BLD-2026-00123,4475,Final Building,Scheduled,,,123 River St,Exampleville,OH,43702,0123-0045-0067-00,Pat Example,Notes,

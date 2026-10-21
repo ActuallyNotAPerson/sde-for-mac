@@ -1,0 +1,218 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:v="using:Sde.App.Views"
+             x:Class="Sde.App.Views.ImportExportView"
+             x:DataType="vm:ImportExportViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="28,22,28,28" Spacing="16" MaxWidth="1000" HorizontalAlignment="Left">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="h1" Text="Import &amp; export" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="Exchange data with FEMA's SDE (Windows), your state, and other tools. Exports in SDE format can be imported by FEMA's SDE 3.0." />
+      </StackPanel>
+
+      <!-- What the last action did -->
+      <Border Classes="subtle" Padding="12,8" IsVisible="{Binding LastResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" />
+          <Button Grid.Column="1" Classes="link" Content="Dismiss" Command="{Binding DismissResultCommand}" />
+        </Grid>
+      </Border>
+
+      <!-- SDE exchange -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="FEMA SDE data" />
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="The same format as SDE's “Export SDE data” / “Import SDE data”: a folder with Export.json and the photos." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,*" >
+            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Export" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Everything in this database. To export only some structures, check them on the Structures page and use Export ▾." />
+                <Button Classes="primary" Content="Export all to an SDE folder…" Command="{Binding ExportAllCommand}" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Import" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="You'll see what's inside before anything is added. You can also drop a folder or .mdb file on this page." />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Content="SDE export folder…" Command="{Binding ChooseSdeFolderCommand}" ToolTip.Tip="SDE 3 (Export.json) or SDE 2.x (SummaryData.xml)" />
+                  <Button Content="SDE database (.mdb)…" Command="{Binding ChooseMdbCommand}" ToolTip.Tip="A FEMA SDE database file, e.g. from a colleague's Windows PC" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </Grid>
+
+          <!-- Preview of a pending import -->
+          <Border Classes="subtle" IsVisible="{Binding HasPending}" Padding="14">
+            <StackPanel Spacing="10">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="h3" Text="Ready to import" />
+                <TextBlock Classes="muted" Text="{Binding PendingSource}" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <TextBlock Text="{Binding PendingNotes}" Classes="issue recommended" TextWrapping="Wrap"
+                         IsVisible="{Binding PendingNotes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              <ItemsControl ItemsSource="{Binding PendingRows}" MaxHeight="320">
+                <ItemsControl.Template>
+                  <ControlTemplate>
+                    <ScrollViewer><ItemsPresenter /></ScrollViewer>
+                  </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ImportRowViewModel">
+                    <Grid ColumnDefinitions="30,2*,2*,*" Margin="0,3">
+                      <CheckBox IsChecked="{Binding Include}" AutomationProperties.Name="{Binding Address, StringFormat='Import {0}'}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Address}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="2" Text="{Binding Detail}" Classes="secondary" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="3" Text="{Binding Status}" Classes="muted" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="If a structure is already in your database:" VerticalAlignment="Center" />
+                <ComboBox SelectedIndex="{Binding ExistingChoice}" Width="260" AutomationProperties.Name="If a structure is already in your database">
+                  <ComboBoxItem Content="Keep mine (skip it)" />
+                  <ComboBoxItem Content="Replace mine with the imported one" />
+                  <ComboBoxItem Content="Keep both (import a copy)" />
+                </ComboBox>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="primary" Content="Import checked" Command="{Binding RunImportCommand}" />
+                <Button Content="Cancel" Command="{Binding CancelImportCommand}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- Inspections or parcels from another system -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="2" Margin="0,0,16,0">
+            <TextBlock Classes="h2" Text="Inspections or parcels" />
+            <TextBlock Classes="muted" TextWrapping="Wrap"
+                       Text="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures (.xlsx, .xls, .csv or .dbf). Import an updated file at any time: only what changed in it is updated, and your edits in SDE are kept." />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="primary" Content="Import inspections or parcels…" Command="{Binding OpenSourceImportCommand}" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <!-- A folder of field photos -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="2" Margin="0,0,16,0">
+            <TextBlock Classes="h2" Text="Photos from the field" />
+            <TextBlock Classes="muted" TextWrapping="Wrap"
+                       Text="Attach a folder of photos to the right structures: by a record ID, parcel number or address in each file name, or by the photo's GPS position. You'll see every match before anything is attached." />
+          </StackPanel>
+          <Button Grid.Column="1" Content="Match a photo folder to structures…" Command="{Binding MatchPhotoFolderCommand}" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <!-- Spreadsheets and maps -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="Spreadsheets &amp; maps" />
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="For your own analysis, your GIS, or sharing results with people who don't use SDE." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,*">
+            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Excel" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Every assessment as one row, with the same 218 columns as SDE's “Export to Excel”." />
+                <Button Content="Export to Excel…" Command="{Binding ExportExcelCommand}" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Google Earth map" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="A pin for each assessment, coloured by % damaged. Structures need a latitude and longitude." />
+                <Button Content="Save map (.kmz)…" Command="{Binding ExportMapCommand}" />
+              </StackPanel>
+            </Border>
+          </Grid>
+
+          <!-- Latitude / longitude -->
+          <Border Classes="subtle" Padding="14">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="Add coordinates in bulk" />
+              <TextBlock Classes="muted" TextWrapping="Wrap"
+                         Text="1. Save a spreadsheet of your structures.  2. Fill in Latitude and Longitude (by hand or with a geocoder).  3. Read it back: you'll see every change before it's saved." />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Save coordinates spreadsheet…" Command="{Binding ExportLatLongCommand}" />
+                <Button Content="Read coordinates…" Command="{Binding ChooseLatLongCommand}" />
+              </StackPanel>
+              <StackPanel Spacing="8" IsVisible="{Binding HasLatLong}" Margin="0,6,0,0">
+                <TextBlock Text="{Binding LatLongSummary}" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="30,2*,1.3*,1.3*,2*" Margin="0,0,0,2">
+                  <TextBlock Grid.Column="1" Classes="eyebrow" Text="STRUCTURE" />
+                  <TextBlock Grid.Column="2" Classes="eyebrow" Text="NOW" />
+                  <TextBlock Grid.Column="3" Classes="eyebrow" Text="FROM SPREADSHEET" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding LatLongRows}" MaxHeight="300">
+                  <ItemsControl.Template>
+                    <ControlTemplate><ScrollViewer><ItemsPresenter /></ScrollViewer></ControlTemplate>
+                  </ItemsControl.Template>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LatLongRowViewModel">
+                      <Grid ColumnDefinitions="30,2*,1.3*,1.3*,2*" Margin="0,3">
+                        <CheckBox IsChecked="{Binding Include}" IsEnabled="{Binding CanInclude}" AutomationProperties.Name="{Binding Address, StringFormat='Update {0}'}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Address}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="2" Text="{Binding Current}" Classes="secondary" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Text="{Binding New}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Text="{Binding Note}" Classes="issue" Classes.required="{Binding IsProblem}" Classes.recommended="{Binding !IsProblem}"
+                                   VerticalAlignment="Center" TextWrapping="Wrap" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Classes="primary" Content="Save checked coordinates" Command="{Binding ApplyLatLongCommand}" />
+                  <Button Content="Cancel" Command="{Binding CancelLatLongCommand}" />
+                </StackPanel>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- Enterprise Import -->
+      <v:EnterpriseImportView DataContext="{Binding Enterprise}" />
+
+      <!-- Settings file -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h2" Text="Share your setup" />
+            <TextBlock Classes="muted" TextWrapping="Wrap"
+                       Text="Give colleagues your saved notes, spreadsheet mappings and default values (e.g. your community's details). Uses SDE's user-settings file, so it also works with FEMA's SDE." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,*">
+            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Export" />
+                <CheckBox Content="Saved notes" IsChecked="{Binding SettingsIncludeNotes}" />
+                <CheckBox Content="Spreadsheet import mappings" IsChecked="{Binding SettingsIncludeMappings}" />
+                <CheckBox Content="Default values" IsChecked="{Binding SettingsIncludeDefaults}" />
+                <Button Content="Save settings file…" Command="{Binding ExportSettingsFileCommand}" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="Import" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Notes and mappings are added to yours. Default values replace yours; you'll be asked first." />
+                <Button Content="Import settings file…" Command="{Binding ImportSettingsFileCommand}" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

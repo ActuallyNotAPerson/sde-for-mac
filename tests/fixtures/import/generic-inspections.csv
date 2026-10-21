@@ -1,0 +1,5 @@
+Record ID,Inspection Date,Inspector,Address,City,State,ZIP,Parcel,Owner,Structure Type,Foundation,Stories,Year Built,Square Feet,Cause of Damage,Water Depth,Condition,Building Value,Repair Estimate
+INS-0001,9/20/2026,Inspector A,100 Sample Avenue,Exampleville,OH,99999,900-01-001,Alex Example,Residential,Crawlspace,1,1955,1200,Flood,2 ft,4 - Average,"$95,000","$40,000"
+INS-0002,9/20/2026,Inspector A,200 Test Road,Exampleville,OH,99999,,Jordan Sample,Residential,Slab on grade,2,1970,1800,Flood,1 ft,3,"$120,000","$30,000"
+INS-0003,9/21/2026,Inspector B,15 Placeholder Street North,Exampleville,OH,99999,,Testco Holdings,Non-Residential,Slab on grade,1,1990,5000,Flood,1 ft,3,"$400,000","$150,000"
+INS-0004,9/21/2026,Inspector B,300 Nowhere Blvd,Exampleville,OH,99999,,Casey Placeholder,Residential,Basement,1,1948,950,Flood,4 ft,2,"$60,000","$45,000"

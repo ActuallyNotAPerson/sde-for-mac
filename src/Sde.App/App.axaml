@@ -1,0 +1,171 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:f="using:Sde.App.ViewModels.Fields"
+             x:Class="Sde.App.App"
+             Name="Substantial Damage Estimator"
+             RequestedThemeVariant="Default">
+
+  <!-- macOS application menu (replaces Avalonia's default "About Avalonia"). -->
+  <NativeMenu.Menu>
+    <NativeMenu>
+      <NativeMenuItem Header="About Substantial Damage Estimator" Click="OnAboutClicked" />
+    </NativeMenu>
+  </NativeMenu.Menu>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="WindowBg" Color="#F4F5F7" />
+          <SolidColorBrush x:Key="SidebarBg" Color="#EBEDF0" />
+          <SolidColorBrush x:Key="CardBg" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="CardBorder" Color="#E1E4E8" />
+          <SolidColorBrush x:Key="SubtleBg" Color="#F0F2F5" />
+          <SolidColorBrush x:Key="TextPrimary" Color="#1A1D21" />
+          <SolidColorBrush x:Key="TextSecondary" Color="#5C6570" />
+          <SolidColorBrush x:Key="TextMuted" Color="#8A929B" />
+          <SolidColorBrush x:Key="Accent" Color="#1E5AA8" />
+          <SolidColorBrush x:Key="AccentSoft" Color="#E6EEF8" />
+          <SolidColorBrush x:Key="OnAccent" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="SelectedRow" Color="#E6EEF8" />
+          <SolidColorBrush x:Key="StatusSubstantialFg" Color="#B42318" />
+          <SolidColorBrush x:Key="StatusSubstantialBg" Color="#FDECEA" />
+          <SolidColorBrush x:Key="StatusCloseFg" Color="#A15C00" />
+          <SolidColorBrush x:Key="StatusCloseBg" Color="#FFF3DC" />
+          <SolidColorBrush x:Key="StatusNotSubstantialFg" Color="#1E7B34" />
+          <SolidColorBrush x:Key="StatusNotSubstantialBg" Color="#E7F5EA" />
+          <SolidColorBrush x:Key="StatusIncompleteFg" Color="#5C6570" />
+          <SolidColorBrush x:Key="StatusIncompleteBg" Color="#EDEFF2" />
+          <SolidColorBrush x:Key="StatusUndeterminedFg" Color="#5B4FA8" />
+          <SolidColorBrush x:Key="StatusUndeterminedBg" Color="#EEECF8" />
+          <SolidColorBrush x:Key="RequiredFg" Color="#B42318" />
+          <SolidColorBrush x:Key="RecommendedFg" Color="#A15C00" />
+          <SolidColorBrush x:Key="SuggestedFg" Color="#3C7A57" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="WindowBg" Color="#1B1D20" />
+          <SolidColorBrush x:Key="SidebarBg" Color="#222529" />
+          <SolidColorBrush x:Key="CardBg" Color="#26292D" />
+          <SolidColorBrush x:Key="CardBorder" Color="#363A40" />
+          <SolidColorBrush x:Key="SubtleBg" Color="#2D3035" />
+          <SolidColorBrush x:Key="TextPrimary" Color="#ECEEF0" />
+          <SolidColorBrush x:Key="TextSecondary" Color="#A9B0B8" />
+          <SolidColorBrush x:Key="TextMuted" Color="#7C848D" />
+          <SolidColorBrush x:Key="Accent" Color="#6FA3E8" />
+          <SolidColorBrush x:Key="AccentSoft" Color="#24354B" />
+          <SolidColorBrush x:Key="OnAccent" Color="#0B1726" />
+          <SolidColorBrush x:Key="SelectedRow" Color="#24354B" />
+          <SolidColorBrush x:Key="StatusSubstantialFg" Color="#FF8A80" />
+          <SolidColorBrush x:Key="StatusSubstantialBg" Color="#4A2522" />
+          <SolidColorBrush x:Key="StatusCloseFg" Color="#FFC266" />
+          <SolidColorBrush x:Key="StatusCloseBg" Color="#46361A" />
+          <SolidColorBrush x:Key="StatusNotSubstantialFg" Color="#7FD493" />
+          <SolidColorBrush x:Key="StatusNotSubstantialBg" Color="#1F3A26" />
+          <SolidColorBrush x:Key="StatusIncompleteFg" Color="#A9B0B8" />
+          <SolidColorBrush x:Key="StatusIncompleteBg" Color="#33363B" />
+          <SolidColorBrush x:Key="StatusUndeterminedFg" Color="#B9AEF5" />
+          <SolidColorBrush x:Key="StatusUndeterminedBg" Color="#33304A" />
+          <SolidColorBrush x:Key="RequiredFg" Color="#FF8A80" />
+          <SolidColorBrush x:Key="RecommendedFg" Color="#FFC266" />
+          <SolidColorBrush x:Key="SuggestedFg" Color="#8FD1A8" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.DataTemplates>
+    <!-- One editor per kind of field; used by every form in the app. -->
+    <DataTemplate DataType="f:TextFieldViewModel">
+      <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="link" Content="Insert snippet ▾" IsVisible="{Binding HasSnippets}" IsEnabled="{Binding IsEnabled}" Padding="0" FontSize="12"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Insert a snippet into {0}'}">
+            <Button.Flyout>
+              <MenuFlyout ItemsSource="{Binding SnippetItems}" />
+            </Button.Flyout>
+          </Button>
+          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        </DockPanel>
+        <TextBox Text="{Binding Text}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" PlaceholderText="{Binding Placeholder}" MaxLength="{Binding MaxLength}"
+                 AcceptsReturn="{Binding IsMultiline}" TextWrapping="Wrap" IsEnabled="{Binding IsEnabled}"
+                 Classes.multiline="{Binding IsMultiline}" />
+        <TextBlock Classes="issue" Classes.required="{Binding IsRequiredIssue}" Classes.recommended="{Binding IsRecommendedIssue}"
+                   Classes.suggested="{Binding IsSuggestedIssue}" Text="{Binding IssueMessage}" IsVisible="{Binding ShowIssueInline}" />
+        <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="f:NumberFieldViewModel">
+      <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        </DockPanel>
+        <NumericUpDown Value="{Binding Value}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" FormatString="{Binding Format}" ShowButtonSpinner="False"
+                       Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" PlaceholderText="{Binding Placeholder}"
+                       IsEnabled="{Binding IsEnabled}" Classes="number">
+          <NumericUpDown.InnerLeftContent>
+            <TextBlock Classes="adorn" Text="{Binding Prefix}" Margin="10,0,0,0" IsVisible="{Binding Prefix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </NumericUpDown.InnerLeftContent>
+          <NumericUpDown.InnerRightContent>
+            <TextBlock Classes="adorn" Text="{Binding Suffix}" Margin="0,0,10,0" IsVisible="{Binding Suffix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </NumericUpDown.InnerRightContent>
+        </NumericUpDown>
+        <TextBlock Classes="issue" Classes.required="{Binding IsRequiredIssue}" Classes.recommended="{Binding IsRecommendedIssue}"
+                   Classes.suggested="{Binding IsSuggestedIssue}" Text="{Binding IssueMessage}" IsVisible="{Binding ShowIssueInline}" />
+        <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="f:DateFieldViewModel">
+      <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        </DockPanel>
+        <CalendarDatePicker SelectedDate="{Binding Date}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" IsEnabled="{Binding IsEnabled}" HorizontalAlignment="Stretch"
+                            SelectedDateFormat="Custom" CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" />
+        <TextBlock Classes="issue" Classes.required="{Binding IsRequiredIssue}" Classes.recommended="{Binding IsRecommendedIssue}"
+                   Classes.suggested="{Binding IsSuggestedIssue}" Text="{Binding IssueMessage}" IsVisible="{Binding ShowIssueInline}" />
+        <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="f:ChoiceFieldViewModel">
+      <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        </DockPanel>
+        <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" IsEnabled="{Binding IsEnabled}"
+                  HorizontalAlignment="Stretch" MaxDropDownHeight="360" />
+        <TextBlock Classes="issue" Classes.required="{Binding IsRequiredIssue}" Classes.recommended="{Binding IsRecommendedIssue}"
+                   Classes.suggested="{Binding IsSuggestedIssue}" Text="{Binding IssueMessage}" IsVisible="{Binding ShowIssueInline}" />
+        <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="f:BoolFieldViewModel">
+      <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
+        <TextBlock Classes="fieldLabel" Text=" " />
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+          <CheckBox IsChecked="{Binding Value}" Content="{Binding Label}" IsEnabled="{Binding IsEnabled}" />
+        </DockPanel>
+        <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </DataTemplate>
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    <StyleInclude Source="avares://SDE/Styles/AppStyles.axaml" />
+  </Application.Styles>
+</Application>

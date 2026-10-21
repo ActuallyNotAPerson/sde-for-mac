@@ -1,0 +1,151 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:Sde.App"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.ImprovementsSheetView"
+             x:DataType="sh:ImprovementsSheetViewModel">
+  <StackPanel Spacing="12" Width="700">
+    <StackPanel Spacing="2">
+      <TextBlock Text="{Binding Address}" FontWeight="SemiBold" />
+      <TextBlock Classes="muted" Text="{Binding SettingsText}" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <ScrollViewer MaxHeight="560" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="12" Margin="0,0,12,0">
+        <!-- Projects -->
+        <Grid ColumnDefinitions="230,*" ColumnSpacing="14">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="fieldLabel" Text="Projects (permits)" />
+            <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" Height="214" AutomationProperties.Name="Improvement projects">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="sh:ImprovementProjectRowViewModel">
+                  <StackPanel Margin="2">
+                    <TextBlock Text="{Binding Title}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Content="+ New project" Command="{Binding NewProjectCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+          </StackPanel>
+
+          <Border Grid.Column="1" Classes="subtle">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="{Binding FormTitle}" />
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4">
+                <TextBlock Classes="fieldLabel" Text="Permit number" />
+                <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Date (permit or start)" />
+                <TextBox Grid.Row="1" Text="{Binding PermitNumber}" AutomationProperties.Name="Permit number" />
+                <CalendarDatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding ProjectDate}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                    CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Project date" />
+                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Classes="fieldLabel" Text="Description" Margin="0,4,0,0" />
+                <TextBox Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding Description}" PlaceholderText="For example: kitchen remodel and new roof" AutomationProperties.Name="Project description" />
+                <TextBlock Grid.Row="4" Classes="fieldLabel" Text="Cost of the improvement" Margin="0,4,0,0" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Classes="fieldLabel" Text="Where the cost came from" Margin="0,4,0,0" />
+                <NumericUpDown Grid.Row="5" Value="{Binding Cost}" Minimum="0" FormatString="N2" ShowButtonSpinner="False" Classes="number" AutomationProperties.Name="Cost of the improvement">
+                  <NumericUpDown.InnerLeftContent>
+                    <TextBlock Classes="adorn" Text="$" Margin="10,0,0,0" />
+                  </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{x:Static sh:ImprovementsSheetViewModel.CostBases}" SelectedItem="{Binding CostBasis}" HorizontalAlignment="Stretch"
+                          PlaceholderText="Choose" AutomationProperties.Name="Where the cost came from" />
+              </Grid>
+              <CheckBox IsChecked="{Binding Included}" Content="Counts toward substantial improvement" />
+              <TextBox Text="{Binding ExclusionReason}" IsVisible="{Binding !Included}" PlaceholderText="Why it doesn't count (for example: routine maintenance)"
+                       AutomationProperties.Name="Why the project doesn't count" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="primary" Content="Save project" Command="{Binding SaveProjectCommand}" />
+                <Button Content="Delete project…" Command="{Binding DeleteProjectCommand}" IsVisible="{Binding !IsNewProject}" />
+                <TextBlock Classes="muted" Text="Not saved yet" VerticalAlignment="Center" IsVisible="{Binding IsProjectDirty}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- Market value -->
+        <Grid ColumnDefinitions="230,*" ColumnSpacing="14" RowDefinitions="Auto,Auto" RowSpacing="4">
+          <TextBlock Classes="fieldLabel" Text="Market value of the structure" />
+          <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Where the market value came from" />
+          <NumericUpDown Grid.Row="1" Value="{Binding MarketValue}" Minimum="0" FormatString="N2" ShowButtonSpinner="False" Classes="number"
+                         AutomationProperties.Name="Market value of the structure, before the improvement">
+            <NumericUpDown.InnerLeftContent>
+              <TextBlock Classes="adorn" Text="$" Margin="10,0,0,0" />
+            </NumericUpDown.InnerLeftContent>
+          </NumericUpDown>
+          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding MarketValueBasis}" PlaceholderText="For example: professional appraisal, or adjusted tax assessed value"
+                   AutomationProperties.Name="Where the market value came from" />
+        </Grid>
+        <TextBlock Classes="help" Text="The building only, not the land, before the improvement. It starts as the building value of the latest damage assessment." />
+
+        <!-- Result -->
+        <Border Classes="card" BorderThickness="0" Padding="16,12" Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}">
+          <StackPanel Spacing="6">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+              <TextBlock Text="{Binding PercentText}" FontSize="32" FontWeight="Bold" VerticalAlignment="Center"
+                         Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Classes="eyebrow" Text="IMPROVEMENT COST AS A PERCENT OF MARKET VALUE" />
+                <TextBlock Text="{Binding ResultText}" FontSize="15" FontWeight="SemiBold"
+                           Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+              </StackPanel>
+            </Grid>
+            <ItemsControl ItemsSource="{Binding Explanation}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" FontSize="12" TextWrapping="Wrap" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl ItemsSource="{Binding Lines}" Margin="0,4,0,0">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="sh:SiLineViewModel">
+                  <Grid ColumnDefinitions="*,100" Margin="0,1">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Project}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Reason}" FontSize="11" Classes="muted" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Classes="money" Text="{Binding Cost}" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Right" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap"
+                   Text="Substantial improvement is a separate finding. It doesn't change any damage assessment, its percent damaged or FEMA's determination." />
+
+        <StackPanel Spacing="4">
+          <TextBlock Classes="fieldLabel" Text="Notes for the determination" />
+          <TextBox Text="{Binding Notes}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48" AutomationProperties.Name="Notes for the determination" />
+        </StackPanel>
+
+        <!-- Earlier determinations -->
+        <StackPanel Spacing="4" IsVisible="{Binding HasDeterminations}">
+          <TextBlock Classes="h3" Text="Determinations made" />
+          <ItemsControl ItemsSource="{Binding Determinations}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="sh:SiDeterminationRowViewModel">
+                <Grid ColumnDefinitions="110,*" Margin="0,2">
+                  <TextBlock Classes="secondary" Text="{Binding When}" FontSize="12" />
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding Result}" FontWeight="Medium" FontSize="12" />
+                    <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+
+    <TextBlock Text="{Binding SavedText}" FontWeight="Medium" TextWrapping="Wrap" IsVisible="{Binding SavedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Content="SI determination PDF…" Command="{Binding SavePdfCommand}" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Done" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Save determination" Command="{Binding SaveDeterminationCommand}" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

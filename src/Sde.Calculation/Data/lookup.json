@@ -1,0 +1,3638 @@
+[
+ {
+   "LookupID": 1,
+   "LookupTypeID": 1,
+   "LookupFieldName": "No",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 2,
+   "LookupTypeID": 1,
+   "LookupFieldName": "Yes",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 4,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Foundation",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 5,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Superstructure",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 6,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Roof Covering",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 7,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Exterior Finish",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 8,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Interior Finish",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 9,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Doors and Windows",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 10,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Cabinets and Countertops",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 11,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Floor Finish",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 11,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 12,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Plumbing",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 12,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 13,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Electrical",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 13,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 14,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Appliances",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 14,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 15,
+   "LookupTypeID": 2,
+   "LookupFieldName": "HVAC",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 19,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 16,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Skirting / Forms Piers",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 17,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 17,
+   "LookupTypeID": 2,
+   "LookupFieldName": "Interiors",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 18,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 19,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Fire",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 20,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Flood",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 21,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Flood and Wind",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 22,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Seismic",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 23,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Wind",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 24,
+   "LookupTypeID": 3,
+   "LookupFieldName": "Other",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 25,
+   "LookupTypeID": 4,
+   "LookupFieldName": "Siding or Stucco (Standard)",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 26,
+   "LookupTypeID": 4,
+   "LookupFieldName": "Brick Veneer",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 27,
+   "LookupTypeID": 4,
+   "LookupFieldName": "EIFS",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 28,
+   "LookupTypeID": 4,
+   "LookupFieldName": "None - common brick, structural",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 29,
+   "LookupTypeID": 5,
+   "LookupFieldName": "A",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 30,
+   "LookupTypeID": 5,
+   "LookupFieldName": "AE",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 31,
+   "LookupTypeID": 5,
+   "LookupFieldName": "AH",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 32,
+   "LookupTypeID": 5,
+   "LookupFieldName": "AO",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 33,
+   "LookupTypeID": 5,
+   "LookupFieldName": "AR",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 34,
+   "LookupTypeID": 5,
+   "LookupFieldName": "A1 thru A99",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 35,
+   "LookupTypeID": 5,
+   "LookupFieldName": "V",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 8,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 36,
+   "LookupTypeID": 5,
+   "LookupFieldName": "VE",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 9,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 37,
+   "LookupTypeID": 5,
+   "LookupFieldName": "X",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 9
+ },
+ {
+   "LookupID": 38,
+   "LookupTypeID": 5,
+   "LookupFieldName": "D",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 11,
+   "zOrder": 99
+ },
+ {
+   "LookupID": 39,
+   "LookupTypeID": 5,
+   "LookupFieldName": "None",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 40,
+   "LookupTypeID": 6,
+   "LookupFieldName": "Yes",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 41,
+   "LookupTypeID": 6,
+   "LookupFieldName": "No",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 42,
+   "LookupTypeID": 6,
+   "LookupFieldName": "Possible",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 43,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Continuous Wall w/Slab (Standard)",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 44,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Piles",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 45,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Crawlspace",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 46,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Slab - on - Grade",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 47,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Basement",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 48,
+   "LookupTypeID": 7,
+   "LookupFieldName": "Piers and Posts",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 49,
+   "LookupTypeID": 8,
+   "LookupFieldName": "Heating and/or Cooling",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 50,
+   "LookupTypeID": 8,
+   "LookupFieldName": "None",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 51,
+   "LookupTypeID": 9,
+   "LookupFieldName": "Low",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 52,
+   "LookupTypeID": 9,
+   "LookupFieldName": "Budget",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 53,
+   "LookupTypeID": 9,
+   "LookupFieldName": "Average",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 54,
+   "LookupTypeID": 9,
+   "LookupFieldName": "Good",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 55,
+   "LookupTypeID": 9,
+   "LookupFieldName": "Excellent",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 74,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Expando",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 75,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Carport",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 76,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Open Porch",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 77,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Enclosed Porch",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 78,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Decks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 79,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Skirting",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 80,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Fireplaces",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 81,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Roofing",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 9,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 82,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Heating / Cooling",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 83,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Appliances",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 12,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 84,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Porch / Breezeways",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 14,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 85,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Garage",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 15,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 86,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Basement",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 16,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 87,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Built-In Equipment",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 17,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 88,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Built-In Security/Communications",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 18,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 89,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Conveyance System",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 19,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 90,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Wall Covering",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 23,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 91,
+   "LookupTypeID": 10,
+   "LookupFieldName": "Windows/Skylights",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 24,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 92,
+   "LookupTypeID": 11,
+   "LookupFieldName": "Single Family Residence",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 93,
+   "LookupTypeID": 11,
+   "LookupFieldName": "Town or Row House",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 94,
+   "LookupTypeID": 11,
+   "LookupFieldName": "Manufactured House",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 95,
+   "LookupTypeID": 12,
+   "LookupFieldName": "Shingles - Asphalt, Wood (Standard)",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 96,
+   "LookupTypeID": 12,
+   "LookupFieldName": "Clay Tile",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 97,
+   "LookupTypeID": 12,
+   "LookupFieldName": "Slate",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 98,
+   "LookupTypeID": 12,
+   "LookupFieldName": "Standing Seam (Metal)",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 99,
+   "LookupTypeID": 13,
+   "LookupFieldName": "Yes",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 100,
+   "LookupTypeID": 13,
+   "LookupFieldName": "No",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 101,
+   "LookupTypeID": 14,
+   "LookupFieldName": "1 Story",
+   "LookupValue1": "NonResidential",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 102,
+   "LookupTypeID": 14,
+   "LookupFieldName": "2 thru 4",
+   "LookupValue1": "NonResidential",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 103,
+   "LookupTypeID": 14,
+   "LookupFieldName": "5 or more",
+   "LookupValue1": "NonResidential",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 104,
+   "LookupTypeID": 14,
+   "LookupFieldName": "One Story (Standard)",
+   "LookupValue1": "Residential",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 105,
+   "LookupTypeID": 14,
+   "LookupFieldName": "Two or More Stories",
+   "LookupValue1": "Residential",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 106,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Office Building",
+   "LookupValue1": "101, 102, 103",
+   "LookupValue2": "1",
+   "OldID": 1,
+   "zOrder": 20
+ },
+ {
+   "LookupID": 107,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Department Stores",
+   "LookupValue1": "101, 102",
+   "LookupValue2": "2",
+   "OldID": 2,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 108,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Motel",
+   "LookupValue1": "101, 102",
+   "LookupValue2": "3",
+   "OldID": 3,
+   "zOrder": 18
+ },
+ {
+   "LookupID": 109,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Restaurants",
+   "LookupValue1": "101",
+   "LookupValue2": "4",
+   "OldID": 4,
+   "zOrder": 22
+ },
+ {
+   "LookupID": 110,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Commercial Retail",
+   "LookupValue1": "101",
+   "LookupValue2": "5",
+   "OldID": 5,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 111,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Strip Mall",
+   "LookupValue1": "101",
+   "LookupValue2": "6",
+   "OldID": 6,
+   "zOrder": 23
+ },
+ {
+   "LookupID": 112,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Convenience Store",
+   "LookupValue1": "101",
+   "LookupValue2": "7",
+   "OldID": 7,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 113,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Fire / Police Station",
+   "LookupValue1": "101",
+   "LookupValue2": "8",
+   "OldID": 8,
+   "zOrder": 9
+ },
+ {
+   "LookupID": 114,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Elementary School",
+   "LookupValue1": "101",
+   "LookupValue2": "9",
+   "OldID": 9,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 115,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Apartments",
+   "LookupValue1": "101, 102, 103",
+   "LookupValue2": "10",
+   "OldID": 10,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 116,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Courthouse",
+   "LookupValue1": "101, 102",
+   "LookupValue2": "11",
+   "OldID": 11,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 117,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Grocery Store",
+   "LookupValue1": "101",
+   "LookupValue2": "12",
+   "OldID": 12,
+   "zOrder": 10
+ },
+ {
+   "LookupID": 118,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Mini-Warehouse",
+   "LookupValue1": "101",
+   "LookupValue2": "13",
+   "OldID": 13,
+   "zOrder": 17
+ },
+ {
+   "LookupID": 119,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Hospital",
+   "LookupValue1": "101, 102, 103",
+   "LookupValue2": "14",
+   "OldID": 14,
+   "zOrder": 12
+ },
+ {
+   "LookupID": 120,
+   "LookupTypeID": 15,
+   "LookupFieldName": "High School",
+   "LookupValue1": "102",
+   "LookupValue2": "15",
+   "OldID": 15,
+   "zOrder": 11
+ },
+ {
+   "LookupID": 121,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Police Station",
+   "LookupValue1": "102",
+   "LookupValue2": "16",
+   "OldID": 16,
+   "zOrder": 21
+ },
+ {
+   "LookupID": 122,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Industrial",
+   "LookupValue1": "102",
+   "LookupValue2": "17",
+   "OldID": 17,
+   "zOrder": 15
+ },
+ {
+   "LookupID": 123,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Hotel",
+   "LookupValue1": "103",
+   "LookupValue2": "18",
+   "OldID": 18,
+   "zOrder": 13
+ },
+ {
+   "LookupID": 124,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Long-Term Care Facility",
+   "LookupValue1": "101, 102",
+   "LookupValue2": "19",
+   "OldID": 19,
+   "zOrder": 16
+ },
+ {
+   "LookupID": 125,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Auditorium",
+   "LookupValue1": "101",
+   "LookupValue2": "20",
+   "OldID": 20,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 126,
+   "LookupTypeID": 15,
+   "LookupFieldName": "House of Worship",
+   "LookupValue1": "101",
+   "LookupValue2": "21",
+   "OldID": 21,
+   "zOrder": 14
+ },
+ {
+   "LookupID": 127,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Fast Food Restaurant",
+   "LookupValue1": "101",
+   "LookupValue2": "22",
+   "OldID": 22,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 128,
+   "LookupTypeID": 15,
+   "LookupFieldName": "Municipal Building",
+   "LookupValue1": "101, 102",
+   "LookupValue2": "23",
+   "OldID": 23,
+   "zOrder": 19
+ },
+ {
+   "LookupID": 130,
+   "LookupTypeID": 16,
+   "LookupFieldName": "Stud-framed (Standard)",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 131,
+   "LookupTypeID": 16,
+   "LookupFieldName": "Masonry",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 132,
+   "LookupTypeID": 16,
+   "LookupFieldName": "ICF",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 133,
+   "LookupTypeID": 16,
+   "LookupFieldName": "Common Brick",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 134,
+   "LookupTypeID": 17,
+   "LookupFieldName": "Structure Type",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 135,
+   "LookupTypeID": 17,
+   "LookupFieldName": "NFIP Community ID",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 136,
+   "LookupTypeID": 17,
+   "LookupFieldName": "Firm Panel",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 137,
+   "LookupTypeID": 17,
+   "LookupFieldName": "Owner's Name",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 138,
+   "LookupTypeID": 17,
+   "LookupFieldName": "Address",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 139,
+   "LookupTypeID": 17,
+   "LookupFieldName": "City",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 140,
+   "LookupTypeID": 17,
+   "LookupFieldName": "County",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 141,
+   "LookupTypeID": 17,
+   "LookupFieldName": "Zip",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 142,
+   "LookupTypeID": 18,
+   "LookupFieldName": "View All Records",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 143,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Owner's Name",
+   "LookupValue1": "OwnerName LIKE '%",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 144,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Building Address",
+   "LookupValue1": "PropertyAddress LIKE '%",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 145,
+   "LookupTypeID": 18,
+   "LookupFieldName": "City",
+   "LookupValue1": "City LIKE '%",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 146,
+   "LookupTypeID": 18,
+   "LookupFieldName": "NFIP Community Name",
+   "LookupValue1": "CommunityName LIKE '%",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 147,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Zip Code",
+   "LookupValue1": "Zip LIKE '%",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 148,
+   "LookupTypeID": 18,
+   "LookupFieldName": "County",
+   "LookupValue1": "County LIKE '%",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 149,
+   "LookupTypeID": 18,
+   "LookupFieldName": "NFIP Community  ID",
+   "LookupValue1": "CommunityID LIKE '%",
+   "LookupValue2": "",
+   "OldID": 19,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 150,
+   "LookupTypeID": 18,
+   "LookupFieldName": "FIRM Panel",
+   "LookupValue1": "FirmPanel LIKE '%",
+   "LookupValue2": "",
+   "OldID": 20,
+   "zOrder": 9
+ },
+ {
+   "LookupID": 153,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Avenue",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 154,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Boulevard",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 155,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Circle",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 156,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Corner",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 157,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Court",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 158,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Cove",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 159,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Curve",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 160,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Drive",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 8,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 161,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Freeway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 9,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 162,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Highway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 163,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Junction",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 11,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 164,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Landing",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 12,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 165,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lane",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 13,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 166,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Parkway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 14,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 167,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Pike",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 15,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 168,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Place",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 16,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 169,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Plaza",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 17,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 170,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Road",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 18,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 171,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Square",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 19,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 172,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Street",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 20,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 173,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Terrace",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 21,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 174,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Turnpike",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 22,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 175,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Way",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 23,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 176,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Alley",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 24,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 177,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Annex",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 25,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 178,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Arcade",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 26,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 179,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bayoo",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 27,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 180,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Beach",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 28,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 181,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bend",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 29,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 182,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bluff",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 30,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 183,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bluffs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 31,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 184,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bottom",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 32,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 185,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Branch",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 33,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 186,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bridge",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 34,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 187,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Brook",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 35,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 188,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Brooks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 36,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 189,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Burg",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 37,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 190,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Burgs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 38,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 191,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Bypass",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 39,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 192,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Camp",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 40,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 193,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Canyon",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 41,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 194,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Cape",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 42,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 195,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Causeway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 43,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 196,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Center",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 44,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 197,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Circles",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 45,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 198,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Cliff",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 46,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 199,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Cliffs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 47,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 200,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Club",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 48,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 201,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Common",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 49,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 202,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Corners",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 50,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 203,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Course",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 51,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 204,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Courts",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 52,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 205,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Coves",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 53,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 206,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Creek",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 54,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 207,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Crescent",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 55,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 208,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Crest",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 56,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 209,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Crossing",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 57,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 210,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Crossroad",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 58,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 211,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Dale",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 59,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 212,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Dam",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 60,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 213,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Divide",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 61,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 214,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Drives",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 62,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 215,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Estate",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 63,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 216,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Estates",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 64,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 217,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Expressway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 65,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 218,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Extension",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 66,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 219,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Fall",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 67,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 220,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Falls",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 68,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 221,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ferry",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 69,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 222,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Field",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 70,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 223,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Fields",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 71,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 224,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Flat",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 72,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 225,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Flats",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 73,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 226,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ford",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 74,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 227,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Fords",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 75,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 228,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Forest",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 76,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 229,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Forge",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 77,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 230,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Forges",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 78,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 231,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Fork",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 79,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 232,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Forks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 80,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 233,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Fort",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 81,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 234,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Garden",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 82,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 235,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Gardens",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 83,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 236,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Gateway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 84,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 237,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Glen",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 85,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 238,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Glens",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 86,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 239,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Green",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 87,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 240,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Greens",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 88,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 241,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Grove",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 89,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 242,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Groves",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 90,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 243,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Harbor",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 91,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 244,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Harbors",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 92,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 245,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Haven",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 93,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 246,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Heights",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 94,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 247,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Hill",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 95,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 248,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Hills",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 96,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 249,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Hollow",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 97,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 250,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Inlet",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 98,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 251,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Island",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 99,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 252,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Islands",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 100,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 253,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Isle",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 101,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 254,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Junctions",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 102,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 255,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Key",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 103,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 256,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Keys",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 104,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 257,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Knoll",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 105,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 258,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Knolls",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 106,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 259,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lake",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 107,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 260,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lakes",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 108,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 261,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Land",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 109,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 262,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Light",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 110,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 263,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lights",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 111,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 264,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Loaf",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 112,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 265,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lock",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 113,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 266,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Locks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 114,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 267,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Lodge",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 115,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 268,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Loop",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 116,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 269,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mall",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 117,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 270,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Manor",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 118,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 271,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Manors",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 119,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 272,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Meadow",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 120,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 273,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Meadows",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 121,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 274,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mews",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 122,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 275,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mill",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 123,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 276,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mills",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 124,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 277,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mission",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 125,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 278,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Motorway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 126,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 279,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mount",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 127,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 280,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mountain",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 128,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 281,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Mountains",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 129,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 282,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Neck",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 130,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 283,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Orchard",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 131,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 284,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Oval",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 132,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 285,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Overpass",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 133,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 286,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Park",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 134,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 287,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Parks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 135,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 288,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Parkways",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 136,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 289,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Pass",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 137,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 290,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Passage",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 138,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 291,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Path",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 139,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 292,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Pine",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 140,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 293,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Pines",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 141,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 294,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Plain",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 142,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 295,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Plains",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 143,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 296,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Point",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 144,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 297,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Points",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 145,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 298,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Port",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 146,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 299,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ports",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 147,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 300,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Prairie",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 148,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 301,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Radial",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 149,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 302,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ramp",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 150,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 303,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ranch",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 151,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 304,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Rapid",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 152,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 305,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Rapids",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 153,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 306,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Rest",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 154,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 307,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ridge",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 155,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 308,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ridges",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 156,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 309,
+   "LookupTypeID": 20,
+   "LookupFieldName": "River",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 157,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 310,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Roads",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 158,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 311,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Route",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 159,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 312,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Row",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 160,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 313,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Rue",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 161,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 314,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Run",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 162,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 315,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Shoal",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 163,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 316,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Shoals",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 164,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 317,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Shore",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 165,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 318,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Shores",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 166,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 319,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Skyway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 167,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 320,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Spring",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 168,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 321,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Springs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 169,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 322,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Spur",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 170,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 323,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Spurs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 171,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 324,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Squares",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 172,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 325,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Station",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 173,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 326,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Stravenue",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 174,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 327,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Stream",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 175,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 328,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Streets",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 176,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 329,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Summit",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 177,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 330,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Throughway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 178,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 331,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Trace",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 179,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 332,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Track",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 180,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 333,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Trafficway",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 181,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 334,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Trail",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 182,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 335,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Tunnel",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 183,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 336,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Underpass",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 184,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 337,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Union",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 185,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 338,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Unions",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 186,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 339,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Valley",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 187,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 340,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Valleys",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 188,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 341,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Viaduct",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 189,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 342,
+   "LookupTypeID": 20,
+   "LookupFieldName": "View",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 190,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 343,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Views",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 191,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 344,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Village",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 192,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 345,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Villages",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 193,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 346,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Vista",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 194,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 347,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Walk",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 195,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 348,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Walks",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 196,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 349,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Wall",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 197,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 350,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Ways",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 199,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 351,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Well",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 200,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 352,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Wells",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 201,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 353,
+   "LookupTypeID": 20,
+   "LookupFieldName": "Other",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": 202,
+   "zOrder": 0
+ },
+ {
+   "LookupID": 355,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Inspector Name",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 10
+ },
+ {
+   "LookupID": 356,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Parcel Number",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 11
+ },
+ {
+   "LookupID": 357,
+   "LookupTypeID": 18,
+   "LookupFieldName": "Lot Number",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 12
+ },
+ {
+   "LookupID": 358,
+   "LookupTypeID": 21,
+   "LookupFieldName": "Hours",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 359,
+   "LookupTypeID": 21,
+   "LookupFieldName": "Days",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 360,
+   "LookupTypeID": 22,
+   "LookupFieldName": "No Physical Damage Sustained",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 361,
+   "LookupTypeID": 22,
+   "LookupFieldName": "Vacant Lot / Property",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 362,
+   "LookupTypeID": 22,
+   "LookupFieldName": "Resident Refused Inspection",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 363,
+   "LookupTypeID": 22,
+   "LookupFieldName": "Address Does Not Exist",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 364,
+   "LookupTypeID": 22,
+   "LookupFieldName": "Other",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 365,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Expando",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 1,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 366,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Carport",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 2,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 367,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Open Porch",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 3,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 368,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Enclosed Porch",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 4,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 369,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Decks",
+   "LookupValue1": "Ea",
+   "LookupValue2": "",
+   "OldID": 5,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 370,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Skirting",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 6,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 371,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Fireplaces",
+   "LookupValue1": "Ea",
+   "LookupValue2": "",
+   "OldID": 7,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 372,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Roofing",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "2",
+   "OldID": 9,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 373,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Heating / Cooling",
+   "LookupValue1": "Ea",
+   "LookupValue2": "",
+   "OldID": 10,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 374,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Appliances",
+   "LookupValue1": "Ea",
+   "LookupValue2": "",
+   "OldID": 12,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 375,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Porch / Breezeways",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 14,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 376,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Garage",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 15,
+   "zOrder": 9
+ },
+ {
+   "LookupID": 377,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Basement",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "",
+   "OldID": 16,
+   "zOrder": null
+ },
+ {
+   "LookupID": 378,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Built-In Equipment",
+   "LookupValue1": "Ea",
+   "LookupValue2": "2",
+   "OldID": 17,
+   "zOrder": null
+ },
+ {
+   "LookupID": 379,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Built-In Security/Communications",
+   "LookupValue1": "Ea",
+   "LookupValue2": "2",
+   "OldID": 18,
+   "zOrder": null
+ },
+ {
+   "LookupID": 380,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Conveyance System",
+   "LookupValue1": "Ea",
+   "LookupValue2": "2",
+   "OldID": 19,
+   "zOrder": null
+ },
+ {
+   "LookupID": 381,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Wall Covering",
+   "LookupValue1": "Sq Ft",
+   "LookupValue2": "2",
+   "OldID": 23,
+   "zOrder": null
+ },
+ {
+   "LookupID": 382,
+   "LookupTypeID": 23,
+   "LookupFieldName": "Windows/Skylights",
+   "LookupValue1": "Ea",
+   "LookupValue2": "2",
+   "OldID": 24,
+   "zOrder": null
+ },
+ {
+   "LookupID": 383,
+   "LookupTypeID": 24,
+   "LookupFieldName": "1 - Very Poor Condition",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 384,
+   "LookupTypeID": 24,
+   "LookupFieldName": "2 - Requires Extensive Repairs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 385,
+   "LookupTypeID": 24,
+   "LookupFieldName": "3 - Requires Some Repairs",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 386,
+   "LookupTypeID": 24,
+   "LookupFieldName": "4 - Average Condition",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 387,
+   "LookupTypeID": 24,
+   "LookupFieldName": "5 - Above Average Condition",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 388,
+   "LookupTypeID": 24,
+   "LookupFieldName": "6 - Excellent Condition",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 389,
+   "LookupTypeID": 24,
+   "LookupFieldName": "Other",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 390,
+   "LookupTypeID": 25,
+   "LookupFieldName": "Computed Actual Cash Value",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 391,
+   "LookupTypeID": 25,
+   "LookupFieldName": "Professional Market Appraisal",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 392,
+   "LookupTypeID": 25,
+   "LookupFieldName": "Adj. Tax Assessed Value",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 393,
+   "LookupTypeID": 26,
+   "LookupFieldName": "Computed Damages",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 394,
+   "LookupTypeID": 26,
+   "LookupFieldName": "Contractor's Estimate",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 395,
+   "LookupTypeID": 26,
+   "LookupFieldName": "Community's Estimate",
+   "LookupValue1": "",
+   "LookupValue2": "",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 396,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Base Cost Per SqFt",
+   "LookupValue1": "Structure",
+   "LookupValue2": "BaseCostPerSqFt",
+   "OldID": null,
+   "zOrder": 1
+ },
+ {
+   "LookupID": 397,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Base Flood Elevation",
+   "LookupValue1": "Structure",
+   "LookupValue2": "BFE",
+   "OldID": null,
+   "zOrder": 2
+ },
+ {
+   "LookupID": 398,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Cell Phone",
+   "LookupValue1": "Structure",
+   "LookupValue2": "CellPhone",
+   "OldID": null,
+   "zOrder": 3
+ },
+ {
+   "LookupID": 399,
+   "LookupTypeID": 28,
+   "LookupFieldName": "City",
+   "LookupValue1": "Structure",
+   "LookupValue2": "City",
+   "OldID": null,
+   "zOrder": 4
+ },
+ {
+   "LookupID": 400,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Community ID",
+   "LookupValue1": "Structure",
+   "LookupValue2": "NFIPCID",
+   "OldID": null,
+   "zOrder": 5
+ },
+ {
+   "LookupID": 401,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Community Name",
+   "LookupValue1": "Structure",
+   "LookupValue2": "NFIPCommunityID",
+   "OldID": null,
+   "zOrder": 6
+ },
+ {
+   "LookupID": 402,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Community Specific Information",
+   "LookupValue1": "Structure",
+   "LookupValue2": "CommunityInformation",
+   "OldID": null,
+   "zOrder": 7
+ },
+ {
+   "LookupID": 403,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Cost Data Date",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "CostDataDate",
+   "OldID": null,
+   "zOrder": 8
+ },
+ {
+   "LookupID": 404,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Cost Data Reference",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "CostData",
+   "OldID": null,
+   "zOrder": 9
+ },
+ {
+   "LookupID": 405,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Date Damaged Occurred",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "DateDamageOccurred",
+   "OldID": null,
+   "zOrder": 10
+ },
+ {
+   "LookupID": 406,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Date Of FIRM Panel",
+   "LookupValue1": "Structure",
+   "LookupValue2": "FIRMPanelDate",
+   "OldID": null,
+   "zOrder": 11
+ },
+ {
+   "LookupID": 407,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Date of Inspection",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "DateOfInspection",
+   "OldID": null,
+   "zOrder": 12
+ },
+ {
+   "LookupID": 408,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Datum",
+   "LookupValue1": "Structure",
+   "LookupValue2": "Datum",
+   "OldID": null,
+   "zOrder": 13
+ },
+ {
+   "LookupID": 409,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Depth Of Flood Above Ground",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "DepthOfFlood",
+   "OldID": null,
+   "zOrder": 14
+ },
+ {
+   "LookupID": 410,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Depth Of Flood Above First Floor",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "DepthOfFloodAboveFFE",
+   "OldID": null,
+   "zOrder": 15
+ },
+ {
+   "LookupID": 411,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Duration Of Flood",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "DurationOfFlood",
+   "OldID": null,
+   "zOrder": 16
+ },
+ {
+   "LookupID": 412,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Elevation Of Lowest Floor",
+   "LookupValue1": "Structure",
+   "LookupValue2": "FirstFloorElevation",
+   "OldID": null,
+   "zOrder": 17
+ },
+ {
+   "LookupID": 413,
+   "LookupTypeID": 28,
+   "LookupFieldName": "FIRM Panel Number",
+   "LookupValue1": "Structure",
+   "LookupValue2": "FIRMPanelNumber",
+   "OldID": null,
+   "zOrder": 18
+ },
+ {
+   "LookupID": 414,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Geographic Adjustment",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "GeographicAdjustment",
+   "OldID": null,
+   "zOrder": 19
+ },
+ {
+   "LookupID": 415,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Inspector Name",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "InspectorName",
+   "OldID": null,
+   "zOrder": 20
+ },
+ {
+   "LookupID": 416,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Inspector Phone",
+   "LookupValue1": "Inspection",
+   "LookupValue2": "InspectorPhoneNumber",
+   "OldID": null,
+   "zOrder": 21
+ },
+ {
+   "LookupID": 417,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Lot Number",
+   "LookupValue1": "Structure",
+   "LookupValue2": "LotNumber",
+   "OldID": null,
+   "zOrder": 22
+ },
+ {
+   "LookupID": 418,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Name, First",
+   "LookupValue1": "Structure",
+   "LookupValue2": "OwnerFirstName",
+   "OldID": null,
+   "zOrder": 23
+ },
+ {
+   "LookupID": 419,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Name, Last",
+   "LookupValue1": "Structure",
+   "LookupValue2": "OwnerLastName",
+   "OldID": null,
+   "zOrder": 24
+ },
+ {
+   "LookupID": 420,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Parcel Number",
+   "LookupValue1": "Structure",
+   "LookupValue2": "ParcelNumber",
+   "OldID": null,
+   "zOrder": 25
+ },
+ {
+   "LookupID": 421,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Phone",
+   "LookupValue1": "Structure",
+   "LookupValue2": "PhoneNumber",
+   "OldID": null,
+   "zOrder": 26
+ },
+ {
+   "LookupID": 422,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Residence Information",
+   "LookupValue1": "Structure",
+   "LookupValue2": "StructureInformation",
+   "OldID": null,
+   "zOrder": 27
+ },
+ {
+   "LookupID": 423,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Street Name",
+   "LookupValue1": "Structure",
+   "LookupValue2": "StreetName",
+   "OldID": null,
+   "zOrder": 28
+ },
+ {
+   "LookupID": 424,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Street Number",
+   "LookupValue1": "Structure",
+   "LookupValue2": "StreetNumber",
+   "OldID": null,
+   "zOrder": 29
+ },
+ {
+   "LookupID": 425,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Structure Information",
+   "LookupValue1": "Structure",
+   "LookupValue2": "StructureInformation",
+   "OldID": null,
+   "zOrder": 30
+ },
+ {
+   "LookupID": 426,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Subdivision",
+   "LookupValue1": "Structure",
+   "LookupValue2": "Subdivision",
+   "OldID": null,
+   "zOrder": 31
+ },
+ {
+   "LookupID": 427,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Year Of Construction",
+   "LookupValue1": "Structure",
+   "LookupValue2": "YearOfConstruction",
+   "OldID": null,
+   "zOrder": 32
+ },
+ {
+   "LookupID": 428,
+   "LookupTypeID": 28,
+   "LookupFieldName": "Zip Code",
+   "LookupValue1": "Structure",
+   "LookupValue2": "ZipCode",
+   "OldID": null,
+   "zOrder": 33
+ }
+]

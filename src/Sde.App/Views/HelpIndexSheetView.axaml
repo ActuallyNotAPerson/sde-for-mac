@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:help="using:Sde.App.Help"
+             x:Class="Sde.App.Views.HelpIndexSheetView"
+             x:DataType="sh:HelpIndexSheetViewModel">
+  <StackPanel Spacing="10" Width="700">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="What to enter in each field, with the page of FEMA's SDE User Manual that covers it. The same help opens from the ? beside a field." />
+    <TextBox Text="{Binding Search}" PlaceholderText="Search the help" AutomationProperties.Name="Search the help" />
+    <TextBlock Classes="muted" Text="{Binding CountText}" />
+    <Grid ColumnDefinitions="260,*" ColumnSpacing="16">
+      <ListBox ItemsSource="{Binding Entries}" SelectedItem="{Binding Selected}" Height="320" AutomationProperties.Name="Fields">
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="help:FieldHelpEntry">
+            <StackPanel Margin="2">
+              <TextBlock Text="{Binding Label}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="muted" Text="{Binding Step}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <ScrollViewer Grid.Column="1" Height="320" IsVisible="{Binding HasSelection}">
+        <StackPanel Spacing="8" DataContext="{Binding Selected}" x:DataType="help:FieldHelpEntry">
+          <TextBlock Classes="h2" Text="{Binding Label}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+          <TextBlock Classes="muted" Text="{Binding PageText, StringFormat='FEMA SDE User Manual, {0}'}" />
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+    <TextBlock Classes="secondary" Text="{Binding MissingMessage}" TextWrapping="Wrap" IsVisible="{Binding ManualMissing}" />
+    <DockPanel>
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+        <Button Classes="link" Content="Open the full manual" Command="{Binding OpenManualCommand}" IsVisible="{Binding ManualAvailable}" />
+        <Button Classes="link" Content="Open FEMA's SDE page" Command="{Binding OpenFemaPageCommand}" IsVisible="{Binding ManualMissing}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Done" Command="{Binding CancelCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Open the manual at this page" Command="{Binding OpenAtPageCommand}" IsVisible="{Binding ManualAvailable}" IsEnabled="{Binding HasSelection}" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

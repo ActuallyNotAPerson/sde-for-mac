@@ -1,0 +1,25 @@
+{
+  "result": {
+    "input": {
+      "address": { "address": "1 First St NE, Washington, DC 20004" },
+      "benchmark": { "id": "4", "benchmarkName": "Public_AR_Current", "isDefault": false }
+    },
+    "addressMatches": [
+      {
+        "tigerLine": { "side": "L", "tigerLineId": "0000000000" },
+        "coordinates": { "x": -77.00911, "y": 38.88991 },
+        "addressComponents": {
+          "fromAddress": "1", "toAddress": "99", "preQualifier": "", "preDirection": "",
+          "preType": "", "streetName": "1ST", "suffixType": "ST", "suffixDirection": "NE",
+          "suffixQualifier": "", "city": "WASHINGTON", "state": "DC", "zip": "20004"
+        },
+        "matchedAddress": "1 1ST ST NE, WASHINGTON, DC, 20004"
+      },
+      {
+        "tigerLine": { "side": "R", "tigerLineId": "0000000001" },
+        "coordinates": { "x": -77.0, "y": 38.9 },
+        "matchedAddress": "SECOND CANDIDATE, WASHINGTON, DC, 20004"
+      }
+    ]
+  }
+}

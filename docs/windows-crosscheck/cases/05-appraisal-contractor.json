@@ -1,0 +1,11 @@
+{
+  "Property": { "OwnerFirstName": "Sam", "OwnerLastName": "Ortiz", "StreetNumber": "315", "StreetName": "Mill", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43704", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 1, "ResidenceTypeID": 92, "FoundationTypeID": 47, "SuperStructureTypeID": 130, "RoofCoveringTypeID": 95,
+    "ExteriorFinishTypeID": 25, "HVACTypeID": 49, "StoryTypeID": 104, "StructureQualityID": 54, "YearOfConstruction": 1958, "SquareFootage": 1900 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "BaseCost": 1.00, "GeographicAdjustment": 1.00,
+    "MarketAppraisal": 210000, "ValueOfBuildingID": 391, "ContractorEstimate": 112500, "CostOfRepairsID": 394,
+    "DepreciationExplanation": "Used Professional Market Appraisal value prepared by the ABC Appraisal Company on 09/30/26 instead of depreciation" },
+  "DepreciationRating": 389,
+  "DepreciationPercent": 1
+}

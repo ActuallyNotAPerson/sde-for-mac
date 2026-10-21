@@ -1,0 +1,4 @@
+Record ID,Inspection ID,Inspection Type,Inspection Date,Inspector,Address,City,State,Zip,Parcel Number,Owner Name,Structure Type,Residence Type,Number of Stories,Foundation Type,Year Built,Square Feet,Cause of Damage,Water Depth,Improved Value,Foundation % Damage,Interior Finish % Damage
+BLD-2026-90001,5001,Substantial Damage Assessment,10/01/2026 9:00 AM,Inspector C,100 Sample Ave,Exampleville,OH,99999,900-01-001,Alex Example,Residential,Single Family Residence,1,Crawlspace,1955,"1,200",Flood,2 ft,"$95,000",10%,60%
+BLD-2026-90002,5002,Building Final,10/01/2026 10:00 AM,Inspector C,100 Sample Ave,Exampleville,OH,99999,900-01-001,Alex Example,Residential,Single Family Residence,1,Crawlspace,1955,"1,200",,,,,
+BLD-2026-90003,5003,Substantial Damage Assessment,10/02/2026 1:30 PM,Inspector D,300 Nowhere Blvd,Exampleville,OH,99999,900-03-001,Casey Placeholder,Residential,Single Family Residence,1,Basement,1948,950,Flood,4 ft,"$60,000",20%,90%

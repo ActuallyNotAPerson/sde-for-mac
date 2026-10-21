@@ -1,0 +1,8 @@
+{
+  "Property": { "OwnerFirstName": "Queen City", "OwnerLastName": "Properties LLC", "StreetNumber": "700", "StreetName": "Riverside", "StreetSuffixID": 172,
+    "City": "Exampleville", "StateID": 36, "ZipCode": "43704", "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of",
+    "StructureTypeID": 2, "StoryTypeID": 101, "StructureUseID": 106, "SprinklerSystem": 99, "YearOfConstruction": 1985, "SquareFootage": 6400 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "BaseCost": 185.00, "GeographicAdjustment": 0.93 },
+  "DepreciationRating": 386,
+  "ElementDamage": { "Foundation": 0, "Interiors": 35, "Electrical": 20, "HVAC": 40, "Plumbing": 10 }
+}

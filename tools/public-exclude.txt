@@ -1,0 +1,9 @@
+# Paths kept out of the public repo (FEMA material that tools/answer-key/setup.sh rebuilds locally, and private notes).
+decomp/
+reference/OriginalCalc/
+HANDOFF.md
+docs/V2-PLAN.md
+docs/reference/
+PUBLISH-STEPS.md
+PII-SCAN-GUIDE.md
+REPO-SETUP-GUIDE.md

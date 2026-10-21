@@ -1,0 +1,12 @@
+{
+  "displayFieldName": "FIRM_PAN",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 2001, "FIRM_PAN": "11001C0359E", "SUFFIX": "E", "PANEL_TYP": "Printed", "EFF_DATE": 1393200000000
+      }
+    }
+  ]
+}

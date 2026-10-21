@@ -1,0 +1,5 @@
+{
+  "Property": { "StreetNumber": "41", "StreetName": "Hill", "StreetSuffixID": 172, "City": "Exampleville", "StateID": 36, "ZipCode": "43702",
+    "NFIPCID": "399990", "NFIPCommunityName": "Exampleville, City of", "StructureTypeID": 1, "ResidenceTypeID": 92, "StoryTypeID": 104 },
+  "Assessment": { "InspectorName": "Inspector A", "DateDamageOccurred": "2026-09-14", "CauseofDamageID": 20, "PhysicalDamage": true, "UndeterminedDamageTypeID": 360 }
+}

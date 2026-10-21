@@ -1,0 +1,415 @@
+LookupID,LookupTypeID,LookupFieldName,LookupValue1,LookupValue2,OldID,zOrder
+1,1,"No",,,2,2
+2,1,"Yes",,,3,1
+4,2,"Foundation",,,1,0
+5,2,"Superstructure",,,2,0
+6,2,"Roof Covering",,,3,0
+7,2,"Exterior Finish",,,5,0
+8,2,"Interior Finish",,,6,0
+9,2,"Doors and Windows",,,7,0
+10,2,"Cabinets and Countertops",,,10,0
+11,2,"Floor Finish",,,11,0
+12,2,"Plumbing",,,12,0
+13,2,"Electrical",,,13,0
+14,2,"Appliances",,,14,0
+15,2,"HVAC",,,19,0
+16,2,"Skirting / Forms Piers",,,17,0
+17,2,"Interiors",,,18,0
+19,3,"Fire",,,1,1
+20,3,"Flood",,,2,2
+21,3,"Flood and Wind",,,3,3
+22,3,"Seismic",,,4,4
+23,3,"Wind",,,5,5
+24,3,"Other",,,6,6
+25,4,"Siding or Stucco (Standard)",,,2,1
+26,4,"Brick Veneer",,,3,2
+27,4,"EIFS",,,4,3
+28,4,"None - common brick, structural",,,5,4
+29,5,"A",,,2,1
+30,5,"AE",,,3,2
+31,5,"AH",,,4,3
+32,5,"AO",,,5,4
+33,5,"AR",,,6,5
+34,5,"A1 thru A99",,,7,6
+35,5,"V",,,8,7
+36,5,"VE",,,9,8
+37,5,"X",,,10,9
+38,5,"D",,,11,99
+39,5,"None",,,1,0
+40,6,"Yes",,,1,1
+41,6,"No",,,2,2
+42,6,"Possible",,,3,3
+43,7,"Continuous Wall w/Slab (Standard)",,,2,1
+44,7,"Piles",,,3,4
+45,7,"Crawlspace",,,4,3
+46,7,"Slab - on - Grade",,,5,5
+47,7,"Basement",,,6,2
+48,7,"Piers and Posts",,,7,6
+49,8,"Heating and/or Cooling",,,2,1
+50,8,"None",,,3,2
+51,9,"Low",,,1,1
+52,9,"Budget",,,2,2
+53,9,"Average",,,3,3
+54,9,"Good",,,4,4
+55,9,"Excellent",,,10,5
+74,10,"Expando",,,1,0
+75,10,"Carport",,,2,0
+76,10,"Open Porch",,,3,0
+77,10,"Enclosed Porch",,,4,0
+78,10,"Decks",,,5,0
+79,10,"Skirting",,,6,0
+80,10,"Fireplaces",,,7,0
+81,10,"Roofing",,,9,0
+82,10,"Heating / Cooling",,,10,0
+83,10,"Appliances",,,12,0
+84,10,"Porch / Breezeways",,,14,0
+85,10,"Garage",,,15,0
+86,10,"Basement",,,16,0
+87,10,"Built-In Equipment",,,17,0
+88,10,"Built-In Security/Communications",,,18,0
+89,10,"Conveyance System",,,19,0
+90,10,"Wall Covering",,,23,0
+91,10,"Windows/Skylights",,,24,0
+92,11,"Single Family Residence",,,1,1
+93,11,"Town or Row House",,,2,2
+94,11,"Manufactured House",,,3,3
+95,12,"Shingles - Asphalt, Wood (Standard)",,,2,1
+96,12,"Clay Tile",,,3,2
+97,12,"Slate",,,5,4
+98,12,"Standing Seam (Metal)",,,6,3
+99,13,"Yes",,,3,1
+100,13,"No",,,2,2
+101,14,"1 Story","NonResidential",,1,1
+102,14,"2 thru 4","NonResidential",,2,2
+103,14,"5 or more","NonResidential",,3,3
+104,14,"One Story (Standard)","Residential",,2,1
+105,14,"Two or More Stories","Residential",,3,2
+106,15,"Office Building","101, 102, 103","1",1,20
+107,15,"Department Stores","101, 102","2",2,6
+108,15,"Motel","101, 102","3",3,18
+109,15,"Restaurants","101","4",4,22
+110,15,"Commercial Retail","101","5",5,3
+111,15,"Strip Mall","101","6",6,23
+112,15,"Convenience Store","101","7",7,4
+113,15,"Fire / Police Station","101","8",8,9
+114,15,"Elementary School","101","9",9,7
+115,15,"Apartments","101, 102, 103","10",10,1
+116,15,"Courthouse","101, 102","11",11,5
+117,15,"Grocery Store","101","12",12,10
+118,15,"Mini-Warehouse","101","13",13,17
+119,15,"Hospital","101, 102, 103","14",14,12
+120,15,"High School","102","15",15,11
+121,15,"Police Station","102","16",16,21
+122,15,"Industrial","102","17",17,15
+123,15,"Hotel","103","18",18,13
+124,15,"Long-Term Care Facility","101, 102","19",19,16
+125,15,"Auditorium","101","20",20,2
+126,15,"House of Worship","101","21",21,14
+127,15,"Fast Food Restaurant","101","22",22,8
+128,15,"Municipal Building","101, 102","23",23,19
+130,16,"Stud-framed (Standard)",,,2,1
+131,16,"Masonry",,,3,4
+132,16,"ICF",,,4,3
+133,16,"Common Brick",,,5,2
+134,17,"Structure Type",,,,1
+135,17,"NFIP Community ID",,,,2
+136,17,"Firm Panel",,,,3
+137,17,"Owner's Name",,,,4
+138,17,"Address",,,,5
+139,17,"City",,,,6
+140,17,"County",,,,7
+141,17,"Zip",,,,8
+142,18,"View All Records",,,1,1
+143,18,"Owner's Name","OwnerName LIKE '%",,2,2
+144,18,"Building Address","PropertyAddress LIKE '%",,3,3
+145,18,"City","City LIKE '%",,4,4
+146,18,"NFIP Community Name","CommunityName LIKE '%",,5,5
+147,18,"Zip Code","Zip LIKE '%",,6,6
+148,18,"County","County LIKE '%",,10,7
+149,18,"NFIP Community  ID","CommunityID LIKE '%",,19,8
+150,18,"FIRM Panel","FirmPanel LIKE '%",,20,9
+153,20,"Avenue","ave, av",,1,4
+154,20,"Boulevard","blvd, bl",,2,11
+155,20,"Circle","cir, cr",,3,24
+156,20,"Corner",,,4,30
+157,20,"Court","ct",,5,33
+158,20,"Cove","cv",,6,35
+159,20,"Curve","curv",,7,42
+160,20,"Drive","dr",,8,46
+161,20,"Freeway","fwy",,9,67
+162,20,"Highway","hwy",,10,81
+163,20,"Junction","jct",,11,89
+164,20,"Landing","lndg",,12,98
+165,20,"Lane","ln",,13,99
+166,20,"Parkway","pkwy, pw",,14,127
+167,20,"Pike","pike",,15,132
+168,20,"Place","pl",,16,135
+169,20,"Plaza","plz",,17,138
+170,20,"Road","rd",,18,153
+171,20,"Square","sq",,19,168
+172,20,"Street","st",,20,173
+173,20,"Terrace","ter",,21,176
+174,20,"Turnpike","tpke",,22,183
+175,20,"Way","way, wy",,23,198
+176,20,"Alley","aly",,24,1
+177,20,"Annex","anx",,25,2
+178,20,"Arcade","arc",,26,3
+179,20,"Bayoo","byu",,27,5
+180,20,"Beach","bch",,28,6
+181,20,"Bend","bnd",,29,7
+182,20,"Bluff","blf",,30,8
+183,20,"Bluffs","blfs",,31,9
+184,20,"Bottom","btm",,32,10
+185,20,"Branch","br",,33,12
+186,20,"Bridge","brg, ests",,34,13
+187,20,"Brook","brk",,35,14
+188,20,"Brooks","brks",,36,15
+189,20,"Burg","bg",,37,16
+190,20,"Burgs","bgs",,38,17
+191,20,"Bypass","byp",,39,18
+192,20,"Camp","cp",,40,19
+193,20,"Canyon","cyn",,41,20
+194,20,"Cape","cpe",,42,21
+195,20,"Causeway","cswy",,43,22
+196,20,"Center","ctr",,44,23
+197,20,"Circles","cirs",,45,25
+198,20,"Cliff","clf",,46,26
+199,20,"Cliffs","clfs",,47,27
+200,20,"Club","clb",,48,28
+201,20,"Common","cmn",,49,29
+202,20,"Corners","cors",,50,31
+203,20,"Course","crse",,51,32
+204,20,"Courts","cts",,52,34
+205,20,"Coves","cvs",,53,36
+206,20,"Creek","crk",,54,37
+207,20,"Crescent","cres",,55,38
+208,20,"Crest","crst",,56,39
+209,20,"Crossing","xing",,57,40
+210,20,"Crossroad","xrd",,58,41
+211,20,"Dale","dl",,59,43
+212,20,"Dam","dm",,60,44
+213,20,"Divide","dv",,61,45
+214,20,"Drives","drs",,62,47
+215,20,"Estate","est",,63,48
+216,20,"Estates",,,64,49
+217,20,"Expressway","expy",,65,50
+218,20,"Extension","ext",,66,51
+219,20,"Fall","fall",,67,52
+220,20,"Falls","fls",,68,53
+221,20,"Ferry","fry",,69,54
+222,20,"Field","fld",,70,55
+223,20,"Fields","flds",,71,56
+224,20,"Flat","flt",,72,57
+225,20,"Flats","flts",,73,58
+226,20,"Ford","frd",,74,59
+227,20,"Fords","frds",,75,60
+228,20,"Forest","frst",,76,61
+229,20,"Forge","frg",,77,62
+230,20,"Forges","frgs",,78,63
+231,20,"Fork","frk",,79,64
+232,20,"Forks","frks",,80,65
+233,20,"Fort","ft",,81,66
+234,20,"Garden","gdn",,82,68
+235,20,"Gardens","gdns",,83,69
+236,20,"Gateway","gtwy",,84,70
+237,20,"Glen","gln",,85,71
+238,20,"Glens","glns",,86,72
+239,20,"Green","grn",,87,73
+240,20,"Greens","grns",,88,74
+241,20,"Grove","grv",,89,75
+242,20,"Groves","grvs",,90,76
+243,20,"Harbor","hbr",,91,77
+244,20,"Harbors","hbrs",,92,78
+245,20,"Haven","hvn",,93,79
+246,20,"Heights","hts",,94,80
+247,20,"Hill","hl",,95,82
+248,20,"Hills","hls",,96,83
+249,20,"Hollow","holw",,97,84
+250,20,"Inlet","inlt",,98,85
+251,20,"Island","is",,99,86
+252,20,"Islands","iss",,100,87
+253,20,"Isle","isle",,101,88
+254,20,"Junctions","jcts",,102,90
+255,20,"Key","ky",,103,91
+256,20,"Keys","kys",,104,92
+257,20,"Knoll","knl",,105,93
+258,20,"Knolls","knls",,106,94
+259,20,"Lake","lk",,107,95
+260,20,"Lakes","lks",,108,96
+261,20,"Land","land",,109,97
+262,20,"Light","lgt",,110,100
+263,20,"Lights","lgts",,111,101
+264,20,"Loaf","lf",,112,102
+265,20,"Lock","lck",,113,103
+266,20,"Locks","lcks",,114,104
+267,20,"Lodge","ldg",,115,105
+268,20,"Loop","loop",,116,106
+269,20,"Mall","mall",,117,107
+270,20,"Manor","mnr",,118,108
+271,20,"Manors","mnrs",,119,109
+272,20,"Meadow","mdw",,120,110
+273,20,"Meadows","mdws",,121,111
+274,20,"Mews","mews",,122,112
+275,20,"Mill","ml",,123,113
+276,20,"Mills","mls",,124,114
+277,20,"Mission","msn",,125,115
+278,20,"Motorway","mtwy",,126,116
+279,20,"Mount","mt",,127,117
+280,20,"Mountain","mtn",,128,118
+281,20,"Mountains","mtns",,129,119
+282,20,"Neck","nck",,130,120
+283,20,"Orchard","orch",,131,121
+284,20,"Oval","oval",,132,123
+285,20,"Overpass","opas",,133,124
+286,20,"Park","park",,134,125
+287,20,"Parks",,,135,126
+288,20,"Parkways","pkwy",,136,128
+289,20,"Pass","pass",,137,129
+290,20,"Passage","psge",,138,130
+291,20,"Path","path",,139,131
+292,20,"Pine",,,140,133
+293,20,"Pines","pnes",,141,134
+294,20,"Plain","pln",,142,136
+295,20,"Plains","plns",,143,137
+296,20,"Point","pt",,144,139
+297,20,"Points","pts",,145,140
+298,20,"Port","prt",,146,141
+299,20,"Ports","prts",,147,142
+300,20,"Prairie","pr",,148,143
+301,20,"Radial","radl",,149,144
+302,20,"Ramp","ramp",,150,145
+303,20,"Ranch","rnch",,151,146
+304,20,"Rapid","rpd",,152,147
+305,20,"Rapids","rpds",,153,148
+306,20,"Rest","rst",,154,149
+307,20,"Ridge","rdg",,155,150
+308,20,"Ridges","rdgs",,156,151
+309,20,"River","riv",,157,152
+310,20,"Roads","rds",,158,154
+311,20,"Route","rte",,159,155
+312,20,"Row","row",,160,156
+313,20,"Rue","rue",,161,157
+314,20,"Run","run",,162,158
+315,20,"Shoal","shl",,163,159
+316,20,"Shoals","shls",,164,160
+317,20,"Shore","shr",,165,161
+318,20,"Shores","shrs",,166,162
+319,20,"Skyway","skwy",,167,163
+320,20,"Spring","spg",,168,164
+321,20,"Springs","spgs",,169,165
+322,20,"Spur","spur",,170,166
+323,20,"Spurs","spur",,171,167
+324,20,"Squares","sqs",,172,169
+325,20,"Station","sta",,173,170
+326,20,"Stravenue","stra",,174,171
+327,20,"Stream","strm",,175,172
+328,20,"Streets","sts",,176,174
+329,20,"Summit","smt",,177,175
+330,20,"Throughway","trwy",,178,177
+331,20,"Trace","trce",,179,178
+332,20,"Track","trak",,180,179
+333,20,"Trafficway","trfy",,181,180
+334,20,"Trail","trl",,182,181
+335,20,"Tunnel","tunl",,183,182
+336,20,"Underpass","upas",,184,184
+337,20,"Union","un",,185,185
+338,20,"Unions","uns",,186,186
+339,20,"Valley","vly",,187,187
+340,20,"Valleys","vlys",,188,188
+341,20,"Viaduct","via",,189,189
+342,20,"View","vw",,190,190
+343,20,"Views","vws",,191,191
+344,20,"Village","vlg",,192,192
+345,20,"Villages","vlgs",,193,193
+346,20,"Vista","vis",,194,194
+347,20,"Walk","walk",,195,195
+348,20,"Walks","walk",,196,196
+349,20,"Wall","wall",,197,197
+350,20,"Ways","ways",,199,199
+351,20,"Well","wl",,200,200
+352,20,"Wells","wls",,201,201
+353,20,"Other",,,202,122
+355,18,"Inspector Name",,,,10
+356,18,"Parcel Number",,,,11
+357,18,"Lot Number",,,,12
+358,21,"Hours",,,,1
+359,21,"Days",,,,2
+360,22,"No Physical Damage Sustained","1.00001",,1,1
+361,22,"Vacant Lot / Property","1.00002",,2,2
+362,22,"Resident Refused Inspection","1.00003",,3,3
+363,22,"Address Does Not Exist","1.00004",,4,4
+364,22,"Other","1.00005",,5,5
+365,23,"Expando","Sq Ft",,1,1
+366,23,"Carport","Sq Ft",,2,2
+367,23,"Open Porch","Sq Ft",,3,3
+368,23,"Enclosed Porch","Sq Ft",,4,4
+369,23,"Decks","Ea",,5,5
+370,23,"Skirting","Sq Ft",,6,6
+371,23,"Fireplaces","Ea",,7,7
+372,23,"Roofing","Sq Ft","2",9,1
+373,23,"Heating / Cooling","Ea",,10,2
+374,23,"Appliances","Ea",,12,3
+375,23,"Porch / Breezeways","Sq Ft",,14,8
+376,23,"Garage","Sq Ft",,15,9
+377,23,"Basement","Sq Ft",,16,
+378,23,"Built-In Equipment","Ea","2",17,
+379,23,"Built-In Security/Communications","Ea","2",18,
+380,23,"Conveyance System","Ea","2",19,
+381,23,"Wall Covering","Sq Ft","2",23,
+382,23,"Windows/Skylights","Ea","2",24,
+383,24,"1 - Very Poor Condition",,,3,1
+384,24,"2 - Requires Extensive Repairs",,,4,2
+385,24,"3 - Requires Some Repairs",,,5,3
+386,24,"4 - Average Condition",,,6,4
+387,24,"5 - Above Average Condition",,,7,5
+388,24,"6 - Excellent Condition",,,8,6
+389,24,"Other",,,9,7
+390,25,"Computed Actual Cash Value",,,1,1
+391,25,"Professional Market Appraisal",,,3,2
+392,25,"Adj. Tax Assessed Value",,,2,3
+393,26,"Computed Damages",,,1,1
+394,26,"Contractor Estimate",,,2,2
+395,26,"Community Estimate",,,3,3
+397,28,"Base Flood Elevation","Property","BFE",3,2
+398,28,"Cell Phone","Property","CellPhone",1,3
+399,28,"City","Property","City",1,4
+400,28,"Community ID","Property","NFIPCID",2,5
+401,28,"Community Name","Property","NFIPCommunityName",1,6
+402,28,"Community Specific Information","Property","CommunityInformation",1,7
+403,28,"Cost Data Date","Assessment","CostDataDate",4,8
+404,28,"Cost Data Reference","Assessment","CostData",1,9
+405,28,"Date Damaged Occurred","Assessment","DateDamageOccurred",4,10
+406,28,"Date Of FIRM Panel","Property","FIRMPanelDate",4,11
+407,28,"Assessment Date","Assessment","DateOfInspection",4,12
+408,28,"Datum","Property","Datum",1,13
+409,28,"Depth Of Flood Above Ground","Assessment","DepthOfFlood",3,14
+410,28,"Depth Of Flood Above First Floor","Assessment","DepthOfFloodAboveFFE",3,15
+411,28,"Duration Of Flood","Assessment","DurationOfFlood",3,16
+412,28,"Elevation Of Lowest Floor","Property","FirstFloorElevation",3,17
+413,28,"FIRM Panel Number","Property","FIRMPanelNumber",1,18
+415,28,"Inspector Name","Assessment","InspectorName",1,20
+416,28,"Inspector Phone","Assessment","InspectorPhoneNumber",1,21
+417,28,"Lot Number","Property","LotNumber",1,22
+418,28,"Name, First","Property","OwnerFirstName",1,23
+419,28,"Name, Last","Property","OwnerLastName",1,24
+420,28,"Parcel Number","Property","ParcelNumber",1,25
+421,28,"Phone","Property","PhoneNumber",1,26
+422,28,"Structure Information","Property","StructureInformation",1,27
+423,28,"Street Name","Property","StreetName",1,28
+424,28,"Street Number","Property","StreetNumber",1,29
+426,28,"Subdivision","Property","Subdivision",1,31
+427,28,"Year Of Construction","Property","YearOfConstruction",2,32
+428,28,"Zip Code","Property","ZipCode",2,33
+429,30,"John",,,,1
+430,30,"John Doe",,,,2
+431,30,"Doe, John",,,,3
+432,31,"Street Number",,,,1
+433,31,"Street Number Street Name (with suffix)",,,,2
+434,31,"Street Number Street Name (without suffix)",,,,3
+435,32,"Street Name (with suffix)",,,,1
+436,32,"Street Name (without suffix)",,,,2
+437,32,"Street Number Street Name (with suffix)",,,,3
+438,32,"Street Number Street Name (without suffix)",,,,4
+439,33,"Street Suffix",,,,1
+440,33,"Street Name Street Suffix",,,,2
+441,33,"Street Number Street Name Street Suffix",,,,3

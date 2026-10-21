@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svc="using:Sde.App.Services"
+             x:Class="Sde.App.Views.PhoneFormPanel"
+             x:DataType="svc:PhoneFormService">
+  <Border Classes="card">
+    <StackPanel Spacing="10">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="h2" Text="Phone form" />
+        <TextBlock Classes="muted" TextWrapping="Wrap"
+                   Text="Lets inspectors find or add structures, fill in fields and take photos in a phone's web browser, over this Mac's Wi-Fi network. Each change shows in edit history as Phone, with the name typed on the phone. Off until you start it; it stops by itself after 12 hours and when SDE quits." />
+      </StackPanel>
+      <TextBlock Classes="issue recommended" TextWrapping="Wrap" Text="Traffic is not encrypted; use it only on a network you trust." />
+
+      <!-- Stopped -->
+      <StackPanel Spacing="8" IsVisible="{Binding IsStopped}">
+        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding LastStopped}" IsVisible="{Binding LastStopped, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <Button Classes="primary" Content="Start phone form" Command="{Binding StartCommand}" HorizontalAlignment="Left" />
+      </StackPanel>
+
+      <!-- Running -->
+      <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsRunning}">
+        <Border Background="White" CornerRadius="8" Padding="8" VerticalAlignment="Top" Margin="0,0,20,0">
+          <Image Source="{Binding QrCode}" Width="200" Height="200" RenderOptions.BitmapInterpolationMode="None"
+                 AutomationProperties.Name="QR code to pair a phone" />
+        </Border>
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Classes="fieldLabel" Text="Scan the QR code with the phone's camera, or open this address and type the PIN" TextWrapping="Wrap" />
+          <SelectableTextBlock Text="{Binding Address}" FontSize="18" FontWeight="SemiBold" AutomationProperties.Name="Phone form address" />
+          <TextBlock Classes="fieldLabel" Text="PIN" Margin="0,8,0,0" />
+          <SelectableTextBlock Text="{Binding Pin}" FontSize="28" FontWeight="Bold" FontFamily="Menlo, Consolas, monospace" AutomationProperties.Name="Pairing PIN" />
+          <TextBlock Classes="muted" TextWrapping="Wrap" Text="The QR code and PIN work once, for 10 minutes; a new one appears after each phone pairs." />
+          <TextBlock Classes="issue required" TextWrapping="Wrap" Text="{Binding PinWarning}" IsVisible="{Binding HasPinWarning}" />
+          <TextBlock Classes="secondary" Text="{Binding TimeLeft}" Margin="0,6,0,0" />
+          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <Button Content="New code" Command="{Binding NewCodeCommand}" AutomationProperties.Name="New pairing code" />
+            <Button Classes="danger" Content="Stop phone form" Command="{Binding StopCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Spacing="6" IsVisible="{Binding IsRunning}">
+        <TextBlock Classes="h3" Text="Paired phones" />
+        <TextBlock Classes="muted" Text="No phones paired yet." IsVisible="{Binding !HasPhones}" />
+        <ItemsControl ItemsSource="{Binding Phones}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="svc:PairedPhoneViewModel">
+              <DockPanel Margin="0,2">
+                <Button DockPanel.Dock="Right" Content="Revoke" Command="{Binding RevokeCommand}" AutomationProperties.Name="{Binding RevokeLabel}" />
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Name}" FontWeight="Medium" />
+                  <TextBlock Classes="muted" Text="{Binding Details}" />
+                </StackPanel>
+              </DockPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

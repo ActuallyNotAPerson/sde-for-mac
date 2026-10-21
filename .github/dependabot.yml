@@ -1,0 +1,21 @@
+# Dependabot opens pull requests to keep the NuGet packages and the GitHub Actions used by the workflows up to date.
+# Security updates are separate (Settings, Advanced Security) and arrive as soon as an advisory is published.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # Minor and patch updates in one pull request a month; major versions each get their own.
+      nuget-minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
