@@ -7,6 +7,15 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      # PDFsharp and MigraDoc 6.5 and later are AGPL-3.0 or commercial and need a license key. SDE for Mac is MIT,
+      # so they stay on 6.2.x, the last MIT release.
+      - dependency-name: "PDFsharp*"
+        versions: [">= 6.5.0"]
+      # SkiaSharp has to match the native library Avalonia ships (SkiaSharp 3 for Avalonia 12.1). Move to a new major
+      # version only together with an Avalonia release that uses it.
+      - dependency-name: "SkiaSharp*"
+        update-types: ["version-update:semver-major"]
     groups:
       # Minor and patch updates in one pull request a month; major versions each get their own.
       nuget-minor-and-patch:

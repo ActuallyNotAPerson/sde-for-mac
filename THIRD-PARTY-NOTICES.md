@@ -72,6 +72,9 @@ and https://github.com/harfbuzz/harfbuzz/blob/main/COPYING.
 | Newtonsoft.Json | 13.0.4 | MIT | https://www.newtonsoft.com/json |
 | QRCoder (the phone form's pairing QR code) | 1.6.0 | MIT | https://github.com/Shane32/QRCoder |
 
+PDFsharp and MigraDoc are kept on 6.2.x: version 6.5 and later are licensed under the AGPL-3.0 or a commercial
+license, not MIT.
+
 ### Microsoft libraries pulled in by the packages above
 
 | Package | Version | License | Project |
