@@ -30,4 +30,7 @@ public sealed class ReportRequest
 
 	/// <summary>Date printed in the footer; default DateTime.Now (the original's code.GetTheDate()).</summary>
 	public DateTime? GeneratedOn { get; init; }
+
+	/// <summary>Markup JSON by photo file name (see <c>SdeStore.GetPhotoMarkups</c>), drawn on the printed photos. Null: none.</summary>
+	public IReadOnlyDictionary<string, string> PhotoMarkups { get; init; }
 }

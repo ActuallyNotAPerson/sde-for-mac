@@ -1,4 +1,5 @@
 using Sde.Core.Assessments;
+using Sde.Core.Photos;
 using Sde.Core.Records;
 
 namespace Sde.Reports.Internal;
@@ -49,11 +50,14 @@ internal sealed class Photo
 internal sealed class PhotoLibrary
 {
 	private readonly string _folder;
+	private readonly IReadOnlyDictionary<string, string> _markups;
 	private readonly Dictionary<string, Photo> _cache = new(StringComparer.Ordinal);
 
-	public PhotoLibrary(string folder)
+	/// <param name="markups">Markup JSON by photo file name, drawn on the printed photos; null for none.</param>
+	public PhotoLibrary(string folder, IReadOnlyDictionary<string, string> markups = null)
 	{
 		_folder = folder;
+		_markups = markups;
 	}
 
 	/// <summary>Active attachments, the default photo first, otherwise in their existing (AttachmentID) order.</summary>
@@ -90,7 +94,8 @@ internal sealed class PhotoLibrary
 		try
 		{
 			// Upright and print-sized (see PhotoPrep); MigraDoc takes the bytes as a "base64:" image source.
-			photo = PhotoPrep.Prepare(path) is (byte[] jpeg, int w, int h)
+			PhotoMarkup markup = _markups != null && _markups.TryGetValue(System.IO.Path.GetFileName(a.FileName), out string json) ? PhotoMarkup.Parse(json) : null;
+			photo = PhotoPrep.Prepare(path, markup) is (byte[] jpeg, int w, int h)
 				? new Photo { Status = PhotoStatus.Ok, Path = "base64:" + Convert.ToBase64String(jpeg), PixelWidth = w, PixelHeight = h, Description = a.Description }
 				: new Photo { Status = PhotoStatus.Unsupported, Description = a.Description };
 		}

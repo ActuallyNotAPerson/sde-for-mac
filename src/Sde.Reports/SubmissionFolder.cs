@@ -17,6 +17,12 @@ public sealed class SubmissionOptions
 	/// <summary>Also include assessments whose result is "Data Entry Incomplete" (left out by default).</summary>
 	public bool IncludeIncomplete { get; init; }
 
+	/// <summary>
+	/// Also write a copy of each marked-up photo with its markup drawn on ("Marked-up photos"). FEMA's SDE package always
+	/// keeps the original photos.
+	/// </summary>
+	public bool IncludeMarkedUpCopies { get; init; }
+
 	/// <summary>The time used in the folder name and printed on the reports (default: now).</summary>
 	public DateTime? GeneratedOn { get; init; }
 }
@@ -51,6 +57,7 @@ public static class SubmissionFolder
 	public const string PercentDamagedFile = "Percent damaged list.pdf";
 	public const string CommunityFile = "Community report.pdf";
 	public const string ResultsFile = "results.csv";
+	public const string MarkedUpFolder = "Marked-up photos";
 
 	/// <summary>
 	/// Writes a new "SDE submission &lt;date time&gt;" folder inside <paramref name="parentFolder"/>. Assessments are
@@ -128,6 +135,11 @@ public static class SubmissionFolder
 			Step("results.csv");
 			ResultsCsv.Write(Path.Combine(folder, ResultsFile), files, links, names, store.Reference);
 			done++;
+
+			if (options.IncludeMarkedUpCopies)
+			{
+				WriteMarkedUpCopies(store, files, Path.Combine(folder, MarkedUpFolder));
+			}
 			progress?.Report(new SubmissionProgress(done, total, "Done"));
 
 			return new SubmissionResult { Folder = folder, Assessments = files.Count, Skipped = skipped, MissingPhotos = missing };
@@ -149,7 +161,38 @@ public static class SubmissionFolder
 		IncludePhotos = options.IncludePhotos,
 		PhotosFolder = store.AttachmentsFolder,
 		GeneratedOn = now,
+		PhotoMarkups = Markups(store, files),
 	};
+
+	/// <summary>The markup of these assessments' photos, by file name.</summary>
+	public static Dictionary<string, string> Markups(SdeStore store, IEnumerable<AssessmentFile> files)
+	{
+		Dictionary<string, string> all = new Dictionary<string, string>(StringComparer.Ordinal);
+		foreach (AssessmentFile f in files)
+		{
+			foreach (KeyValuePair<string, string> m in store.GetPhotoMarkups(f.Assessment.AssessmentID))
+			{
+				all[m.Key] = m.Value;
+			}
+		}
+		return all;
+	}
+
+	/// <summary>A JPEG copy of each marked-up photo with its marks drawn on, named after the stored photo.</summary>
+	private static void WriteMarkedUpCopies(SdeStore store, IReadOnlyList<AssessmentFile> files, string folder)
+	{
+		foreach (KeyValuePair<string, string> m in Markups(store, files))
+		{
+			Sde.Core.Photos.PhotoMarkup markup = Sde.Core.Photos.PhotoMarkup.Parse(m.Value);
+			string photo = Path.Combine(store.AttachmentsFolder, m.Key);
+			if (markup == null || markup.IsEmpty || !File.Exists(photo))
+			{
+				continue;
+			}
+			Directory.CreateDirectory(folder);
+			PhotoMarkupRenderer.WriteMarkedUpCopy(photo, markup, Path.Combine(folder, Path.GetFileNameWithoutExtension(m.Key) + " (marked up).jpg"));
+		}
+	}
 
 	/// <summary>
 	/// "BLD-2026-00123 – 123 River Street.pdf" (the record ID when the assessment was imported), with the inspection date added

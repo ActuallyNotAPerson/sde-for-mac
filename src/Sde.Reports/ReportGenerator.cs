@@ -60,7 +60,7 @@ public static class ReportGenerator
 			.Where(f => f != null)
 			.Select(f => new AssessmentView(f, reference))
 			.ToList();
-		PhotoLibrary photos = new PhotoLibrary(request.PhotosFolder);
+		PhotoLibrary photos = new PhotoLibrary(request.PhotosFolder, request.PhotoMarkups);
 		Document doc = Theme.NewDocument(Title(request.Kind), $"{items.Count} assessment(s)");
 
 		if (items.Count == 0)
