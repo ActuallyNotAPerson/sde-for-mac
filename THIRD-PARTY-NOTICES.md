@@ -71,7 +71,7 @@ and https://github.com/harfbuzz/harfbuzz/blob/main/COPYING.
 | PDFsharp, PDFsharp-MigraDoc | 6.2.4 | MIT | https://docs.pdfsharp.net/ |
 | RBush.Signed | 4.0.0 | MIT | https://github.com/viceroypenguin/RBush |
 | Newtonsoft.Json | 13.0.4 | MIT | https://www.newtonsoft.com/json |
-| QRCoder (the phone form's pairing QR code) | 1.6.0 | MIT | https://github.com/Shane32/QRCoder |
+| QRCoder (the phone form's pairing QR code and the field worksheets' codes) | 1.6.0 | MIT | https://github.com/Shane32/QRCoder |
 
 PDFsharp and MigraDoc are kept on 6.2.x: version 6.5 and later are licensed under the AGPL-3.0 or a commercial
 license, not MIT.
