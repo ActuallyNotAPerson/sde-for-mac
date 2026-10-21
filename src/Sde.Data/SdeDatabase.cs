@@ -215,6 +215,27 @@ public sealed class SdeDatabase
 		return result;
 	}
 
+	/// <summary>
+	/// Runs <paramref name="work"/> in one transaction with another SQLite file attached as <paramref name="alias"/>
+	/// (SQLite can't attach inside a transaction, so it is attached first and detached after).
+	/// </summary>
+	public void InTransactionWithAttached(string attachPath, string alias, Action<SqliteConnection, IDbTransaction> work)
+	{
+		using SqliteConnection c = Connect();
+		c.Execute($"ATTACH DATABASE @attachPath AS {alias}", new { attachPath });
+		try
+		{
+			using SqliteTransaction tx = c.BeginTransaction(deferred: false);
+			work(c, tx);
+			tx.Commit();
+			Interlocked.Increment(ref _commits);
+		}
+		finally
+		{
+			c.Execute($"DETACH DATABASE {alias}");
+		}
+	}
+
 	public void InTransaction(Action<SqliteConnection, IDbTransaction> work) =>
 		InTransaction<bool>((c, tx) =>
 		{

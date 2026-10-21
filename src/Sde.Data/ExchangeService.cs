@@ -140,13 +140,13 @@ public sealed class ExchangeService
 	/// rows can never collide with existing ones (an original bug). The import is one batch in edit history, named
 	/// after <paramref name="sourceName"/>; Final and Letter sent assessments are never replaced.
 	/// </summary>
-	public ImportResult Import(SdeDataset data, string photosFolder, ExistingRecordAction existing, string sourceName = null)
+	public ImportResult Import(SdeDataset data, string photosFolder, ExistingRecordAction existing, string sourceName = null, SaveContext context = null)
 	{
 		ImportResult result = new ImportResult();
 		AssessmentCalculator calculator = _store.Calculator;
 		List<(string From, string To)> photoCopies = new();
 
-		SaveContext ctx = SaveContext.Batch(SaveVia.Import, "Imported" + (string.IsNullOrEmpty(sourceName) ? "" : " from " + sourceName));
+		SaveContext ctx = context?.AsBatch() ?? SaveContext.Batch(SaveVia.Import, "Imported" + (string.IsNullOrEmpty(sourceName) ? "" : " from " + sourceName));
 		_store.Database.InTransaction((c, tx) =>
 		{
 			// Rows in Recently deleted with the same IDs would make the import skip or overwrite something nobody can
@@ -213,6 +213,12 @@ public sealed class ExchangeService
 					{
 						result.Skipped++;
 						result.Warnings.Add($"Assessment {sourceAssessment.AssessmentID} wasn't replaced: it is Final or its letter was sent. Reopen it first to import over it.");
+						continue;
+					}
+					if (assessmentExists && !newIds && ctx.Via != SaveVia.WorkPackage && SdeStore.IsCheckedOut(c, tx, sourceAssessment.AssessmentID))
+					{
+						result.Skipped++;
+						result.Warnings.Add($"Assessment {sourceAssessment.AssessmentID} wasn't replaced: it is checked out to another Mac in a work package.");
 						continue;
 					}
 					AssessmentFile file = BuildFile(data, sourceAssessment, target, newIds, photoCopies, photosFolder);

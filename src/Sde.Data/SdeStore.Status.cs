@@ -57,6 +57,10 @@ public sealed partial class SdeStore
 		{
 			return current;
 		}
+		if (ctx.Via != SaveVia.WorkPackage)
+		{
+			EnsureNotCheckedOut(c, tx, assessmentId);
+		}
 		bool reopening = current.IsLocked && !AssessmentStatuses.IsLocked(status);
 		if (reopening && string.IsNullOrWhiteSpace(reason))
 		{

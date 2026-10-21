@@ -129,7 +129,7 @@ public sealed partial class SdeStore
 				{
 					continue;
 				}
-				if (!ctx.AllowLocked && GetStatus(c, tx, group.Key).IsLocked)
+				if (!ctx.AllowLocked && (GetStatus(c, tx, group.Key).IsLocked || IsCheckedOut(c, tx, group.Key)))
 				{
 					result.Locked.Add(group.Key);
 					continue;

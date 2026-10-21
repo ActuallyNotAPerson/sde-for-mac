@@ -77,6 +77,7 @@ public sealed partial class SdeStore
 				{
 					throw new AssessmentLockedException(aid, status.Value, new List<FieldDiff>());
 				}
+				EnsureNotCheckedOut(c, tx, aid);
 			}
 			c.Execute("UPDATE Assessment SET Active = 0 WHERE PropertyID = @propertyId AND Active = 1", new { propertyId }, tx);
 			c.Execute("UPDATE Property SET Active = 0 WHERE PropertyID = @propertyId", new { propertyId }, tx);
@@ -112,6 +113,7 @@ public sealed partial class SdeStore
 			{
 				throw new AssessmentLockedException(assessmentId, GetStatus(c, tx, assessmentId).Value, new List<FieldDiff>());
 			}
+			EnsureNotCheckedOut(c, tx, assessmentId);
 			PropertyRecord p = TableMap<PropertyRecord>.Get(c, new { a.PropertyID }, tx);
 			c.Execute("UPDATE Assessment SET Active = 0 WHERE AssessmentID = @assessmentId", new { assessmentId }, tx);
 			BumpVersion(c, tx, assessmentId, VersionKind.Assessment);

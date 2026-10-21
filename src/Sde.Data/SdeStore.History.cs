@@ -38,6 +38,10 @@ public sealed partial class SdeStore
 		List<FieldDiff> diffs = before == null ? new List<FieldDiff>() : AssessmentDiff.Compare(before, file, Reference);
 		if (before != null)
 		{
+			if (ctx.Via != SaveVia.WorkPackage)
+			{
+				EnsureNotCheckedOut(c, tx, id);
+			}
 			AssessmentStatusRecord status = GetStatus(c, tx, id);
 			if (status.IsLocked)
 			{

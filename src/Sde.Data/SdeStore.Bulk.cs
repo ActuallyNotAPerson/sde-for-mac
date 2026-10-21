@@ -46,7 +46,7 @@ public sealed partial class SdeStore
 		{
 			foreach (AssessmentFile f in files)
 			{
-				if (!ctx.AllowLocked && GetStatus(c, tx, f.Assessment.AssessmentID).IsLocked)
+				if (!ctx.AllowLocked && (GetStatus(c, tx, f.Assessment.AssessmentID).IsLocked || IsCheckedOut(c, tx, f.Assessment.AssessmentID)))
 				{
 					AssessmentFile stored = LoadAssessment(c, tx, f.Assessment.AssessmentID);
 					if (stored != null && AssessmentDiff.Compare(stored, f, Reference).Count > 0)

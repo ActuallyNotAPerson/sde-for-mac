@@ -72,7 +72,7 @@ public sealed partial class SdeStore
 			foreach (ImportedAssessment item in items)
 			{
 				Guid id = item.File.Assessment.AssessmentID;
-				if (!ctx.AllowLocked && id != Guid.Empty && GetStatus(c, tx, id).IsLocked)
+				if (!ctx.AllowLocked && id != Guid.Empty && (GetStatus(c, tx, id).IsLocked || IsCheckedOut(c, tx, id)))
 				{
 					locked.Add(id);
 					continue;
