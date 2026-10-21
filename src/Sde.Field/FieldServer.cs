@@ -293,6 +293,8 @@ public sealed class FieldServer : IAsyncDisposable
 		app.MapGet("/api/lookups", () => Results.Json(FieldApi.Lookups(_store().Reference)));
 		app.MapGet("/api/structures", (HttpContext ctx) => Results.Json(FieldApi.Search(_store(), ctx.Request.Query["q"].ToString())));
 		app.MapPost("/api/structures", AddStructure);
+		app.MapGet("/api/teams", () => Results.Json(FieldApi.Teams(_store())));
+		app.MapGet("/api/teams/{id:guid}/assignments", (Guid id) => Results.Json(FieldApi.Assignments(_store(), id)));
 		app.MapPost("/api/properties/{id:guid}/assessments", AddAssessment);
 		app.MapGet("/api/assessments/{id:guid}", (Guid id) =>
 		{

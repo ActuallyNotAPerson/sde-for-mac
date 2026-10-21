@@ -22,6 +22,12 @@ public sealed record LookupsDto(IReadOnlyList<string> Steps, IReadOnlyList<Field
 public sealed record StructureDto(Guid PropertyId, Guid? AssessmentId, string Address, string City, string Owner, string Parcel,
 	string RecordId, string StructureType, string Result);
 
+/// <summary>A field team the phone can choose (no member names or phone numbers).</summary>
+public sealed record TeamDto(Guid TeamId, string Name, string Color);
+
+/// <summary>A structure on a team's list, in route order.</summary>
+public sealed record AssignmentDto(Guid AssignmentId, string ShortCode, int? RouteOrder, string Status, string DueDate, StructureDto Structure);
+
 /// <summary>An assessment as the phone edits it: only the fields that apply to it now.</summary>
 public sealed record AssessmentDto(Guid AssessmentId, Guid PropertyId, string Address, string StructureType, string Status, bool Locked,
 	string Result, int PhotoCount, IReadOnlyList<StepDto> Steps);
@@ -65,25 +71,59 @@ public static class FieldApi
 	/// <summary>
 	/// Structures whose address, city, ZIP, owner, parcel number or record ID contain every word of
 	/// <paramref name="query"/> (any case). An empty query lists the most recently changed.
+	/// A field worksheet's short code finds its structure, listed first.
 	/// </summary>
 	public static IReadOnlyList<StructureDto> Search(SdeStore store, string query)
 	{
 		string[] words = (query ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+		List<StructureSummary> structures = store.ListStructures();
 		List<StructureDto> results = new();
-		foreach (StructureSummary s in store.ListStructures())
+		// A field worksheet's code (typed, or read from its QR code) finds its structure first.
+		AssignmentRecord coded = words.Length == 0 ? null : store.FindAssignmentByCode(query);
+		if (coded != null && structures.FirstOrDefault(x => x.PropertyID == coded.PropertyID) is StructureSummary codedStructure)
+		{
+			results.Add(Dto(codedStructure));
+		}
+		foreach (StructureSummary s in structures)
 		{
 			string haystack = string.Join(" ", s.Address, s.City, s.ZipCode, s.Owner, s.ParcelNumber, s.ExternalId);
-			if (words.All(w => haystack.Contains(w, StringComparison.OrdinalIgnoreCase)))
+			if (words.All(w => haystack.Contains(w, StringComparison.OrdinalIgnoreCase)) && s.PropertyID != coded?.PropertyID)
 			{
-				results.Add(new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner, s.ParcelNumber,
-					s.ExternalId, TypeName(s.StructureTypeID), ResultText(s.PercentDamage, s.DamageMessage)));
-				if (results.Count >= MaxResults)
-				{
-					break;
-				}
+				results.Add(Dto(s));
+			}
+			if (results.Count >= MaxResults)
+			{
+				break;
 			}
 		}
 		return results;
+	}
+
+	private static StructureDto Dto(StructureSummary s) => new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner,
+		s.ParcelNumber, s.ExternalId, TypeName(s.StructureTypeID), ResultText(s.PercentDamage, s.DamageMessage));
+
+	/// <summary>The active field teams, by name.</summary>
+	public static IReadOnlyList<TeamDto> Teams(SdeStore store) =>
+		store.GetTeams().OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase).Select(t => new TeamDto(t.TeamID, t.Name, t.Color)).ToList();
+
+	/// <summary>A team's structures in route order ("My assignments"); structures removed since are left out.</summary>
+	public static IReadOnlyList<AssignmentDto> Assignments(SdeStore store, Guid teamId)
+	{
+		Dictionary<Guid, StructureSummary> structures = new();
+		foreach (StructureSummary s in store.ListStructures())
+		{
+			structures.TryAdd(s.PropertyID, s);
+		}
+		List<AssignmentDto> list = new();
+		foreach (AssignmentRecord a in store.GetAssignments(teamId))
+		{
+			if (structures.TryGetValue(a.PropertyID, out StructureSummary s))
+			{
+				list.Add(new AssignmentDto(a.AssignmentID, a.ShortCode, a.RouteOrder, a.Status,
+					a.DueDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), Dto(s)));
+			}
+		}
+		return list;
 	}
 
 	public static AssessmentDto Describe(SdeStore store, AssessmentFile file)
