@@ -101,6 +101,14 @@ SDE is published self-contained, so the .NET runtime (MIT, https://github.com/do
 together with the ASP.NET Core shared framework (MIT, https://github.com/dotnet/aspnetcore), whose Kestrel web server
 runs the phone form.
 
+## Web libraries
+
+| Library | Version | License | Project |
+| --- | --- | --- | --- |
+| Leaflet, inlined into the web maps SDE writes (Share a web map) | 1.9.4 | BSD-2-Clause; Copyright (c) 2010-2023 Volodymyr Agafonkin, Copyright (c) 2010-2011 CloudMade | https://leafletjs.com/ |
+
+Each web map folder also contains Leaflet's license as `LICENSE-Leaflet.txt`.
+
 ## Fonts
 
 | Font | License | Source |
