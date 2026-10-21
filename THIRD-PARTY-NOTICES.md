@@ -95,7 +95,7 @@ publishes its XMP Toolkit SDK under BSD-3-Clause (https://github.com/adobe/XMP-T
 | Microsoft.Extensions.Logging.Abstractions | 8.0.3 | MIT | https://github.com/dotnet/runtime |
 | Microsoft.IO.RecyclableMemoryStream | 3.0.1 | MIT | https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream |
 | System.IO.Packaging | 8.0.1 | MIT | https://github.com/dotnet/runtime |
-| System.Security.Cryptography.Pkcs | 8.0.1 | MIT | https://github.com/dotnet/runtime |
+| System.Security.Cryptography.Pkcs | 8.0.2 | MIT | https://github.com/dotnet/runtime |
 
 SDE is published self-contained, so the .NET runtime (MIT, https://github.com/dotnet/runtime) travels inside the app,
 together with the ASP.NET Core shared framework (MIT, https://github.com/dotnet/aspnetcore), whose Kestrel web server

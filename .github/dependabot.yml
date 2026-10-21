@@ -16,6 +16,9 @@ updates:
       # version only together with an Avalonia release that uses it.
       - dependency-name: "SkiaSharp*"
         update-types: ["version-update:semver-major"]
+      # Svg.Skia (which the map library uses) must stay on a release built on SkiaSharp 3, for the same reason.
+      - dependency-name: "Svg.Skia"
+        update-types: ["version-update:semver-major"]
     groups:
       # Minor and patch updates in one pull request a month; major versions each get their own.
       nuget-minor-and-patch:
