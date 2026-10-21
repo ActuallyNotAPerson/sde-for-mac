@@ -77,6 +77,18 @@ public static class EventSummaryReport
 		{
 			sub.Add(s.EventName.Trim());
 		}
+		if (!string.IsNullOrWhiteSpace(s.Event?.DisasterNumber))
+		{
+			sub.Add(s.Event.DisasterNumber.Trim());
+		}
+		if (!string.IsNullOrWhiteSpace(s.Event?.Kind))
+		{
+			sub.Add(s.Event.Kind.Trim());
+		}
+		if (s.Event?.DateRange is string eventDates)
+		{
+			sub.Add("Event " + eventDates);
+		}
 		string damage = Range("Damage occurred", s.DamageStart, s.DamageEnd);
 		if (damage != null)
 		{
