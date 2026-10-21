@@ -1,0 +1,23 @@
+name: Code of conduct concern
+description: Behaviour in this project that goes against the code of conduct.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This page is public.** If the concern is sensitive, or about something you'd rather not post in public,
+        please send a private report instead: open the repository's **Security** tab, click **Report a vulnerability**
+        and start the title with "Code of conduct". Only the maintainers can see it.
+
+        See CODE_OF_CONDUCT.md for what the code of conduct covers.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Describe the behaviour and where it happened.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link (optional)
+      description: A link to the comment, issue or pull request, if there is one.
