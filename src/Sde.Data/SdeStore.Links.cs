@@ -65,8 +65,12 @@ public sealed partial class SdeStore
 				if (item.ShapeTotal is decimal total)
 				{
 					Guid propertyId = item.Property.PropertyID;
-					TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
-					TableMap<ShapeRecord>.Insert(c, new ShapeRecord { ShapeType = "c", PropertyID = propertyId, TotalSqFt = total }, tx);
+					ShapeRecord[] shapes = { new ShapeRecord { ShapeType = "c", TotalSqFt = total } };
+					if (!SameShapes(c, tx, propertyId, shapes))
+					{
+						ReplaceShapes(c, tx, propertyId, shapes);
+						BumpVersion(c, tx, propertyId, VersionKind.Property);
+					}
 				}
 			}
 		});

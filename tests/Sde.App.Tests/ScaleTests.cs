@@ -45,7 +45,7 @@ public class ScaleTests
 		Populate(ui.Store, 1000);
 
 		Stopwatch sw = Stopwatch.StartNew();
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Pump();
 		TimeSpan load = sw.Elapsed;
 		Assert.Equal(1000, ui.Main.Structures.Rows.Count);

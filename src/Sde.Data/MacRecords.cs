@@ -24,12 +24,55 @@ public sealed class SaveContext
 	/// <summary>An event to record with the save, e.g. "Imported from SDE_1". For a new assessment it replaces "Assessment created".</summary>
 	public string Event { get; init; }
 
+	/// <summary>The assessment's version the writer loaded (see <see cref="VersionStamp"/>); null doesn't check.</summary>
+	public long? ExpectedVersion { get; init; }
+
+	/// <summary>The structure's version the writer loaded; null doesn't check.</summary>
+	public long? ExpectedPropertyVersion { get; init; }
+
+	/// <summary>The assessment's LastUpdate the writer loaded, which catches saves by versions older than v2.5; null doesn't check.</summary>
+	public DateTime? ExpectedLastUpdate { get; init; }
+
+	/// <summary>The structure's LastUpdate the writer loaded; null doesn't check.</summary>
+	public DateTime? ExpectedPropertyLastUpdate { get; init; }
+
+	/// <summary>True when the save must be refused if someone else saved since the writer loaded (see <see cref="ConcurrencyException"/>).</summary>
+	public bool HasExpectations => ExpectedVersion != null || ExpectedPropertyVersion != null || ExpectedLastUpdate != null || ExpectedPropertyLastUpdate != null;
+
+	/// <summary>This context, refusing the save if the database has moved on from <paramref name="loaded"/> (null: no check).</summary>
+	public SaveContext Expecting(VersionStamp loaded) => new SaveContext
+	{
+		User = User,
+		Via = Via,
+		BatchId = BatchId,
+		AllowLocked = AllowLocked,
+		Event = Event,
+		ExpectedVersion = loaded?.Assessment,
+		ExpectedPropertyVersion = loaded?.Property,
+		ExpectedLastUpdate = loaded?.AssessmentLastUpdate,
+		ExpectedPropertyLastUpdate = loaded?.PropertyLastUpdate,
+	};
+
 	/// <summary>An ordinary edit in the app.</summary>
 	public static SaveContext App { get; } = new SaveContext();
 
 	/// <summary>A new context for one batch (bulk edit, import) with its own BatchId.</summary>
 	public static SaveContext Batch(string via, string eventLabel = null) =>
 		new SaveContext { Via = via, BatchId = Guid.NewGuid().ToString("N"), Event = eventLabel };
+
+	/// <summary>This context with a BatchId of its own when it has none (one bulk change is one batch in edit history).</summary>
+	public SaveContext AsBatch() => BatchId != null ? this : new SaveContext
+	{
+		User = User,
+		Via = Via,
+		BatchId = Guid.NewGuid().ToString("N"),
+		AllowLocked = AllowLocked,
+		Event = Event,
+		ExpectedVersion = ExpectedVersion,
+		ExpectedPropertyVersion = ExpectedPropertyVersion,
+		ExpectedLastUpdate = ExpectedLastUpdate,
+		ExpectedPropertyLastUpdate = ExpectedPropertyLastUpdate,
+	};
 }
 
 /// <summary>Values for <see cref="SaveContext.Via"/> (stored as text, so new ones can be added freely).</summary>
@@ -45,6 +88,21 @@ public static class SaveVia
 	public const string Online = "Online lookup";
 	public const string PhotoFolder = "Photo folder";
 	public const string DepthTable = "Depth table";
+
+	/// <summary>The map: Set location, dragging a structure, copying values from a map layer.</summary>
+	public const string Map = "Map";
+
+	/// <summary>An AI assistant connected through SDE's MCP server.</summary>
+	public const string AiAssistant = "AI assistant";
+
+	/// <summary>Checking a work package back in from another Mac.</summary>
+	public const string WorkPackage = "Work package";
+
+	/// <summary>Flood depth from high-water marks or a depth grid.</summary>
+	public const string DepthTool = "Depth tool";
+
+	/// <summary>Values read from an elevation certificate.</summary>
+	public const string EcImport = "EC import";
 }
 
 /// <summary>Where an assessment is in the review workflow. An assessment with no status row is a Draft.</summary>

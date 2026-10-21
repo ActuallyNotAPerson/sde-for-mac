@@ -35,7 +35,7 @@ public sealed partial class SdeStore
 	/// </summary>
 	public BulkResult SaveAssessments(IReadOnlyList<AssessmentFile> files, SaveContext context)
 	{
-		SaveContext ctx = context.BatchId != null ? context : new SaveContext { User = context.User, Via = context.Via, BatchId = Guid.NewGuid().ToString("N"), AllowLocked = context.AllowLocked, Event = context.Event };
+		SaveContext ctx = context.AsBatch();
 		AssessmentCalculator calc = Calculator;
 		foreach (AssessmentFile f in files)
 		{
@@ -80,40 +80,71 @@ public sealed partial class SdeStore
 	}
 
 	/// <summary>
-	/// Puts back what one bulk edit, copy or replace changed, as a new batch ("Revert"). A value someone has changed
-	/// again since is left as it is and counted in <see cref="BulkResult.ChangedSince"/>.
+	/// Puts back what one bulk edit, copy, replace or AI assistant call changed, as a new batch ("Revert"). A value
+	/// someone has changed again since is left as it is and counted in <see cref="BulkResult.ChangedSince"/>. Changes
+	/// made to structures on their own (a replace in a structure field) are put back on the structures.
 	/// </summary>
 	public BulkResult RevertBatch(string batchId, SaveContext context = null)
 	{
 		List<EditHistoryRecord> rows = GetBatch(batchId).Where(r => r.Field != null && FieldCatalog.Get(r.Field) != null).ToList();
 		Dictionary<Guid, AssessmentFile> files = new Dictionary<Guid, AssessmentFile>();
+		Dictionary<Guid, PropertyRecord> properties = new Dictionary<Guid, PropertyRecord>();
 		int changedSince = 0;
 		foreach (EditHistoryRecord row in rows.AsEnumerable().Reverse())
 		{
-			Guid? id = row.AssessmentID;
-			if (id == null)
+			FieldInfo f = FieldCatalog.Get(row.Field);
+			AssessmentFile target;
+			if (row.AssessmentID is Guid id)
+			{
+				if (!files.TryGetValue(id, out target))
+				{
+					target = LoadAssessment(id);
+					if (target == null)
+					{
+						continue;
+					}
+					files[id] = target;
+				}
+			}
+			else if (row.PropertyID is Guid pid && f.Model == FieldModel.Property)
+			{
+				if (!properties.TryGetValue(pid, out PropertyRecord p))
+				{
+					p = GetProperty(pid);
+					if (p == null)
+					{
+						continue;
+					}
+					properties[pid] = p;
+				}
+				target = new AssessmentFile { Property = p };
+			}
+			else
 			{
 				continue;
 			}
-			if (!files.TryGetValue(id.Value, out AssessmentFile file))
-			{
-				file = LoadAssessment(id.Value);
-				if (file == null)
-				{
-					continue;
-				}
-				files[id.Value] = file;
-			}
-			FieldInfo f = FieldCatalog.Get(row.Field);
-			if (FieldCatalog.Canonical(FieldCatalog.GetValue(file, f)) != row.NewValue)
+			if (FieldCatalog.Canonical(FieldCatalog.GetValue(target, f)) != row.NewValue)
 			{
 				changedSince++;
 				continue;
 			}
-			FieldCatalog.SetValue(file, f, row.OldValue == null ? null : FieldCatalog.Convert(row.OldValue, f.RecordProperty.PropertyType));
+			FieldCatalog.SetValue(target, f, row.OldValue == null ? null : FieldCatalog.Convert(row.OldValue, f.RecordProperty.PropertyType));
 		}
-		SaveContext ctx = context ?? SaveContext.Batch(SaveVia.Undo, "Reverted a change made to several assessments");
+		SaveContext ctx = (context ?? SaveContext.Batch(SaveVia.Undo, "Reverted a change made to several assessments")).AsBatch();
 		BulkResult result = SaveAssessments(files.Values.ToList(), ctx);
+		if (properties.Count > 0)
+		{
+			Database.InTransaction((c, tx) =>
+			{
+				foreach (PropertyRecord p in properties.Values)
+				{
+					if (SavePropertyTracked(c, tx, p, ctx))
+					{
+						result.Changed++;
+					}
+				}
+			});
+		}
 		result.ChangedSince = changedSince;
 		return result;
 	}
@@ -139,7 +170,9 @@ public sealed partial class SdeStore
 	/// <summary>
 	/// What replacing <paramref name="search"/> with <paramref name="replace"/> in a field would change. Text fields
 	/// replace the matching part only, ignoring case (FEMA's version also lowercased the rest of the value); number and
-	/// date fields match the whole value. Structure fields are listed once per structure.
+	/// date fields match the whole value. Structure fields are searched on every active structure, including ones with
+	/// no assessment, and are never locked: a Final assessment keeps its own record of what it was based on in its
+	/// history.
 	/// </summary>
 	public List<SearchMatch> PreviewReplace(SearchField field, string search, string replace)
 	{
@@ -148,14 +181,24 @@ public sealed partial class SdeStore
 		{
 			return matches;
 		}
-		HashSet<Guid> seenProperties = new HashSet<Guid>();
+		if (field.Field.Model == FieldModel.Property)
+		{
+			foreach (PropertyRecord p in GetProperties())
+			{
+				AssessmentFile holder = new AssessmentFile { Property = p };
+				object value = FieldCatalog.GetValue(holder, field.Field);
+				string before = field.IsText ? value as string : FieldCatalog.Display(field.Field, value, Reference);
+				string after = Replaced(field, value, search, replace);
+				if (after != null && after != before)
+				{
+					matches.Add(new SearchMatch(p.PropertyID, null, AddressLabel(p), before, after, false));
+				}
+			}
+			return matches;
+		}
 		Dictionary<Guid, AssessmentStatusRecord> statuses = GetStatuses();
 		foreach (AssessmentFile file in LoadAllAssessments())
 		{
-			if (field.Field.Model == FieldModel.Property && !seenProperties.Add(file.Property.PropertyID))
-			{
-				continue;
-			}
 			object value = FieldCatalog.GetValue(file, field.Field);
 			string before = field.IsText ? value as string : FieldCatalog.Display(field.Field, value, Reference);
 			string after = Replaced(field, value, search, replace);
@@ -163,9 +206,8 @@ public sealed partial class SdeStore
 			{
 				continue;
 			}
-			bool locked = field.Field.Model == FieldModel.Assessment && statuses.TryGetValue(file.Assessment.AssessmentID, out AssessmentStatusRecord s) && s.IsLocked;
-			matches.Add(new SearchMatch(file.Property.PropertyID, field.Field.Model == FieldModel.Assessment ? file.Assessment.AssessmentID : null,
-				AddressLabel(file.Property), before, after, locked));
+			bool locked = statuses.TryGetValue(file.Assessment.AssessmentID, out AssessmentStatusRecord s) && s.IsLocked;
+			matches.Add(new SearchMatch(file.Property.PropertyID, file.Assessment.AssessmentID, AddressLabel(file.Property), before, after, locked));
 		}
 		return matches;
 	}
@@ -173,25 +215,45 @@ public sealed partial class SdeStore
 	/// <summary>Replaces as previewed, in one transaction and one batch. Locked assessments are skipped.</summary>
 	public BulkResult Replace(SearchField field, string search, string replace, SaveContext context = null)
 	{
-		SaveContext ctx = context ?? SaveContext.Batch(SaveVia.BulkEdit, $"Search and replace in {field.Label}");
-		HashSet<Guid> seenProperties = new HashSet<Guid>();
-		List<AssessmentFile> changed = new List<AssessmentFile>();
+		SaveContext ctx = (context ?? SaveContext.Batch(SaveVia.BulkEdit, $"Search and replace in {field.Label}")).AsBatch();
+		if (field.Field.Model == FieldModel.Property)
+		{
+			BulkResult result = new BulkResult { BatchId = ctx.BatchId };
+			List<PropertyRecord> changed = new List<PropertyRecord>();
+			foreach (PropertyRecord p in GetProperties())
+			{
+				AssessmentFile holder = new AssessmentFile { Property = p };
+				string after = Replaced(field, FieldCatalog.GetValue(holder, field.Field), search, replace);
+				if (after != null)
+				{
+					FieldCatalog.SetValue(holder, field.Field, after.Length == 0 ? null : (object)after);
+					changed.Add(p);
+				}
+			}
+			Database.InTransaction((c, tx) =>
+			{
+				foreach (PropertyRecord p in changed)
+				{
+					if (SavePropertyTracked(c, tx, p, ctx))
+					{
+						result.Changed++;
+					}
+				}
+			});
+			return result;
+		}
+		List<AssessmentFile> files = new List<AssessmentFile>();
 		foreach (AssessmentFile file in LoadAllAssessments())
 		{
-			if (field.Field.Model == FieldModel.Property && !seenProperties.Add(file.Property.PropertyID))
-			{
-				continue;
-			}
-			object value = FieldCatalog.GetValue(file, field.Field);
-			string after = Replaced(field, value, search, replace);
+			string after = Replaced(field, FieldCatalog.GetValue(file, field.Field), search, replace);
 			if (after == null)
 			{
 				continue;
 			}
 			FieldCatalog.SetValue(file, field.Field, after.Length == 0 ? null : (object)after);
-			changed.Add(file);
+			files.Add(file);
 		}
-		return SaveAssessments(changed, ctx);
+		return SaveAssessments(files, ctx);
 	}
 
 	/// <summary>The new text for a value, or null when it doesn't match.</summary>

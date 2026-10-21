@@ -40,7 +40,7 @@ public class MapDashboardUiTests
 				ui.Store.SaveProperty(p);
 			}
 		}
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		// The tests have no internet, and the page must work without a basemap.
 		ui.Main.Map.Basemap = Basemaps.None;
 	}

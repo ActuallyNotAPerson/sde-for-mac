@@ -26,6 +26,7 @@
           </NativeMenuItem>
           <NativeMenuItem Header="New Database…" Command="{Binding Settings.NewDatabaseCommand}" />
           <NativeMenuItem Header="Save a Copy of the Database…" Command="{Binding Settings.BackUpCommand}" />
+          <NativeMenuItem Header="Move the Database…" Command="{Binding Settings.MoveDatabaseCommand}" />
           <NativeMenuItem Header="Restore from Backup…" Command="{Binding RestoreBackupCommand}" />
           <NativeMenuItemSeparator />
           <NativeMenuItem Header="Save" Gesture="Cmd+S" Command="{Binding SaveCommand}" />

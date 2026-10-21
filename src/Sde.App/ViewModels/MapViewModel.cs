@@ -372,8 +372,8 @@ public sealed partial class MapViewModel : ViewModelBase
 			}
 			p.Latitude = lat;
 			p.Longitude = lon;
-			Guid[] ids = target.AssessmentID is Guid a ? new[] { a } : Array.Empty<Guid>();
-			_app.Writes.Write(ids, () => _app.Store.SaveProperty(p, new SaveContext { Via = "Map" }));
+			// Matched by structure: an editor showing any assessment of it (not only the newest) catches up.
+			_app.Writes.WriteForStructures(new[] { p.PropertyID }, () => _app.Store.SaveProperty(p, new SaveContext { Via = SaveVia.Map }));
 		}
 		catch (Exception ex) when (ex is not OutOfMemoryException)
 		{

@@ -117,7 +117,7 @@ public class KeyboardTests
 	{
 		using UiSession ui = new UiSession();
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		StructuresViewModel s = ui.Main.Structures;
 		Assert.False(s.AllChecked);
 		s.Rows[0].IsChecked = true;

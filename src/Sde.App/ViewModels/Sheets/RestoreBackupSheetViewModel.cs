@@ -32,7 +32,7 @@ public sealed partial class RestoreBackupSheetViewModel : SheetViewModel
 		: base("Restore from a backup")
 	{
 		_app = app;
-		foreach (BackupInfo b in app.Backups?.List() ?? new List<BackupInfo>())
+		foreach (BackupInfo b in app.Backups?.List(withCounts: true) ?? new List<BackupInfo>())
 		{
 			Backups.Add(new BackupRowViewModel(b));
 		}

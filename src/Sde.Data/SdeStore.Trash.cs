@@ -80,6 +80,11 @@ public sealed partial class SdeStore
 			}
 			c.Execute("UPDATE Assessment SET Active = 0 WHERE PropertyID = @propertyId AND Active = 1", new { propertyId }, tx);
 			c.Execute("UPDATE Property SET Active = 0 WHERE PropertyID = @propertyId", new { propertyId }, tx);
+			foreach (Guid aid in assessments)
+			{
+				BumpVersion(c, tx, aid, VersionKind.Assessment);
+			}
+			BumpVersion(c, tx, propertyId, VersionKind.Property);
 			DateTime now = Clock();
 			TableMap<DeletedItemRecord>.Upsert(c, new DeletedItemRecord
 			{
@@ -109,6 +114,7 @@ public sealed partial class SdeStore
 			}
 			PropertyRecord p = TableMap<PropertyRecord>.Get(c, new { a.PropertyID }, tx);
 			c.Execute("UPDATE Assessment SET Active = 0 WHERE AssessmentID = @assessmentId", new { assessmentId }, tx);
+			BumpVersion(c, tx, assessmentId, VersionKind.Assessment);
 			DateTime now = Clock();
 			TableMap<DeletedItemRecord>.Upsert(c, new DeletedItemRecord
 			{
@@ -160,7 +166,8 @@ public sealed partial class SdeStore
 
 	/// <summary>
 	/// Puts something back. A restored assessment whose structure is also in Recently deleted brings the structure back
-	/// too; a restored structure brings back the assessments that were deleted with it.
+	/// too; a restored structure brings back the assessments that were deleted with it. A photo goes back only to the
+	/// assessment it was removed from, and not while that assessment is Final or Letter sent.
 	/// </summary>
 	public void Restore(string itemKey, SaveContext context = null)
 	{
@@ -176,6 +183,7 @@ public sealed partial class SdeStore
 					break;
 				case DeletedKind.Assessment:
 					c.Execute("UPDATE Assessment SET Active = 1 WHERE AssessmentID = @AssessmentID", new { item.AssessmentID }, tx);
+					BumpVersion(c, tx, item.AssessmentID!.Value, VersionKind.Assessment);
 					if (c.ExecuteScalar<long>("SELECT Active FROM Property WHERE PropertyID = @PropertyID", new { item.PropertyID }, tx) == 0
 						&& TableMap<DeletedItemRecord>.Get(c, new { ItemKey = StructureKey(item.PropertyID!.Value) }, tx) is DeletedItemRecord structure)
 					{
@@ -186,7 +194,21 @@ public sealed partial class SdeStore
 					WriteEvent(c, tx, item.PropertyID!.Value, item.AssessmentID, "Restored from Recently deleted", ctx);
 					break;
 				case DeletedKind.Photo:
-					c.Execute("UPDATE Attachment SET Active = 1 WHERE FileName = @FileName", new { item.FileName }, tx);
+					if (item.AssessmentID is Guid owner)
+					{
+						AssessmentStatusRecord status = GetStatus(c, tx, owner);
+						if (status.IsLocked && !ctx.AllowLocked)
+						{
+							throw new AssessmentLockedException(owner, status.Value,
+								new List<FieldDiff> { new FieldDiff(AssessmentDiff.PhotoKey, "Photo restored", null, item.FileName) });
+						}
+						c.Execute("UPDATE Attachment SET Active = 1 WHERE FileName = @FileName AND AssessmentID = @owner AND Active = 0", new { item.FileName, owner }, tx);
+						BumpVersion(c, tx, owner, VersionKind.Assessment);
+					}
+					else
+					{
+						c.Execute("UPDATE Attachment SET Active = 1 WHERE FileName = @FileName AND Active = 0", new { item.FileName }, tx);
+					}
 					WriteEvent(c, tx, item.PropertyID!.Value, item.AssessmentID, "Photo restored", ctx);
 					break;
 			}
@@ -194,13 +216,15 @@ public sealed partial class SdeStore
 		});
 	}
 
-	private static void RestoreStructure(IDbConnection c, IDbTransaction tx, DeletedItemRecord item)
+	private void RestoreStructure(IDbConnection c, IDbTransaction tx, DeletedItemRecord item)
 	{
 		c.Execute("UPDATE Property SET Active = 1 WHERE PropertyID = @PropertyID", new { item.PropertyID }, tx);
+		BumpVersion(c, tx, item.PropertyID!.Value, VersionKind.Property);
 		List<Guid> assessments = string.IsNullOrEmpty(item.Detail) ? new List<Guid>() : JsonConvert.DeserializeObject<List<Guid>>(item.Detail);
 		foreach (Guid id in assessments)
 		{
 			c.Execute("UPDATE Assessment SET Active = 1 WHERE AssessmentID = @id", new { id }, tx);
+			BumpVersion(c, tx, id, VersionKind.Assessment);
 		}
 	}
 
@@ -211,8 +235,9 @@ public sealed partial class SdeStore
 	public void EmptyTrash() => PurgeWhere(null, null);
 
 	/// <summary>
-	/// Removes items older than <see cref="KeepDays"/> for good, and drops Recently deleted rows whose target is gone
-	/// (an older version of this app may have deleted it). Called when the database is opened.
+	/// Removes items older than <see cref="KeepDays"/> for good, and drops Recently deleted, photo markup and dismissed
+	/// check rows whose target is gone (an older version of this app may have deleted it). Called when the database is
+	/// opened.
 	/// </summary>
 	public int PurgeExpired()
 	{
@@ -220,7 +245,12 @@ public sealed partial class SdeStore
 			DELETE FROM DeletedItem WHERE
 			  (Kind = 'Structure' AND NOT EXISTS (SELECT 1 FROM Property p WHERE p.PropertyID = DeletedItem.PropertyID)) OR
 			  (Kind = 'Assessment' AND NOT EXISTS (SELECT 1 FROM Assessment a WHERE a.AssessmentID = DeletedItem.AssessmentID)) OR
-			  (Kind = 'Photo' AND NOT EXISTS (SELECT 1 FROM Attachment t WHERE t.FileName = DeletedItem.FileName))
+			  (Kind = 'Photo' AND NOT EXISTS (SELECT 1 FROM Attachment t WHERE t.FileName = DeletedItem.FileName));
+			DELETE FROM PhotoMarkup WHERE NOT EXISTS (SELECT 1 FROM Attachment t WHERE t.FileName = PhotoMarkup.FileName);
+			DELETE FROM QaDismissal WHERE
+			  NOT EXISTS (SELECT 1 FROM Assessment a WHERE a.AssessmentID = QaDismissal.ObjectID) AND
+			  NOT EXISTS (SELECT 1 FROM Property p WHERE p.PropertyID = QaDismissal.ObjectID) AND
+			  NOT EXISTS (SELECT 1 FROM Event e WHERE e.EventID = QaDismissal.ObjectID);
 			""", transaction: tx));
 		return PurgeWhere("PurgeAfter <= @now", new { now = Clock() });
 	}
@@ -239,8 +269,10 @@ public sealed partial class SdeStore
 						foreach (Guid aid in c.Query<Guid>("SELECT AssessmentID FROM Assessment WHERE PropertyID = @PropertyID", new { item.PropertyID }, tx).ToList())
 						{
 							files.AddRange(DeleteAssessmentRows(c, tx, aid));
+							BumpVersion(c, tx, aid, VersionKind.Assessment);
 							TableMap<DeletedItemRecord>.Delete(c, "ItemKey = @key", new { key = AssessmentKey(aid) }, tx);
 						}
+						BumpVersion(c, tx, item.PropertyID!.Value, VersionKind.Property);
 						object pid = new { propertyId = item.PropertyID };
 						TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", pid, tx);
 						TableMap<CustomFieldResultRecord>.Delete(c, "ObjectIdentifier = @propertyId", pid, tx);
@@ -249,6 +281,7 @@ public sealed partial class SdeStore
 						break;
 					case DeletedKind.Assessment:
 						files.AddRange(DeleteAssessmentRows(c, tx, item.AssessmentID!.Value));
+						BumpVersion(c, tx, item.AssessmentID!.Value, VersionKind.Assessment);
 						break;
 					case DeletedKind.Photo:
 						c.Execute("DELETE FROM Attachment WHERE FileName = @FileName AND Active = 0", new { item.FileName }, tx);
@@ -283,6 +316,7 @@ public sealed partial class SdeStore
 			if (c.ExecuteScalar<long?>("SELECT Active FROM Assessment WHERE AssessmentID = @aid", new { aid }, tx) == 0)
 			{
 				files.AddRange(DeleteAssessmentRows(c, tx, aid));
+				BumpVersion(c, tx, aid, VersionKind.Assessment);
 				TableMap<DeletedItemRecord>.Delete(c, "ItemKey = @key", new { key = AssessmentKey(aid) }, tx);
 				removed.Add($"Assessment {aid} was in Recently deleted and has been replaced by the imported one.");
 			}
@@ -294,8 +328,10 @@ public sealed partial class SdeStore
 				foreach (Guid aid in c.Query<Guid>("SELECT AssessmentID FROM Assessment WHERE PropertyID = @pid", new { pid }, tx).ToList())
 				{
 					files.AddRange(DeleteAssessmentRows(c, tx, aid));
+					BumpVersion(c, tx, aid, VersionKind.Assessment);
 					TableMap<DeletedItemRecord>.Delete(c, "ItemKey = @key", new { key = AssessmentKey(aid) }, tx);
 				}
+				BumpVersion(c, tx, pid, VersionKind.Property);
 				object args = new { propertyId = pid };
 				TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", args, tx);
 				TableMap<CustomFieldResultRecord>.Delete(c, "ObjectIdentifier = @propertyId", args, tx);

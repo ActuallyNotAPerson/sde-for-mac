@@ -36,14 +36,11 @@ public sealed record AddStructureRequest(int StructureType, IReadOnlyList<Change
 
 public sealed record PairRequest(string Token, string Pin, string Name);
 
-/// <summary>A value the phone sent that can't be used, with a message for the inspector.</summary>
-public sealed class FieldInputException(string message) : Exception(message);
-
 /// <summary>What the phone form reads and how it checks and applies changes. No web code here, so it is easy to test.</summary>
 public static class FieldApi
 {
 	public const int MaxResults = 50;
-	public const int MaxTextLength = 2000;
+	public const int MaxTextLength = FieldInput.MaxTextLength;
 
 	public static string KindName(FieldKind kind) => kind switch
 	{
@@ -72,15 +69,13 @@ public static class FieldApi
 	public static IReadOnlyList<StructureDto> Search(SdeStore store, string query)
 	{
 		string[] words = (query ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-		Dictionary<Guid, PropertyRecord> properties = store.GetProperties().ToDictionary(p => p.PropertyID);
 		List<StructureDto> results = new();
 		foreach (StructureSummary s in store.ListStructures())
 		{
-			properties.TryGetValue(s.PropertyID, out PropertyRecord p);
-			string haystack = string.Join(" ", s.Address, s.City, p?.ZipCode, s.Owner, p?.ParcelNumber, s.ExternalId);
+			string haystack = string.Join(" ", s.Address, s.City, s.ZipCode, s.Owner, s.ParcelNumber, s.ExternalId);
 			if (words.All(w => haystack.Contains(w, StringComparison.OrdinalIgnoreCase)))
 			{
-				results.Add(new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner, p?.ParcelNumber,
+				results.Add(new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner, s.ParcelNumber,
 					s.ExternalId, TypeName(s.StructureTypeID), ResultText(s.PercentDamage, s.DamageMessage)));
 				if (results.Count >= MaxResults)
 				{
@@ -110,84 +105,13 @@ public static class FieldApi
 	}
 
 	/// <summary>
-	/// Applies the phone's changes in order: each key must be a known field that applies to the assessment at that
-	/// point (after the changes before it), and each value must suit the field. Every change then goes through
-	/// <see cref="FieldRules.Apply"/>, so dependent fields reset as they do in the editor. Throws
-	/// <see cref="FieldInputException"/> with a plain-English message for the first problem.
+	/// Applies the phone's changes in order through <see cref="FieldInput.Apply"/>: each key must be a known field that
+	/// applies to the assessment at that point, each value must suit the field, and dependent fields reset as they do in
+	/// the editor. Throws <see cref="FieldInputException"/> with a plain-English message for the first problem.
 	/// </summary>
-	public static void Apply(AssessmentFile file, IEnumerable<ChangeDto> changes, ReferenceData reference, AssessmentCalculator calculator)
-	{
-		foreach (ChangeDto change in changes ?? Array.Empty<ChangeDto>())
-		{
-			FieldInfo f = FieldCatalog.Get(change?.Key) ?? throw new FieldInputException("The phone sent a field SDE doesn't know. Reload the page and try again.");
-			if (!f.AppliesTo(file))
-			{
-				throw new FieldInputException($"{f.Label} doesn't apply to this assessment.");
-			}
-			object value = Convert(f, change.Value, file, reference);
-			FieldRules.Apply(file, new[] { new FieldChange(f.Key, value) }, calculator);
-		}
-	}
-
-	/// <summary>Checks and converts one value to the field's column type (null clears it).</summary>
-	public static object Convert(FieldInfo f, string text, AssessmentFile file, ReferenceData reference)
-	{
-		text = text?.Trim();
-		Type type = f.RecordProperty.PropertyType;
-		if (string.IsNullOrEmpty(text))
-		{
-			if (f.Kind == FieldKind.StructureType)
-			{
-				throw new FieldInputException("Choose residential or non-residential.");
-			}
-			return FieldCatalog.Convert(null, type);
-		}
-		switch (f.Kind)
-		{
-			case FieldKind.Text:
-			case FieldKind.MultilineText:
-				if (text.Length > MaxTextLength)
-				{
-					throw new FieldInputException($"{f.Label} is too long (at most {MaxTextLength} characters).");
-				}
-				return FieldCatalog.Convert(text, type);
-			case FieldKind.Number:
-				if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal n))
-				{
-					throw new FieldInputException($"{f.Label}: type a number.");
-				}
-				try
-				{
-					return FieldCatalog.Convert(n.ToString(CultureInfo.InvariantCulture), type);
-				}
-				catch (Exception ex) when (ex is FormatException or OverflowException)
-				{
-					throw new FieldInputException($"{f.Label}: type a whole number in range.");
-				}
-			case FieldKind.Date:
-				if (!DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d) || d.Year < 1800 || d.Year > 2200)
-				{
-					throw new FieldInputException($"{f.Label}: choose a date.");
-				}
-				return FieldCatalog.Convert(d.Date, type);
-			case FieldKind.YesNo:
-				bool yes = text.ToLowerInvariant() switch
-				{
-					"true" or "1" or "yes" => true,
-					"false" or "0" or "no" => false,
-					_ => throw new FieldInputException($"{f.Label}: choose yes or no."),
-				};
-				return FieldCatalog.Convert(yes, type);
-			default:
-				// A choice: it must be one of the choices offered for this assessment right now.
-				if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id)
-					|| !FieldCatalog.Options(f, file, reference).Any(o => o.Id == id))
-				{
-					throw new FieldInputException($"{f.Label}: choose one of the choices in the list.");
-				}
-				return FieldCatalog.Convert(id, type);
-		}
-	}
+	public static void Apply(AssessmentFile file, IEnumerable<ChangeDto> changes, ReferenceData reference, AssessmentCalculator calculator) =>
+		FieldInput.Apply(file, (changes ?? Array.Empty<ChangeDto>()).Select(c => new FieldInputChange(c?.Key, c?.Value)), reference, calculator,
+			"The phone sent a field SDE doesn't know. Reload the page and try again.");
 
 	/// <summary>A new structure and assessment (not saved), set up as the Mac's "New structure" does, with the phone's first values.</summary>
 	public static AssessmentFile NewStructure(SdeStore store, AddStructureRequest request)

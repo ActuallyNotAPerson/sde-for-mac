@@ -20,7 +20,7 @@ public class InteropUiTests
 	{
 		using UiSession ui = new UiSession();
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		string pdf = Path.Combine(ui.Folder, kind + ".pdf");
 		ui.Dialogs.Answers.Enqueue(pdf);
 		await ui.Main.Structures.PrintCommand.ExecuteAsync(kind);

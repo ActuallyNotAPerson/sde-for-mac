@@ -117,6 +117,7 @@ public sealed class UiSession : IDisposable
 	{
 		Main.Editor?.Save();
 		Window.Close();
+		Services.Close();
 		Environment.SetEnvironmentVariable("SDE_DATABASE", null);
 		_db.Dispose();
 	}

@@ -41,11 +41,7 @@ public sealed class DirectFieldWriter(Func<SdeStore> store) : IFieldWriter
 	{
 		lock (_gate)
 		{
-			SdeStore s = store();
-			AssessmentFile file = s.LoadAssessment(assessmentId) ?? throw new ArgumentException("That assessment no longer exists.");
-			change(file);
-			s.SaveAssessment(file, context);
-			return Task.FromResult(file);
+			return Task.FromResult(store().Apply(assessmentId, change, context));
 		}
 	}
 

@@ -4,6 +4,7 @@ using Sde.App.Services;
 using Sde.App.ViewModels.Editor;
 using Sde.App.ViewModels.Sheets;
 using Sde.Core.Assessments;
+using Sde.Data;
 
 namespace Sde.App.ViewModels;
 
@@ -46,6 +47,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			Structures.Reload();
 			RefreshStatus();
 		};
+		app.Changes.Changed += OnExternalChanges;
 		app.DatabaseChanged += () =>
 		{
 			Editor = null;
@@ -139,6 +141,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		};
 		Map.IsActive = page == Page.Map;
 		Dashboard.IsActive = page == Page.Dashboard;
+		RefreshStatus();
 		if (page == Page.Map)
 		{
 			Map.Reload();
@@ -155,7 +158,32 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (page == Page.Structures)
 		{
 			Structures.Reload();
-			RefreshStatus();
+		}
+	}
+
+	/// <summary>The window became active (check for others' saves now, then every 1.5 seconds) or inactive (stop checking).</summary>
+	public void WindowActivated(bool active) => _app.Changes.IsActive = active;
+
+	/// <summary>Another program saved something: lists catch up, and so does the open assessment if it was one of them.</summary>
+	private void OnExternalChanges(ExternalChanges changes)
+	{
+		Structures.Reload();
+		RefreshStatus();
+		if (Map.IsActive)
+		{
+			Map.Reload();
+		}
+		if (Dashboard.IsActive)
+		{
+			Dashboard.Reload();
+		}
+		if (ActivePage == Page.Trash)
+		{
+			Trash.Reload();
+		}
+		if (Editor != null && (changes.Unversioned || changes.Assessments.Contains(Editor.Assessment.AssessmentID) || changes.Properties.Contains(Editor.Property.PropertyID)))
+		{
+			RefreshEditor();
 		}
 	}
 
@@ -248,14 +276,14 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	public void OpenAssessment(Guid assessmentId)
 	{
 		Editor?.Save();
-		AssessmentFile file = _app.Store.LoadAssessment(assessmentId);
+		(AssessmentFile file, VersionStamp stamp) = _app.Store.LoadAssessmentWithStamp(assessmentId);
 		if (file == null)
 		{
 			_app.Dialogs.Notify("Not found", "That assessment no longer exists.", isError: true);
 			ShowStructures(saveEditor: false);
 			return;
 		}
-		Editor = new AssessmentEditorViewModel(_app, this, file);
+		Editor = new AssessmentEditorViewModel(_app, this, file, stamp: stamp);
 		ActivePage = Page.Editor;
 		CurrentPage = Editor;
 		RefreshStatus();
@@ -265,7 +293,11 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	public void OpenDraft(AssessmentFile draft)
 	{
 		Editor?.Save();
-		Editor = new AssessmentEditorViewModel(_app, this, draft, isDraft: true);
+		// A new assessment of an existing structure still expects that structure as it was loaded.
+		Guid propertyId = draft.Property.PropertyID;
+		VersionStamp stamp = propertyId == Guid.Empty ? null
+			: new VersionStamp(0, _app.Store.GetVersion(propertyId), null, draft.Property.LastUpdate);
+		Editor = new AssessmentEditorViewModel(_app, this, draft, isDraft: true, stamp: stamp);
 		ActivePage = Page.Editor;
 		CurrentPage = Editor;
 	}
@@ -292,9 +324,51 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 
 	Guid? IEditorHost.OpenAssessmentId => Editor?.Assessment.AssessmentID;
 
+	Guid? IEditorHost.OpenPropertyId => Editor?.Property.PropertyID;
+
 	void IEditorHost.FlushEditor() => Editor?.Save();
 
-	void IEditorHost.ReloadEditor()
+	void IEditorHost.ReloadEditor() => RefreshEditor();
+
+	/// <summary>
+	/// Catches the open editor up with the database. Nothing happens when its assessment and structure haven't changed
+	/// since it loaded them (so its undo steps survive writes to other assessments). An editor with unsaved changes
+	/// saves them, which finds the newer copy and merges onto it; a clean one reloads, and its undo steps are dropped,
+	/// since undoing would put someone else's change back. One deleted elsewhere is closed.
+	/// </summary>
+	public void RefreshEditor()
+	{
+		if (Editor == null)
+		{
+			return;
+		}
+		if (Editor.IsDraft)
+		{
+			// Not in the database yet; its first save checks its structure's version.
+			return;
+		}
+		Guid id = Editor.Assessment.AssessmentID;
+		VersionStamp now = _app.Store.GetStamp(id);
+		if (now != null && now == Editor.Stamp)
+		{
+			return;
+		}
+		if (now != null && Editor.IsDirty)
+		{
+			Editor.Save();
+			return;
+		}
+		_app.Undo.Forget(id);
+		(AssessmentFile file, VersionStamp stamp) = _app.Store.LoadAssessmentWithStamp(id);
+		ReplaceEditor(file, stamp);
+	}
+
+	/// <summary>
+	/// Shows a new copy of the open assessment (after it was reloaded, merged or undone), keeping the step that was
+	/// showing. <paramref name="conflict"/> is what the user is asked about after a merge. A copy that is gone or
+	/// deleted closes the editor.
+	/// </summary>
+	public void ReplaceEditor(AssessmentFile file, VersionStamp stamp, EditConflict conflict = null)
 	{
 		if (Editor == null)
 		{
@@ -302,7 +376,6 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		}
 		int step = Editor.Sections.IndexOf(Editor.SelectedSection);
 		bool showing = CurrentPage == Editor;
-		AssessmentFile file = _app.Store.LoadAssessment(Editor.Assessment.AssessmentID);
 		if (file == null || !file.Assessment.Active || !file.Property.Active)
 		{
 			Editor = null;
@@ -312,7 +385,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			}
 			return;
 		}
-		Editor = new AssessmentEditorViewModel(_app, this, file);
+		Editor = new AssessmentEditorViewModel(_app, this, file, stamp: stamp) { Conflict = conflict };
 		if (step > 0 && step < Editor.Sections.Count)
 		{
 			Editor.SelectedSection = Editor.Sections[step];

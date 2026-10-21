@@ -56,7 +56,13 @@ public sealed class AppSettings
 
 	public const int MaxRecent = 8;
 
-	private static string FilePath => Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "app-settings.json");
+	/// <summary>
+	/// ~/Library/Application Support/SDE/app-settings.json, or, when SDE_DATABASE chose the database (tests, training),
+	/// a file beside that database, so a test or training session never changes the person's own settings.
+	/// </summary>
+	private static string FilePath => Environment.GetEnvironmentVariable("SDE_DATABASE") is string forced && forced.Length > 0
+		? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(forced))!, "app-settings.json")
+		: Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "app-settings.json");
 
 	/// <summary>Keeps two saves in this app from writing the temporary file at the same time.</summary>
 	private static readonly object SaveGate = new object();
@@ -147,6 +153,7 @@ public sealed class AppServices
 		Errors = new ErrorPresenter(Sheets);
 		Jobs = new JobRunner(Errors);
 		Writes = new AssessmentWriteCoordinator(this);
+		Changes = new ExternalChangeMonitor(this);
 		PhoneForm = new PhoneFormService(this);
 		Manual = new ManualService(dialogs);
 		Settings = AppSettings.Load();
@@ -155,6 +162,7 @@ public sealed class AppServices
 		if (!string.IsNullOrEmpty(forced))
 		{
 			Store = new SdeStore(SdeDatabase.OpenOrCreate(forced));
+			StartWatching(Store);
 			IsSample = Store.GetSetting<bool>(SampleDatabase.SettingKey);
 			Tidy(Store);
 			Store.UserName = UserName;
@@ -184,6 +192,18 @@ public sealed class AppServices
 
 	/// <summary>Undo and redo for assessments.</summary>
 	public UndoService Undo { get; } = new UndoService();
+
+	/// <summary>
+	/// This app's lease on the open database: shared while it is open, to itself during a restore or a move, which are
+	/// refused while another copy of SDE holds one (see <see cref="DatabaseLease"/>). Null where leases aren't available.
+	/// </summary>
+	public DatabaseLease Lease { get; private set; }
+
+	/// <summary>Notices saves made to the open database by other programs (polled by <see cref="Changes"/>).</summary>
+	public ChangeWatcher Watcher { get; private set; }
+
+	/// <summary>Tells the window about saves made by other programs while it is active.</summary>
+	public ExternalChangeMonitor Changes { get; }
 
 	/// <summary>
 	/// Automatic backups of the open database. Off (null) when SDE_DATABASE chose the database, so tests and training
@@ -246,6 +266,7 @@ public sealed class AppServices
 		string previous = Store?.Database.FilePath;
 		bool previousWasSample = IsSample;
 		Store = store;
+		StartWatching(store);
 		IsSample = store.GetSetting<bool>(SampleDatabase.SettingKey);
 		if (IsSample && !previousWasSample)
 		{
@@ -329,13 +350,89 @@ public sealed class AppServices
 		}
 	}
 
-	/// <summary>Replaces the open database with a backup (after backing up the current state) and reopens it.</summary>
+	/// <summary>
+	/// Replaces the open database with a backup (after backing up the current state) and reopens it. Refused while
+	/// another copy of SDE has the database open.
+	/// </summary>
 	public void RestoreBackup(BackupInfo backup)
 	{
 		string path = Store.Database.FilePath;
 		OpeningBackup.Wait(TimeSpan.FromSeconds(30));
-		new BackupService(Store.Database).Restore(backup);
+		Watcher?.Dispose();
+		Watcher = null;
+		try
+		{
+			new BackupService(Store.Database).Restore(backup, Lease);
+		}
+		catch
+		{
+			Watcher = new ChangeWatcher(Store.Database);
+			throw;
+		}
 		Open(path);
+	}
+
+	/// <summary>
+	/// Moves the open database (with its photos, documents and map layers) to <paramref name="newPath"/>, or copies it
+	/// there, as a job with progress, then opens the new one. A move is refused while another copy of SDE has the
+	/// database open. Returns false when it didn't happen (the job runner has shown why).
+	/// </summary>
+	public async Task<bool> MoveOrCopyDatabaseAsync(string newPath, bool move)
+	{
+		OpeningBackup.Wait(TimeSpan.FromSeconds(30));
+		SdeDatabase database = Store.Database;
+		DatabaseLease lease = Lease;
+		if (move)
+		{
+			Watcher?.Dispose();
+			Watcher = null;
+		}
+		JobOutcome<bool> outcome = await Jobs.RunAsync(move ? "Moving the database" : "Copying the database", (progress, ct) =>
+		{
+			IProgress<(int Done, int Total)> files = new Progress<(int Done, int Total)>(x => progress.Report(new JobProgress(x.Done, x.Total, "Copying photos and documents")));
+			if (move)
+			{
+				DatabaseFiles.Move(database, newPath, lease, files);
+			}
+			else
+			{
+				DatabaseFiles.Copy(database, newPath, files);
+			}
+			return true;
+		}, move ? "Couldn't move the database" : "Couldn't copy the database", canStop: false);
+		if (!outcome.Completed)
+		{
+			if (Watcher == null && File.Exists(database.FilePath))
+			{
+				Watcher = new ChangeWatcher(database);
+			}
+			return false;
+		}
+		if (move)
+		{
+			Settings.RecentDatabases.RemoveAll(p => string.Equals(p, database.FilePath, StringComparison.Ordinal));
+		}
+		Open(newPath);
+		return true;
+	}
+
+	/// <summary>Takes this app's lease on a newly opened database and starts noticing others' saves to it.</summary>
+	private void StartWatching(SdeStore store)
+	{
+		Watcher?.Dispose();
+		Lease?.Dispose();
+		Lease = DatabaseLease.TryShared(store.Database.LockPath);
+		Watcher = new ChangeWatcher(store.Database);
+	}
+
+	/// <summary>Lets go of the open database's lease and connection (on quitting; tests call it for each window).</summary>
+	public void Close()
+	{
+		Changes.IsActive = false;
+		Watcher?.Dispose();
+		Watcher = null;
+		Lease?.Dispose();
+		Lease = null;
 	}
 
 	/// <summary>On opening a database: removes what has been in Recently deleted for more than 30 days.</summary>

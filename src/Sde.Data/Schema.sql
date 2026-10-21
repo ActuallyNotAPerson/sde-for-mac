@@ -580,3 +580,202 @@ CREATE TABLE IF NOT EXISTS StructureLink (
 	PRIMARY KEY (Source, RecordId)
 );
 CREATE INDEX IF NOT EXISTS IX_StructureLink_Property ON StructureLink(PropertyID);
+
+-- ───────────────────────── Mac-only, added in v2.5 (MacSchemaVersion 3) ─────────────────────────
+-- Same rules as v2.0's tables: foreign keys to FEMA's rows use ON DELETE CASCADE (or there are none, and rows whose
+-- target is gone are dropped when the database is opened), keys are GUIDs or stored file names (never ElementID or
+-- AttachmentID, which change on every save), and none of it is ever exported. Every v2.5 table is created here at
+-- once, so later work never has to change this file.
+
+-- The version of each structure and assessment, so two programs using one database (this app, the AI assistant
+-- server, the app on another Mac via a shared folder) notice each other's saves. No row means version 0: never saved
+-- by v2.5. Seq orders every save in this database; WriterId names the running copy of the app that saved.
+CREATE TABLE IF NOT EXISTS RowVersion (
+	ObjectID  TEXT PRIMARY KEY NOT NULL,   -- a PropertyID or an AssessmentID
+	Kind      TEXT NOT NULL,               -- 'P' structure, 'A' assessment
+	Version   INTEGER NOT NULL,
+	Seq       INTEGER NOT NULL,
+	WriterId  TEXT,
+	ChangedOn TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_RowVersion_Seq ON RowVersion(Seq);
+
+-- A disaster (a flood, a storm) and the assessments made after it. An assessment belongs to at most one event.
+CREATE TABLE IF NOT EXISTS Event (
+	EventID       TEXT PRIMARY KEY NOT NULL,
+	Name          TEXT NOT NULL,
+	Kind          TEXT,                    -- Flood, Hurricane, Tornado, Fire, Other
+	DRNumber      TEXT,                    -- a disaster declaration number, e.g. DR-4999
+	StartDate     TEXT,
+	EndDate       TEXT,
+	Notes         TEXT,
+	DatumOffsetFt REAL,                    -- added to high-water mark elevations from another datum, or NULL
+	CreatedOn     TEXT,
+	CreatedBy     TEXT
+);
+
+CREATE TABLE IF NOT EXISTS EventAssessment (
+	AssessmentID TEXT PRIMARY KEY NOT NULL REFERENCES Assessment(AssessmentID) ON DELETE CASCADE,
+	EventID      TEXT NOT NULL REFERENCES Event(EventID) ON DELETE CASCADE,
+	AddedOn      TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_EventAssessment_Event ON EventAssessment(EventID);
+
+-- Field teams and the structures assigned to them.
+CREATE TABLE IF NOT EXISTS Team (
+	TeamID    TEXT PRIMARY KEY NOT NULL,
+	Name      TEXT NOT NULL,
+	Members   TEXT,                        -- free text: names, phone numbers
+	Color     TEXT,                        -- '#RRGGBB', for the map
+	Active    INTEGER NOT NULL DEFAULT 1,
+	CreatedOn TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Assignment (
+	AssignmentID TEXT PRIMARY KEY NOT NULL,
+	PropertyID   TEXT NOT NULL REFERENCES Property(PropertyID) ON DELETE CASCADE,
+	TeamID       TEXT NOT NULL REFERENCES Team(TeamID) ON DELETE CASCADE,
+	EventID      TEXT REFERENCES Event(EventID) ON DELETE SET NULL,
+	AssignedOn   TEXT,
+	AssignedBy   TEXT,
+	DueDate      TEXT,
+	RouteOrder   INTEGER,                  -- the stop's place in the team's route
+	Status       TEXT NOT NULL DEFAULT 'Assigned',   -- Assigned, Visited, Done, Skipped
+	ShortCode    TEXT,                     -- the code printed (and in the QR code) on the field worksheet
+	Notes        TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_Assignment_Team ON Assignment(TeamID);
+CREATE INDEX IF NOT EXISTS IX_Assignment_Property ON Assignment(PropertyID);
+CREATE UNIQUE INDEX IF NOT EXISTS UX_Assignment_ShortCode ON Assignment(ShortCode) WHERE ShortCode IS NOT NULL;
+
+-- Review: comments on an assessment (threaded, resolvable) and quality checks someone looked at and set aside.
+CREATE TABLE IF NOT EXISTS ReviewComment (
+	CommentID    TEXT PRIMARY KEY NOT NULL,
+	AssessmentID TEXT NOT NULL REFERENCES Assessment(AssessmentID) ON DELETE CASCADE,
+	ParentID     TEXT REFERENCES ReviewComment(CommentID) ON DELETE CASCADE,   -- set on a reply
+	FieldKey     TEXT,                     -- the field it's about (FieldCatalog key), or NULL for the whole assessment
+	Body         TEXT NOT NULL,
+	Author       TEXT,
+	Via          TEXT,                     -- App, AI assistant
+	CreatedOn    TEXT NOT NULL,
+	ResolvedOn   TEXT,
+	ResolvedBy   TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_ReviewComment_Assessment ON ReviewComment(AssessmentID);
+
+-- No foreign key: ObjectID can be a structure, an assessment or an event.
+CREATE TABLE IF NOT EXISTS QaDismissal (
+	RuleId      TEXT NOT NULL,             -- the check, e.g. DuplicateParcel
+	ObjectID    TEXT NOT NULL,             -- what it was about
+	Detail      TEXT NOT NULL DEFAULT '',  -- which finding exactly (e.g. the other structure), so a new one still shows
+	Reason      TEXT NOT NULL,
+	DismissedOn TEXT,
+	DismissedBy TEXT,
+	PRIMARY KEY (RuleId, ObjectID, Detail)
+);
+
+-- Compliance after a substantial damage (SD) or substantial improvement (SI) determination, and its timeline.
+CREATE TABLE IF NOT EXISTS ComplianceCase (
+	CaseID            TEXT PRIMARY KEY NOT NULL,
+	PropertyID        TEXT NOT NULL REFERENCES Property(PropertyID) ON DELETE CASCADE,
+	AssessmentID      TEXT REFERENCES Assessment(AssessmentID) ON DELETE CASCADE,          -- an SD determination
+	DeterminationID   TEXT REFERENCES SIDetermination(DeterminationID) ON DELETE CASCADE,  -- an SI determination
+	Kind              TEXT NOT NULL,       -- SD, SI
+	Path              TEXT,                -- Elevate, Relocate, Demolish, Floodproof, RepairBelowThreshold
+	PermitNumber      TEXT,
+	PermitIssuedOn    TEXT,
+	Deadline          TEXT,
+	IccClaimNumber    TEXT,
+	IccStatus         TEXT,                -- NotFiled, Filed, Approved, Paid, Denied
+	IccAmount         REAL,
+	EcReceivedOn      TEXT,                -- the elevation certificate after the work
+	FinalInspectionOn TEXT,
+	ComplianceCertOn  TEXT,                -- certificate of compliance or occupancy
+	Status            TEXT NOT NULL DEFAULT 'Open',   -- Open, Closed
+	ClosedOn          TEXT,
+	ClosedReason      TEXT,
+	Notes             TEXT,
+	CreatedOn         TEXT,
+	CreatedBy         TEXT,
+	UpdatedOn         TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_ComplianceCase_Property ON ComplianceCase(PropertyID);
+CREATE UNIQUE INDEX IF NOT EXISTS UX_ComplianceCase_Assessment ON ComplianceCase(AssessmentID) WHERE AssessmentID IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS UX_ComplianceCase_Determination ON ComplianceCase(DeterminationID) WHERE DeterminationID IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS ComplianceEntry (
+	EntryID   TEXT PRIMARY KEY NOT NULL,
+	CaseID    TEXT NOT NULL REFERENCES ComplianceCase(CaseID) ON DELETE CASCADE,
+	EntryOn   TEXT NOT NULL,
+	Kind      TEXT,                        -- Note, Letter, Call, Permit, Inspection, ICC, Status
+	Text      TEXT,
+	LetterID  TEXT,                        -- the LetterLog row, for a letter
+	CreatedBy TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_ComplianceEntry_Case ON ComplianceEntry(CaseID, EntryOn);
+
+-- Assessments checked out to another Mac in a work package (.sdework). Read-only here until checked back in.
+CREATE TABLE IF NOT EXISTS CheckOut (
+	AssessmentID    TEXT PRIMARY KEY NOT NULL REFERENCES Assessment(AssessmentID) ON DELETE CASCADE,
+	PackageID       TEXT NOT NULL,
+	CheckedOutOn    TEXT NOT NULL,
+	CheckedOutBy    TEXT,
+	CheckedOutTo    TEXT,                  -- who, or which Mac, took it
+	Version         INTEGER,               -- the assessment's RowVersion when it left
+	PropertyVersion INTEGER                -- its structure's RowVersion when it left
+);
+CREATE INDEX IF NOT EXISTS IX_CheckOut_Package ON CheckOut(PackageID);
+
+-- Drawings on a photo (a water line, arrows, boxes, text), as JSON. The photo file itself is never changed.
+CREATE TABLE IF NOT EXISTS PhotoMarkup (
+	FileName  TEXT PRIMARY KEY NOT NULL,   -- Attachment.FileName
+	Markup    TEXT NOT NULL,
+	UpdatedOn TEXT,
+	UpdatedBy TEXT
+);
+
+-- Documents kept with a structure (an elevation certificate, a permit), stored in the "documents" folder.
+CREATE TABLE IF NOT EXISTS Document (
+	DocumentID   TEXT PRIMARY KEY NOT NULL,
+	PropertyID   TEXT NOT NULL REFERENCES Property(PropertyID) ON DELETE CASCADE,
+	AssessmentID TEXT REFERENCES Assessment(AssessmentID) ON DELETE CASCADE,
+	Kind         TEXT NOT NULL,            -- ElevationCertificate, Permit, Other
+	FileName     TEXT NOT NULL,            -- the stored name in the documents folder
+	OriginalName TEXT,
+	Title        TEXT,
+	Fields       TEXT,                     -- JSON: values read from it (an elevation certificate's A5, C2a, ...)
+	AddedOn      TEXT,
+	AddedBy      TEXT
+);
+CREATE INDEX IF NOT EXISTS IX_Document_Property ON Document(PropertyID);
+
+-- The map's layers and bookmarks. Feature data lives in "<database>.layers.gpkg" beside the database.
+CREATE TABLE IF NOT EXISTS MapLayer (
+	LayerID      TEXT PRIMARY KEY NOT NULL,
+	Name         TEXT NOT NULL,
+	SourceKind   TEXT NOT NULL,            -- Structures, File, ArcGisRest, Nfhl, Basemap
+	Source       TEXT,                     -- the original file path or URL
+	TableName    TEXT,                     -- its feature table in the layers GeoPackage, when copied in
+	GeometryType TEXT,                     -- Point, Line, Polygon
+	SortOrder    INTEGER NOT NULL DEFAULT 0,
+	Visible      INTEGER NOT NULL DEFAULT 1,
+	Opacity      REAL NOT NULL DEFAULT 1,
+	MinScale     REAL,
+	MaxScale     REAL,
+	Style        TEXT,                     -- JSON
+	Labels       TEXT,                     -- JSON
+	Editable     INTEGER NOT NULL DEFAULT 0,
+	AddedOn      TEXT,
+	UpdatedOn    TEXT
+);
+
+CREATE TABLE IF NOT EXISTS MapBookmark (
+	BookmarkID TEXT PRIMARY KEY NOT NULL,
+	Name       TEXT NOT NULL,
+	MinX       REAL NOT NULL,              -- longitude and latitude (WGS 84)
+	MinY       REAL NOT NULL,
+	MaxX       REAL NOT NULL,
+	MaxY       REAL NOT NULL,
+	SortOrder  INTEGER NOT NULL DEFAULT 0,
+	CreatedOn  TEXT
+);

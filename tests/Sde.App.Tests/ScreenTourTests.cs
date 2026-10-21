@@ -28,7 +28,7 @@ public class ScreenTourTests
 		using UiSession ui = new UiSession(ThemeVariant.Light);
 		ui.Snapshot("00-structures-empty");
 		AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Snapshot("01-structures");
 
 		Guid ranch = ui.Main.Structures.Rows.First(r => r.Address.StartsWith("123")).AssessmentID!.Value;
@@ -55,7 +55,7 @@ public class ScreenTourTests
 		BindingErrors.Instance.Messages.Clear();
 		using UiSession ui = new UiSession(ThemeVariant.Dark);
 		AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Snapshot("40-dark-structures");
 		ui.Main.OpenAssessment(ui.Main.Structures.Rows.First(r => r.Address.StartsWith("48")).AssessmentID!.Value);
 		ui.Main.Editor.SelectedSection = ui.Main.Editor.Sections.OfType<DamageSectionViewModel>().Single();
@@ -69,7 +69,7 @@ public class ScreenTourTests
 		BindingErrors.Instance.Messages.Clear();
 		using UiSession ui = new UiSession(ThemeVariant.Light);
 		AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Pump();
 
 		// Each check keeps the same control across the switch: a control made after it would be coloured right anyway.

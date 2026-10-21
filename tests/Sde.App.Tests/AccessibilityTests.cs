@@ -32,7 +32,7 @@ public class AccessibilityTests
 	{
 		using UiSession ui = new UiSession(height: 1600);
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		List<string> problems = new();
 		void Check(string page)
 		{

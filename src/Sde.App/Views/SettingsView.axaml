@@ -121,6 +121,7 @@
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Content="Show in Finder" Command="{Binding RevealDatabaseCommand}" />
             <Button Content="Save a copy…" Command="{Binding BackUpCommand}" />
+            <Button Content="Move…" Command="{Binding MoveDatabaseCommand}" AutomationProperties.Name="Move the database" />
             <Button Content="Restore from backup…" Command="{Binding RestoreBackupCommand}" />
             <Button Content="Open another…" Command="{Binding OpenDatabaseCommand}" />
             <Button Content="New empty database…" Command="{Binding NewDatabaseCommand}" />

@@ -23,7 +23,7 @@ public class OutputsUiTests
 	{
 		UiSession ui = new UiSession();
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Pump();
 		return ui;
 	}

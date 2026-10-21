@@ -69,6 +69,9 @@ public partial class MainWindow : Window, IDialogs
 		base.OnDataContextChanged(e);
 		if (DataContext is MainViewModel main)
 		{
+			// Others' saves are checked for while the window is active (and at once when it becomes active).
+			Activated += (_, _) => main.WindowActivated(true);
+			Deactivated += (_, _) => main.WindowActivated(false);
 			main.PropertyChanged += (_, args) =>
 			{
 				if (args.PropertyName == nameof(MainViewModel.RecentDatabases))

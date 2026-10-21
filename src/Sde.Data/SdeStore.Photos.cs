@@ -118,7 +118,7 @@ public sealed partial class SdeStore
 	/// </summary>
 	public BulkResult AttachPhotos(IReadOnlyList<AttachedPhoto> photos, SaveContext context)
 	{
-		SaveContext ctx = context.BatchId != null ? context : new SaveContext { User = context.User, Via = context.Via, BatchId = Guid.NewGuid().ToString("N"), AllowLocked = context.AllowLocked, Event = context.Event };
+		SaveContext ctx = context.AsBatch();
 		BulkResult result = new BulkResult { BatchId = ctx.BatchId };
 		Database.InTransaction((c, tx) =>
 		{

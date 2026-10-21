@@ -64,6 +64,12 @@ public sealed class UndoService
 		return forward;
 	}
 
+	/// <summary>
+	/// Forgets one assessment's steps: after someone else's change was loaded, undoing would put their change back
+	/// (every step is a snapshot of the whole assessment).
+	/// </summary>
+	public void Forget(Guid id) => _stacks.Remove(id);
+
 	/// <summary>Forgets everything (another database was opened).</summary>
 	public void Clear() => _stacks.Clear();
 }

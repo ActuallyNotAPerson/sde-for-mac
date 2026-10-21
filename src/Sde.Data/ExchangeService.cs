@@ -179,6 +179,7 @@ public sealed class ExchangeService
 				if (writeProperty)
 				{
 					TableMap<PropertyRecord>.Upsert(c, target, tx);
+					_store.BumpVersion(c, tx, target.PropertyID, VersionKind.Property);
 					if (!copyAll && propertyExists)
 					{
 						result.PropertiesUpdated++;
@@ -236,19 +237,33 @@ public sealed class ExchangeService
 		});
 
 		_store.DeletePendingFiles();
-		// Photos are copied after the transaction commits.
-		Directory.CreateDirectory(_store.AttachmentsFolder);
+		// Photos are copied after the transaction commits, so the import has happened whatever goes wrong here: a photo
+		// that can't be copied is a warning, never a failure.
+		try
+		{
+			Directory.CreateDirectory(_store.AttachmentsFolder);
+		}
+		catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+		{
+			result.Warnings.Add($"The photos weren't copied: the attachments folder couldn't be made ({ex.Message}).");
+			return result;
+		}
 		foreach ((string from, string to) in photoCopies)
 		{
 			string source = Path.Combine(photosFolder ?? "", from);
-			if (File.Exists(source))
+			if (!File.Exists(source))
+			{
+				result.Warnings.Add("Photo not found in import: " + from);
+				continue;
+			}
+			try
 			{
 				File.Copy(source, Path.Combine(_store.AttachmentsFolder, to), overwrite: true);
 				result.PhotosCopied++;
 			}
-			else
+			catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
 			{
-				result.Warnings.Add("Photo not found in import: " + from);
+				result.Warnings.Add($"Photo {from} couldn't be copied: {ex.Message}");
 			}
 		}
 		return result;

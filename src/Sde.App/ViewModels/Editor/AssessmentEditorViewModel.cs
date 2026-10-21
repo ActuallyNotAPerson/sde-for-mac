@@ -78,12 +78,17 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	private string _lastSaved;
 
 	/// <param name="isDraft">A new assessment that isn't in the database yet; it is saved on the first edit.</param>
-	public AssessmentEditorViewModel(AppServices app, MainViewModel main, AssessmentFile file, bool isDraft = false)
+	/// <param name="stamp">
+	/// The versions <paramref name="file"/> was loaded at (see <see cref="Stamp"/>); null reads them now (for a draft:
+	/// none, so its first save doesn't check).
+	/// </param>
+	public AssessmentEditorViewModel(AppServices app, MainViewModel main, AssessmentFile file, bool isDraft = false, VersionStamp stamp = null)
 	{
 		_app = app;
 		_main = main;
 		File = file;
 		IsDraft = isDraft;
+		Stamp = stamp ?? (isDraft ? null : app.Store.GetStamp(file.Assessment.AssessmentID));
 		Reference = app.Store.Reference;
 		// "Permits BLD-2026-00123 / 4471" (source, record and inspection) for an imported inspection.
 		_source = app.Store.GetExternalLink(file.Assessment.AssessmentID) is Sde.Data.ExternalLinkRecord link
@@ -141,6 +146,34 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	}
 
 	public AssessmentFile File { get; }
+
+	/// <summary>
+	/// The versions of this assessment and its structure that the editor's copy is based on. Saves expect them, so a
+	/// save over someone else's newer change is refused and merged instead (see <see cref="ResolveConflict"/>).
+	/// </summary>
+	public VersionStamp Stamp { get; private set; }
+
+	/// <summary>
+	/// True when there is something to save: what's on screen differs from what was last loaded or saved. (A draft is
+	/// dirty once it has been edited at all.) Leaving the editor saves only then, so viewing an assessment never
+	/// changes it.
+	/// </summary>
+	public bool IsDirty => IsDraft ? _dirty : _shapesChanged || UndoService.Snapshot(File) != _lastSaved;
+
+	/// <summary>False once the window has replaced this editor with a newer copy of the assessment.</summary>
+	private bool IsCurrent => _main.Editor == this;
+
+	/// <summary>
+	/// After saving onto someone else's newer copy: the values both had changed, now showing theirs, with
+	/// "Keep mine" to put this editor's back.
+	/// </summary>
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasConflict), nameof(ConflictText))]
+	public partial EditConflict Conflict { get; set; }
+
+	public bool HasConflict => Conflict != null;
+
+	public string ConflictText => Conflict?.Text;
 
 	/// <summary>True until a new assessment's first edit is saved: closing it before then leaves nothing behind.</summary>
 	[ObservableProperty]
@@ -795,6 +828,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	{
 		int added = 0;
 		List<(AttachmentRecord Attachment, string Source)> addedPhotos = new();
+		List<AttachedPhoto> late = new();
 		string temp = Path.Combine(Path.GetTempPath(), "sde-photos");
 		Guid assessmentId = Assessment.AssessmentID;
 		IsAddingPhotos = true;
@@ -821,6 +855,13 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 					_app.Dialogs.Notify("Photo not added", ex.Message, isError: true);
 					continue;
 				}
+				if (!IsCurrent)
+				{
+					// While the photo was copied, the window replaced this editor with a newer copy (someone else
+					// saved): attach the rest straight to the assessment.
+					late.Add(new AttachedPhoto(assessmentId, a, null));
+					continue;
+				}
 				a.DefaultImage = !File.Attachments.Any(x => x.Active);
 				File.Attachments.Add(a);
 				Photos.Add(NewPhotoVm(a));
@@ -832,7 +873,22 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		{
 			IsAddingPhotos = false;
 		}
-		if (added > 0)
+		if (late.Count > 0)
+		{
+			try
+			{
+				BulkResult result = _app.Writes.Write(new[] { assessmentId }, () => _app.Store.AttachPhotos(late, SaveContext.App));
+				foreach (AttachedPhoto p in late.Where(p => result.Locked.Contains(p.AssessmentID)))
+				{
+					System.IO.File.Delete(_app.Store.PhotoPath(p.Attachment));
+				}
+			}
+			catch (Exception ex) when (ex is not OutOfMemoryException)
+			{
+				_app.Errors.Show("Couldn't add the photos", ex);
+			}
+		}
+		if (added > 0 && IsCurrent)
 		{
 			RefreshPhotoPositions();
 			Edited();
@@ -871,24 +927,29 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 
 	// ───────────── Saving, switching, deleting ─────────────
 
-	/// <summary>Saves immediately (also called when leaving the editor). A draft nobody has edited isn't saved.</summary>
+	/// <summary>
+	/// Saves immediately (also called when leaving the editor) when there is something to save: a draft nobody has
+	/// edited, or an assessment only looked at, isn't saved. When someone else saved the assessment since this copy was
+	/// loaded, the save is refused and this editor's changes are put onto their copy instead.
+	/// </summary>
 	[RelayCommand]
 	public void Save()
 	{
 		_saveTimer.Stop();
-		if (IsDraft && !_dirty)
+		if (!IsDirty)
 		{
+			if (!IsDraft)
+			{
+				SaveState = "Saved";
+				_inBurst = false;
+			}
 			return;
 		}
 		try
 		{
-			// The assessment first: a new structure gets its ID here, which the shapes need.
-			_app.Store.SaveAssessment(File);
-			if (_shapesChanged)
-			{
-				_app.Store.SaveShapes(Property.PropertyID, Shapes.Select(s => s.Shape));
-				_shapesChanged = false;
-			}
+			// The assessment and the square-footage shapes in one transaction (a new structure gets its ID first).
+			Stamp = _app.Store.SaveAssessment(File, SaveContext.App.Expecting(Stamp), _shapesChanged ? Shapes.Select(s => s.Shape).ToList() : null);
+			_shapesChanged = false;
 			SaveState = "Saved";
 			_saveErrorShown = false;
 			_inBurst = false;
@@ -900,6 +961,10 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 				OnPropertyChanged(nameof(HasOtherAssessments));
 				_app.RaiseDataChanged();
 			}
+		}
+		catch (ConcurrencyException)
+		{
+			ResolveConflict();
 		}
 		catch (AssessmentLockedException ex)
 		{
@@ -923,6 +988,89 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 			{
 				AppLog.Write("Save failed again", ex);
 			}
+		}
+	}
+
+	/// <summary>
+	/// Someone else saved this assessment (or its structure) since this copy was loaded. Their copy is loaded, this
+	/// editor's own changes (since its last save) are put onto it, and the result is saved and shown. Values both sides
+	/// changed keep theirs, and a banner offers "Keep mine". Undo steps are dropped: they hold whole copies from before
+	/// the other change.
+	/// </summary>
+	private void ResolveConflict()
+	{
+		Guid id = Assessment.AssessmentID;
+		AssessmentFile baseline = UndoService.Read(_lastSaved);
+		string mine = UndoService.Snapshot(File);
+		List<ShapeRecord> shapes = _shapesChanged ? Shapes.Select(s => s.Shape).ToList() : null;
+		for (int attempt = 0; attempt < 3; attempt++)
+		{
+			(AssessmentFile theirs, VersionStamp stamp) = _app.Store.LoadAssessmentWithStamp(id);
+			if (theirs == null || !theirs.Assessment.Active || !theirs.Property.Active)
+			{
+				SaveState = "Not saved";
+				_app.Dialogs.Notify("Not saved", "This assessment was deleted somewhere else while it was open, so your changes couldn't be saved.", isError: true);
+				_main.ReplaceEditor(null, null);
+				return;
+			}
+			MergeResult merged = AssessmentMerge.Merge(baseline, UndoService.Read(mine), theirs, Reference, _calculator);
+			try
+			{
+				VersionStamp saved = _app.Store.SaveAssessment(merged.Merged, SaveContext.App.Expecting(stamp), shapes);
+				_app.Undo.Forget(id);
+				EditConflict conflict = merged.Conflicts.Count == 0 ? null : new EditConflict(merged.Conflicts, mine);
+				_main.ReplaceEditor(merged.Merged, saved, conflict);
+				_app.RaiseDataChanged();
+				return;
+			}
+			catch (ConcurrencyException)
+			{
+				// Saved again in the meantime: merge onto that.
+			}
+			catch (AssessmentLockedException ex)
+			{
+				_app.Undo.Forget(id);
+				_app.Dialogs.Notify("Not saved", "Someone else made this assessment " + Sde.Data.AssessmentStatuses.Label(ex.Status) + " while it was open, so your changes couldn't be saved.", isError: true);
+				_main.ReplaceEditor(theirs, stamp);
+				return;
+			}
+		}
+		SaveState = "Not saved";
+		_app.Dialogs.Notify("Not saved", "This assessment keeps changing somewhere else. Your changes weren't saved; try again in a moment.", isError: true);
+	}
+
+	/// <summary>The banner's "Use theirs": their values stay.</summary>
+	[RelayCommand]
+	private void UseTheirs() => Conflict = null;
+
+	/// <summary>The banner's "Keep mine": puts this editor's values back for the fields both sides changed, and saves.</summary>
+	[RelayCommand]
+	private void KeepMine()
+	{
+		EditConflict conflict = Conflict;
+		Save();
+		if (conflict == null || !IsCurrent)
+		{
+			return;
+		}
+		Guid id = Assessment.AssessmentID;
+		AssessmentFile next = UndoService.Read(UndoService.Snapshot(File));
+		AssessmentMerge.ApplyValues(next, UndoService.Read(conflict.MineSnapshot), conflict.Changes.Select(c => c.Key).ToList(), Reference, _calculator);
+		try
+		{
+			VersionStamp saved = _app.Store.SaveAssessment(next, SaveContext.App.Expecting(Stamp));
+			_app.Undo.Push(id, _lastSaved);
+			_main.ReplaceEditor(next, saved);
+			_app.RaiseDataChanged();
+		}
+		catch (ConcurrencyException)
+		{
+			_app.Dialogs.Notify("Not saved", "Someone else changed this assessment again. It now shows their change; make yours again if it's still needed.");
+			_main.RefreshEditor();
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			_app.Errors.Show("Couldn't save this assessment", ex);
 		}
 	}
 
@@ -1058,6 +1206,8 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 			_app.Errors.Show("Couldn't change the status", ex);
 			return;
 		}
+		// A status change is a new version of the assessment, made here: this copy is still the current one.
+		Stamp = _app.Store.GetStamp(Assessment.AssessmentID);
 		LoadStatus();
 		_app.RaiseDataChanged();
 	}
@@ -1106,6 +1256,10 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	private void Step(bool back)
 	{
 		Save();
+		if (!IsCurrent)
+		{
+			return;     // the save merged someone else's change and replaced this editor (and its undo steps)
+		}
 		Guid id = Assessment.AssessmentID;
 		if (back ? !CanUndo : !CanRedo)
 		{
@@ -1115,8 +1269,18 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		string target = back ? _app.Undo.Undo(id, current) : _app.Undo.Redo(id, current);
 		try
 		{
-			// Saved like any other change (history shows "Undo"), then the editor reloads from the database.
-			_app.Writes.Write(new[] { id }, () => _app.Store.SaveAssessment(UndoService.Read(target), new SaveContext { Via = SaveVia.Undo }));
+			// Saved like any other change (history shows "Undo"), then the editor reloads from the database. The save
+			// expects this editor's versions: undo never puts back over someone else's later change.
+			_app.Store.SaveAssessment(UndoService.Read(target), new SaveContext { Via = SaveVia.Undo }.Expecting(Stamp));
+			(AssessmentFile file, VersionStamp stamp) = _app.Store.LoadAssessmentWithStamp(id);
+			_main.ReplaceEditor(file, stamp);
+			_app.RaiseDataChanged();
+		}
+		catch (ConcurrencyException)
+		{
+			_app.Undo.Forget(id);
+			_app.Dialogs.Notify(back ? "Couldn't undo" : "Couldn't redo", "Someone else changed this assessment since, so its earlier versions can't be put back. It now shows their change.");
+			_main.RefreshEditor();
 		}
 		catch (Exception ex) when (ex is not OutOfMemoryException)
 		{

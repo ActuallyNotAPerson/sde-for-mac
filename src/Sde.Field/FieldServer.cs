@@ -455,14 +455,12 @@ public sealed class FieldServer : IAsyncDisposable
 				return Results.Json(new { error = "The Mac couldn't convert that photo. Try taking it again, or set the camera to save JPEG (Most Compatible)." },
 					statusCode: StatusCodes.Status422UnprocessableEntity);
 			}
-			Sde.Core.Records.AttachmentRecord added = null;
+			// Copied into the attachments folder here, on the web server's thread: the save itself runs on the Mac
+			// app's UI thread, which a 25 MB copy would freeze.
+			Sde.Core.Records.AttachmentRecord added = store.ImportPhoto(id, converted, description);
 			try
 			{
-				AssessmentFile saved = await _writer.ApplyAsync(id, f =>
-				{
-					added = store.ImportPhoto(id, converted, description);
-					f.Attachments.Add(added);
-				}, ContextFor(ctx));
+				AssessmentFile saved = await _writer.ApplyAsync(id, f => f.Attachments.Add(added), ContextFor(ctx));
 				return Results.Json(new { photoCount = saved.Attachments.Count });
 			}
 			catch
