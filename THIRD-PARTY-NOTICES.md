@@ -87,12 +87,25 @@ XmpCore's `.nuspec` has no license expression, only a link to Adobe's license fo
 (https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html). Its README says the same BSD license applies; Adobe
 publishes its XMP Toolkit SDK under BSD-3-Clause (https://github.com/adobe/XMP-Toolkit-SDK).
 
+### AI assistant server (`SDE mcp`)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| ModelContextProtocol, ModelContextProtocol.Core | 2.3.0 | Apache-2.0 | https://github.com/modelcontextprotocol/csharp-sdk |
+| Microsoft.Extensions.AI.Abstractions (pulled in by ModelContextProtocol.Core) | 10.11.0 | MIT | https://github.com/dotnet/extensions |
+| Microsoft.Extensions.Hosting and the Microsoft.Extensions libraries it uses (configuration, dependency injection, logging, options) | 10.0.13 | MIT | https://github.com/dotnet/runtime |
+
+The MCP C# SDK ships no NOTICE file (none in the 2.3.0 packages or in its repository at that release). Its `LICENSE`
+says some older contributions remain under the MIT license, and its `THIRD-PARTY-NOTICES.txt` lists the MIT-licensed
+code it includes; both are in the repository linked above. In SDE.app the Microsoft.Extensions libraries are the copies
+in the ASP.NET Core shared framework (below), whose version they match.
+
 ### Microsoft libraries pulled in by the packages above
 
 | Package | Version | License | Project |
 | --- | --- | --- | --- |
-| Microsoft.Extensions.DependencyInjection.Abstractions | 8.0.2 | MIT | https://github.com/dotnet/runtime |
-| Microsoft.Extensions.Logging.Abstractions | 8.0.3 | MIT | https://github.com/dotnet/runtime |
+| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.13 | MIT | https://github.com/dotnet/runtime |
+| Microsoft.Extensions.Logging.Abstractions | 10.0.13 | MIT | https://github.com/dotnet/runtime |
 | Microsoft.IO.RecyclableMemoryStream | 3.0.1 | MIT | https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream |
 | System.IO.Packaging | 8.0.1 | MIT | https://github.com/dotnet/runtime |
 | System.Security.Cryptography.Pkcs | 8.0.2 | MIT | https://github.com/dotnet/runtime |
