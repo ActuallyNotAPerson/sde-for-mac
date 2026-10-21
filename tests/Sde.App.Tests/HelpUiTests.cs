@@ -364,6 +364,19 @@ public class HelpUiTests
 	}
 
 	[AvaloniaFact]
+	public async Task OpenSampleDatabase_LogsNoError()
+	{
+		using UiSession ui = new UiSession();
+		ui.Services.SampleFolder = Path.Combine(ui.Folder, SampleDatabase.FolderName);
+		await ui.Main.OpenSampleDatabase();
+		await ui.Services.OpeningBackup;
+		Assert.True(ui.Services.IsSample);
+		string log = File.Exists(AppLog.TodayFile) ? File.ReadAllText(AppLog.TodayFile) : "";
+		Assert.DoesNotContain("Couldn't make the automatic backup", log);
+		Assert.DoesNotContain("Exception", log);
+	}
+
+	[AvaloniaFact]
 	public async Task NormalDatabases_ExportWithoutTheSampleQuestion()
 	{
 		using UiSession ui = new UiSession();

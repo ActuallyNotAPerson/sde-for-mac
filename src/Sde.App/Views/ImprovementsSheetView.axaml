@@ -78,15 +78,15 @@
         <TextBlock Classes="help" Text="The building only, not the land, before the improvement. It starts as the building value of the latest damage assessment." />
 
         <!-- Result -->
-        <Border Classes="card" BorderThickness="0" Padding="16,12" Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}">
+        <Border Classes="card" BorderThickness="0" Padding="16,12" app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
           <StackPanel Spacing="6">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
               <TextBlock Text="{Binding PercentText}" FontSize="32" FontWeight="Bold" VerticalAlignment="Center"
-                         Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                         app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Classes="eyebrow" Text="IMPROVEMENT COST AS A PERCENT OF MARKET VALUE" />
                 <TextBlock Text="{Binding ResultText}" FontSize="15" FontWeight="SemiBold"
-                           Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                           app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
               </StackPanel>
             </Grid>
             <ItemsControl ItemsSource="{Binding Explanation}">

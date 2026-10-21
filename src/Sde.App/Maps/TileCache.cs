@@ -1,3 +1,5 @@
+using System.Net;
+using System.Reflection;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
@@ -27,11 +29,39 @@ public sealed class TileCache
 	private readonly CancellationTokenSource _stop = new CancellationTokenSource();
 
 	/// <param name="folder">Where tiles are kept on disk (created when the first one is saved).</param>
-	/// <param name="download">Gets the bytes at a web address; null uses a plain HTTP client.</param>
+	/// <param name="download">Gets the bytes at a web address; null uses <see cref="DownloadAsync"/> with SDE's own HTTP client.</param>
 	public TileCache(string folder, Func<string, CancellationToken, Task<byte[]>> download = null)
 	{
 		_folder = folder;
-		_download = download ?? Http.GetBytesAsync;
+		_download = download ?? ((url, cancel) => DownloadAsync(Http.Client, url, cancel));
+	}
+
+	/// <summary>
+	/// How SDE names itself to the tile server, with the app's version: OpenStreetMap's tile rules ask every app to say
+	/// who it is.
+	/// </summary>
+	public static string UserAgent { get; } = "SDE-for-Mac/"
+		+ (typeof(TileCache).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+')[0] ?? "0.1")
+		+ " (Substantial Damage Estimator)";
+
+	/// <summary>
+	/// An HTTP client for map tiles that sends <see cref="UserAgent"/>. With no handler it uses the network; tests pass
+	/// one that answers without it.
+	/// </summary>
+	public static HttpClient CreateClient(HttpMessageHandler handler = null)
+	{
+		HttpClient c = handler == null ? new HttpClient() : new HttpClient(handler);
+		c.Timeout = TimeSpan.FromSeconds(15);
+		c.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+		return c;
+	}
+
+	/// <summary>Gets one tile's bytes. An answer other than success throws HttpRequestException with its status code.</summary>
+	public static async Task<byte[]> DownloadAsync(HttpClient client, string url, CancellationToken cancel)
+	{
+		using HttpResponseMessage response = await client.GetAsync(url, cancel);
+		response.EnsureSuccessStatusCode();
+		return await response.Content.ReadAsByteArrayAsync(cancel);
 	}
 
 	/// <summary>Raised on the screen's thread when a tile has arrived or could not be had, so the map should redraw.</summary>
@@ -109,7 +139,7 @@ public sealed class TileCache
 				catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException && !_stop.IsCancellationRequested)
 				{
 					bytes = stale;
-					error = ex is HttpRequestException ? "The map service didn't answer. Check the internet connection." : "The map service took too long to answer.";
+					error = DownloadProblem(ex);
 				}
 				finally
 				{
@@ -155,6 +185,23 @@ public sealed class TileCache
 		});
 	}
 
+	/// <summary>Why a tile couldn't be downloaded, in plain English.</summary>
+	private static string DownloadProblem(Exception ex)
+	{
+		if (ex is HttpRequestException { StatusCode: HttpStatusCode status })
+		{
+			// The map service answered, so the connection works: say what it answered instead.
+			int code = (int)status;
+			return status switch
+			{
+				HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => $"The map service refused the request (HTTP {code}).",
+				HttpStatusCode.NotFound => $"The map service couldn't find this part of the map (HTTP {code}).",
+				_ => $"The map service couldn't send this part of the map (HTTP {code}).",
+			};
+		}
+		return ex is HttpRequestException ? "The map service didn't answer. Check the internet connection." : "The map service took too long to answer.";
+	}
+
 	private void Remember(string key, Bitmap bitmap)
 	{
 		_memory[key] = bitmap;
@@ -185,23 +232,9 @@ public sealed class TileCache
 		}
 	}
 
+	/// <summary>Holds the one HTTP client every tile download shares, made on first use.</summary>
 	private static class Http
 	{
-		private static readonly HttpClient Client = Create();
-
-		private static HttpClient Create()
-		{
-			HttpClient c = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-			// OpenStreetMap's tile rules ask every app to say who it is.
-			c.DefaultRequestHeaders.UserAgent.ParseAdd("SDE-for-Mac/2.0 (Substantial Damage Estimator)");
-			return c;
-		}
-
-		public static async Task<byte[]> GetBytesAsync(string url, CancellationToken cancel)
-		{
-			using HttpResponseMessage response = await Client.GetAsync(url, cancel);
-			response.EnsureSuccessStatusCode();
-			return await response.Content.ReadAsByteArrayAsync(cancel);
-		}
+		public static readonly HttpClient Client = CreateClient();
 	}
 }

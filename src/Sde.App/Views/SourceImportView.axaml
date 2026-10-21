@@ -264,9 +264,9 @@
                     <TextBlock Grid.Column="2" Text="{Binding Address}" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
                     <TextBlock Grid.Column="3" Text="{Binding Status}" Classes="secondary" VerticalAlignment="Top" Margin="0,4,0,0" />
                     <Border Grid.Column="4" Classes="pill" VerticalAlignment="Top" HorizontalAlignment="Left"
-                            Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}">
+                            app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
                       <TextBlock Text="{Binding Result}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis"
-                                 Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                                 app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
                     </Border>
                     <TextBlock Grid.Column="5" Text="{Binding Note}" Classes="issue" Classes.required="{Binding IsProblem}" Classes.recommended="{Binding !IsProblem}"
                                VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,4,0,0" />

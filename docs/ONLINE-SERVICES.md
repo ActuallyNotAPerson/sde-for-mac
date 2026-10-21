@@ -19,6 +19,7 @@ The online lookups in `src/Sde.Interop/Online` were written from the services' d
   - 22: Political Jurisdictions. Fields used: `CID`, `POL_NAME1`.
 - Confirm `STATIC_BFE` is -9999 when there is no BFE (SDE maps it to none), and that `ZONE_SUBTY` is `FLOODWAY` for floodway polygons (SDE tests for the word, ignoring case).
 - Confirm the exact `FLD_ZONE` spellings for zone X, zone A99, and V zones, and what `ZONE_SUBTY` says for shaded X, so `FloodInfoMapper` maps them correctly.
+- A point on a boundary can hit several zone polygons. SDE reports the strictest: a floodway, then a V zone, then any other A zone, then shaded X, then unshaded X (`ZONE_SUBTY` "AREA OF MINIMAL FLOOD HAZARD" or blank), then anything else. Confirm that every shaded X subtype differs from the unshaded one.
 - Confirm that a point outside any mapped area returns an empty `features` array, and that an overloaded server returns either an HTTP error or HTTP 200 with an `error` object (both are handled).
 - Check that the service accepts the request without a token or referrer, and note its rate limits before using it for large batches (`OnlineBatch` defaults to 4 at a time).
 - Check that `EFF_DATE` is the date wanted for SDE's FIRM panel date.

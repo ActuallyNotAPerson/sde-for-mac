@@ -60,24 +60,22 @@ public sealed class NfhlClient
 	/// <summary>The flood information at the point, or null when the map has no flood zone there.</summary>
 	public async Task<FloodInfo> LookupAsync(double latitude, double longitude, CancellationToken ct)
 	{
-		List<JsonElement> zones = await QueryAsync(FloodZoneLayer, latitude, longitude, ct).ConfigureAwait(false);
+		// The three layers are asked at once. Their answers are then read in order, so a failure is reported just as if
+		// they had been asked one after another: the zone layer's first, and none from the other two when the point
+		// has no flood zone.
+		Task<List<JsonElement>> zonesQuery = QueryAsync(FloodZoneLayer, latitude, longitude, ct);
+		Task<List<JsonElement>> panelsQuery = QueryAsync(PanelLayer, latitude, longitude, ct);
+		Task<List<JsonElement>> communitiesQuery = QueryAsync(CommunityLayer, latitude, longitude, ct);
+		await Task.WhenAll(new Task[] { zonesQuery, panelsQuery, communitiesQuery }).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+		List<JsonElement> zones = await zonesQuery.ConfigureAwait(false);
 		if (zones.Count == 0)
 		{
 			return null;
 		}
-		List<JsonElement> panels = await QueryAsync(PanelLayer, latitude, longitude, ct).ConfigureAwait(false);
-		List<JsonElement> communities = await QueryAsync(CommunityLayer, latitude, longitude, ct).ConfigureAwait(false);
+		List<JsonElement> panels = await panelsQuery.ConfigureAwait(false);
+		List<JsonElement> communities = await communitiesQuery.ConfigureAwait(false);
 
-		// A point on a boundary can hit several polygons; a floodway polygon wins because it is the stricter answer.
-		JsonElement zone = zones[0];
-		foreach (JsonElement candidate in zones)
-		{
-			if (IsFloodway(OnlineHttp.Text(candidate, "ZONE_SUBTY")))
-			{
-				zone = candidate;
-				break;
-			}
-		}
+		JsonElement zone = StrictestZone(zones);
 		string subtype = OnlineHttp.Text(zone, "ZONE_SUBTY");
 
 		decimal? bfe = null;
@@ -114,6 +112,70 @@ public sealed class NfhlClient
 	}
 
 	private static bool IsFloodway(string subtype) => subtype != null && subtype.Contains("FLOODWAY", StringComparison.OrdinalIgnoreCase);
+
+	/// <summary>
+	/// The zone to report when a point hits several polygons, for example on a boundary: the strictest, as ranked by
+	/// <see cref="ZoneRank"/>. Zones of the same rank keep the service's order.
+	/// </summary>
+	private static JsonElement StrictestZone(List<JsonElement> zones)
+	{
+		JsonElement best = zones[0];
+		int bestRank = ZoneRank(best);
+		foreach (JsonElement candidate in zones.Skip(1))
+		{
+			int rank = ZoneRank(candidate);
+			if (rank < bestRank)
+			{
+				best = candidate;
+				bestRank = rank;
+			}
+		}
+		return best;
+	}
+
+	/// <summary>
+	/// How strict a zone is, strictest first: a floodway (0), a coastal V zone (1), any other A zone (2), a shaded X
+	/// zone such as the 0.2% annual chance flood hazard (3), an unshaded X zone (4), and anything else, such as D or
+	/// open water (5).
+	/// </summary>
+	private static int ZoneRank(JsonElement zone)
+	{
+		string subtype = OnlineHttp.Text(zone, "ZONE_SUBTY");
+		if (IsFloodway(subtype))
+		{
+			return 0;
+		}
+		string code = (OnlineHttp.Text(zone, "FLD_ZONE") ?? "").Trim().ToUpperInvariant();
+		if (IsZone(code, 'V'))
+		{
+			return 1;
+		}
+		if (IsZone(code, 'A'))
+		{
+			return 2;
+		}
+		if (code == "X")
+		{
+			// The unshaded X zone's subtype is "AREA OF MINIMAL FLOOD HAZARD" (or blank); every other X subtype is shaded.
+			bool unshaded = string.IsNullOrWhiteSpace(subtype) || subtype.Contains("MINIMAL", StringComparison.OrdinalIgnoreCase);
+			return unshaded ? 4 : 3;
+		}
+		return 5;
+	}
+
+	/// <summary>
+	/// The zone code is an A or V zone: the letter alone, with E, H, O or R after it (AE, AH, AO, AR, VE), A99, or a
+	/// numbered zone from older maps (A1 to A30, V1 to V30). "AREA NOT INCLUDED" is not an A zone.
+	/// </summary>
+	private static bool IsZone(string code, char letter)
+	{
+		if (code.Length == 0 || code[0] != letter)
+		{
+			return false;
+		}
+		string rest = code.Substring(1);
+		return rest.Length == 0 || rest is "E" or "H" or "O" or "R" || rest.Length <= 2 && rest.All(char.IsAsciiDigit);
+	}
 
 	/// <summary>Runs one layer's point query and returns each feature's attributes.</summary>
 	private async Task<List<JsonElement>> QueryAsync(int layer, double latitude, double longitude, CancellationToken ct)

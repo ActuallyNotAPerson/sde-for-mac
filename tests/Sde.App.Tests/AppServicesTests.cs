@@ -51,6 +51,82 @@ public class AppServicesTests
 		Assert.Contains("Reopen it first", ErrorPresenter.Describe(null, new AssessmentLockedException(Guid.Empty, AssessmentStatus.Final, new List<FieldDiff>())).Message);
 	}
 
+	/// <summary>Runs <paramref name="test"/> with the path of app-settings.json in a new temporary folder.</summary>
+	private static void WithSettingsFolder(Action<string> test)
+	{
+		string folder = Path.Combine(Path.GetTempPath(), "sde-settings-" + Guid.NewGuid().ToString("N"));
+		try
+		{
+			test(Path.Combine(folder, "app-settings.json"));
+		}
+		finally
+		{
+			if (Directory.Exists(folder))
+			{
+				Directory.Delete(folder, recursive: true);
+			}
+		}
+	}
+
+	[Theory]
+	[InlineData("cut short")]
+	[InlineData("empty")]
+	[InlineData("missing")]
+	public void Settings_DamagedFile_ComesBackFromTheBackup(string damage)
+	{
+		WithSettingsFolder(path =>
+		{
+			new AppSettings { DatabasePath = "/Volumes/Work/first.sqlite", YourName = "Pat Example" }.Save(path);
+			new AppSettings { DatabasePath = "/Volumes/Work/second.sqlite", YourName = "Pat Example" }.Save(path);
+			Assert.Equal("/Volumes/Work/second.sqlite", AppSettings.Load(path).DatabasePath);
+
+			string text = File.ReadAllText(path);
+			switch (damage)
+			{
+				case "cut short":
+					File.WriteAllText(path, text.Substring(0, text.Length / 2));
+					break;
+				case "empty":
+					File.WriteAllText(path, "");
+					break;
+				default:
+					File.Delete(path);
+					break;
+			}
+			AppSettings loaded = AppSettings.Load(path);
+			Assert.Equal("/Volumes/Work/first.sqlite", loaded.DatabasePath);   // the settings before the last save
+			Assert.Equal("Pat Example", loaded.YourName);
+		});
+	}
+
+	[Fact]
+	public void Settings_NoFileAndNoBackup_AreTheDefaults()
+	{
+		WithSettingsFolder(path =>
+		{
+			Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+			File.WriteAllText(path, "{\"DatabasePath\": \"/Volumes/Wo");
+			Assert.Null(AppSettings.Load(path).DatabasePath);
+			File.Delete(path);
+			Assert.Null(AppSettings.Load(path).DatabasePath);
+		});
+	}
+
+	[Fact]
+	public void Settings_Save_KeepsTheLastOneAsBackup_AndLeavesNoTemporaryFiles()
+	{
+		WithSettingsFolder(path =>
+		{
+			new AppSettings { DatabasePath = "/Volumes/Work/first.sqlite" }.Save(path);
+			new AppSettings { DatabasePath = "/Volumes/Work/second.sqlite" }.Save(path);
+			new AppSettings { DatabasePath = "/Volumes/Work/third.sqlite" }.Save(path);
+			string[] files = Directory.GetFiles(Path.GetDirectoryName(path)!).Select(Path.GetFileName).Order(StringComparer.Ordinal).ToArray();
+			Assert.Equal(new[] { "app-settings.json", "app-settings.json.bak" }, files);
+			Assert.Equal("/Volumes/Work/third.sqlite", AppSettings.Load(path).DatabasePath);
+			Assert.Equal("/Volumes/Work/second.sqlite", AppSettings.Load(path + ".bak").DatabasePath);
+		});
+	}
+
 	private sealed class TestSheet() : SheetViewModel("Test");
 
 	[AvaloniaFact]

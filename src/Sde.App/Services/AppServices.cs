@@ -58,22 +58,68 @@ public sealed class AppSettings
 
 	private static string FilePath => Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "app-settings.json");
 
-	public static AppSettings Load()
+	/// <summary>Keeps two saves in this app from writing the temporary file at the same time.</summary>
+	private static readonly object SaveGate = new object();
+
+	/// <summary>The remembered settings (see <see cref="Load(string)"/>).</summary>
+	public static AppSettings Load() => Load(FilePath);
+
+	/// <summary>
+	/// Reads the settings at <paramref name="path"/>. When that file is missing, cut short or can't be read, the copy
+	/// kept by the last save (the same name with ".bak" added) is read instead, and failing that the defaults are used.
+	/// </summary>
+	public static AppSettings Load(string path) => Read(path) ?? Read(path + ".bak") ?? new AppSettings();
+
+	/// <summary>The settings in one file, or null when it is missing, cut short or can't be read.</summary>
+	private static AppSettings Read(string path)
 	{
 		try
 		{
-			return File.Exists(FilePath) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new AppSettings() : new AppSettings();
+			return File.Exists(path) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path)) : null;
 		}
-		catch (JsonException)
+		catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
 		{
-			return new AppSettings();
+			return null;
 		}
 	}
 
-	public void Save()
+	/// <summary>Remembers the settings (see <see cref="Save(string)"/>).</summary>
+	public void Save() => Save(FilePath);
+
+	/// <summary>
+	/// Writes the settings to a temporary file in the same folder, then moves it over <paramref name="path"/> in one
+	/// step, so a crash or a full disk never leaves a half-written settings file. The previous file is kept with ".bak"
+	/// added to its name, for <see cref="Load(string)"/> to fall back to.
+	/// </summary>
+	public void Save(string path)
 	{
-		Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-		File.WriteAllText(FilePath, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+		byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, new JsonSerializerOptions { WriteIndented = true });
+		lock (SaveGate)
+		{
+			Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+			string temp = path + ".tmp";
+			try
+			{
+				using (FileStream stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+				{
+					stream.Write(json);
+					stream.Flush(flushToDisk: true);
+				}
+				if (File.Exists(path))
+				{
+					File.Replace(temp, path, path + ".bak");
+				}
+				else
+				{
+					File.Move(temp, path);
+				}
+			}
+			finally
+			{
+				// Gone already when the save worked; a save that failed part-way leaves nothing behind.
+				File.Delete(temp);
+			}
+		}
 	}
 }
 
@@ -208,7 +254,7 @@ public sealed class AppServices
 		// The sample is practice: no backups of it, and it isn't what SDE opens next time.
 		Backups = IsSample ? null : new BackupService(store.Database);
 		BackupService backups = Backups;
-		OpeningBackup = Task.Run(() =>
+		OpeningBackup = backups == null ? Task.CompletedTask : Task.Run(() =>
 		{
 			try
 			{

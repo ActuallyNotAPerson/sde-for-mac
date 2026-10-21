@@ -566,23 +566,23 @@
       <Border Grid.Column="2" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1,0,0,0">
         <ScrollViewer>
           <StackPanel Margin="16,18" Spacing="14">
-            <Border Classes="card" Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}" BorderThickness="0">
+            <Border Classes="card" app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}" BorderThickness="0">
               <StackPanel Spacing="4">
                 <TextBlock Classes="eyebrow" Text="PERCENT DAMAGED" />
-                <TextBlock Text="{Binding PercentText}" FontSize="44" FontWeight="Bold" Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                <TextBlock Text="{Binding PercentText}" FontSize="44" FontWeight="Bold" app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
                 <TextBlock Text="{Binding Determination}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap"
-                           Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                           app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
                 <TextBlock Text="{Binding StateHint}" FontSize="12" TextWrapping="Wrap" Classes="secondary" Margin="0,4,0,0" />
               </StackPanel>
             </Border>
 
             <!-- Cumulative damage (Settings; off by default). A separate finding: FEMA's result above never changes. -->
             <Border Classes="card" Padding="16,12" BorderThickness="0" IsVisible="{Binding ShowCumulative}" Name="CumulativeCard"
-                    Background="{Binding CumulativeState, Converter={x:Static app:Converters.StatusBackground}}">
+                    app:ThemeBrush.Background="{Binding CumulativeState, Converter={x:Static app:Converters.StatusBackgroundKey}}">
               <StackPanel Spacing="4">
                 <TextBlock Classes="eyebrow" Text="CUMULATIVE DAMAGE" />
                 <TextBlock Text="{Binding CumulativeTitle}" FontWeight="SemiBold" TextWrapping="Wrap"
-                           Foreground="{Binding CumulativeState, Converter={x:Static app:Converters.StatusForeground}}"
+                           app:ThemeBrush.Foreground="{Binding CumulativeState, Converter={x:Static app:Converters.StatusForegroundKey}}"
                            ToolTip.Tip="Damage from the events in the look-back period added together, as set in Settings. FEMA's reports and exports keep FEMA's own result." />
                 <TextBlock Text="{Binding CumulativeVerdict}" FontSize="12" TextWrapping="Wrap" />
                 <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="A separate finding: the percent damaged and determination above don't change." />
@@ -648,7 +648,7 @@
                       <Button Classes="subtle" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="4,4"
                               Command="{Binding Go}" CommandParameter="{Binding Issue}">
                         <Grid ColumnDefinitions="14,*">
-                          <Ellipse Width="7" Height="7" Fill="{Binding Severity, Converter={x:Static app:Converters.IssueBrush}}" VerticalAlignment="Top" Margin="0,5,0,0" />
+                          <Ellipse Width="7" Height="7" app:ThemeBrush.Fill="{Binding Severity, Converter={x:Static app:Converters.IssueBrushKey}}" VerticalAlignment="Top" Margin="0,5,0,0" />
                           <StackPanel Grid.Column="1">
                             <TextBlock Text="{Binding FieldName}" FontSize="12" FontWeight="Medium" TextWrapping="Wrap" />
                             <TextBlock Text="{Binding Message}" FontSize="11" Classes="muted" TextWrapping="Wrap" />

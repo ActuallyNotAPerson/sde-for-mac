@@ -25,6 +25,7 @@ Versions are those resolved for the macOS app. Licenses are taken from each pack
 | Avalonia.Fonts.Inter | 12.1.3 | MIT (the Inter font inside it is SIL OFL 1.1, see below) | https://avaloniaui.net/ |
 | Avalonia.Remote.Protocol | 12.1.3 | MIT | https://avaloniaui.net/ |
 | Avalonia.FreeDesktop, Avalonia.FreeDesktop.AtSpi, Avalonia.X11, Avalonia.Win32 | 12.1.3 | MIT | https://avaloniaui.net/ |
+| Avalonia.Angle.Windows.Natives (Windows only, pulled in by Avalonia.Win32; a build of Google's ANGLE) | 2.1.27548.20260419 | BSD-3-Clause (the package's `LICENSE` file) | https://avaloniaui.net/ |
 | Avalonia.BuildServices | 11.3.2 | MIT | https://avaloniaui.net/ |
 | MicroCom.Runtime | 0.11.6 | MIT | https://github.com/kekekeks/MicroCom |
 | Tmds.DBus.Protocol | 0.94.1 | MIT | https://github.com/tmds/Tmds.DBus |
@@ -66,7 +67,7 @@ and https://github.com/harfbuzz/harfbuzz/blob/main/COPYING.
 | ClosedXML.Parser | 2.0.0 | MIT | https://github.com/ClosedXML/ClosedXML.Parser |
 | ExcelNumberFormat | 1.1.0 | MIT | https://github.com/andersnm/ExcelNumberFormat |
 | ExcelDataReader | 3.9.0 | MIT | https://github.com/ExcelDataReader/ExcelDataReader |
-| DocumentFormat.OpenXml, DocumentFormat.OpenXml.Framework | 3.1.1 | MIT | https://github.com/dotnet/Open-XML-SDK |
+| DocumentFormat.OpenXml, DocumentFormat.OpenXml.Framework | 3.3.0 | MIT | https://github.com/dotnet/Open-XML-SDK |
 | PDFsharp, PDFsharp-MigraDoc | 6.2.4 | MIT | https://docs.pdfsharp.net/ |
 | RBush.Signed | 4.0.0 | MIT | https://github.com/viceroypenguin/RBush |
 | Newtonsoft.Json | 13.0.4 | MIT | https://www.newtonsoft.com/json |
@@ -74,6 +75,17 @@ and https://github.com/harfbuzz/harfbuzz/blob/main/COPYING.
 
 PDFsharp and MigraDoc are kept on 6.2.x: version 6.5 and later are licensed under the AGPL-3.0 or a commercial
 license, not MIT.
+
+### Photos
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| MetadataExtractor (reads the date and GPS position in photos) | 2.9.3 | Apache-2.0 | https://github.com/drewnoakes/metadata-extractor-dotnet |
+| XmpCore (pulled in by MetadataExtractor) | 6.1.10.1 | BSD-3-Clause | https://github.com/drewnoakes/xmp-core-dotnet |
+
+XmpCore's `.nuspec` has no license expression, only a link to Adobe's license for the XMP library it is ported from
+(https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html). Its README says the same BSD license applies; Adobe
+publishes its XMP Toolkit SDK under BSD-3-Clause (https://github.com/adobe/XMP-Toolkit-SDK).
 
 ### Microsoft libraries pulled in by the packages above
 

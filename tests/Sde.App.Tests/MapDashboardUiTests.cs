@@ -1,3 +1,5 @@
+using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using Avalonia;
 using Avalonia.Headless.XUnit;
@@ -267,6 +269,51 @@ public class MapDashboardUiTests
 		await Wait(ui, () => reasons.Count > 0 ? new object() : null);
 		Assert.Single(reasons);
 		Assert.Equal(1, second.FailureCount);
+	}
+
+	/// <summary>A tile server that answers every request with one status code and remembers the User-Agent sent.</summary>
+	private sealed class TileServer(HttpStatusCode status) : HttpMessageHandler
+	{
+		public List<string> UserAgents { get; } = new();
+
+		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+		{
+			lock (UserAgents)
+			{
+				UserAgents.Add(request.Headers.UserAgent.ToString());
+			}
+			return Task.FromResult(new HttpResponseMessage(status));
+		}
+	}
+
+	[AvaloniaTheory]
+	[InlineData(HttpStatusCode.Forbidden, "The map service refused the request (HTTP 403).")]
+	[InlineData(HttpStatusCode.NotFound, "The map service couldn't find this part of the map (HTTP 404).")]
+	public async Task TileCache_ARefusedOrMissingTile_IsNotCalledAConnectionProblem(HttpStatusCode status, string expected)
+	{
+		using UiSession ui = new UiSession();
+		Basemap basemap = new Basemap("test", "Test", "https://tiles.example/{z}/{x}/{y}.png", "Test", 5);
+		TileServer server = new TileServer(status);
+		using HttpClient client = TileCache.CreateClient(server);
+		TileCache cache = new TileCache(Path.Combine(ui.Folder, "tiles"), (url, ct) => TileCache.DownloadAsync(client, url, ct));
+		List<string> reasons = new();
+		cache.DownloadFailed += reasons.Add;
+		cache.TryGet(basemap, 3, 2, 1);
+		await Wait(ui, () => reasons.Count > 0 ? new object() : null);
+		Assert.Equal(expected, Assert.Single(reasons));
+
+		// The tile server is told which version of SDE is asking.
+		string version = typeof(TileCache).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split('+')[0];
+		Assert.Equal($"SDE-for-Mac/{version} (Substantial Damage Estimator)", Assert.Single(server.UserAgents));
+		Assert.Equal(TileCache.UserAgent, server.UserAgents[0]);
+
+		// No answer at all is still a connection problem.
+		TileCache offline = new TileCache(Path.Combine(ui.Folder, "offline"), (url, ct) => throw new HttpRequestException("No route to host"));
+		List<string> offlineReasons = new();
+		offline.DownloadFailed += offlineReasons.Add;
+		offline.TryGet(basemap, 3, 2, 1);
+		await Wait(ui, () => offlineReasons.Count > 0 ? new object() : null);
+		Assert.Equal("The map service didn't answer. Check the internet connection.", Assert.Single(offlineReasons));
 	}
 
 	private static async Task<T> Wait<T>(UiSession ui, Func<T> get) where T : class

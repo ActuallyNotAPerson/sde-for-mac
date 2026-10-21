@@ -1,4 +1,5 @@
 using Avalonia.Headless.XUnit;
+using Avalonia.VisualTree;
 using Sde.App.ViewModels;
 using Sde.App.ViewModels.Editor;
 using Sde.App.ViewModels.Fields;
@@ -162,6 +163,11 @@ public class EditorBehaviourTests
 		// Removed photos go to Recently deleted; the file stays until it is emptied.
 		Assert.True(File.Exists(removed.Path));
 		Assert.Contains(ui.Store.GetDeletedItems(), d => d.Value == DeletedKind.Photo);
+
+		// The screenshot shows the Photos & notes step with the photo that is left.
+		e.SelectedSection = e.Sections.OfType<PhotosSectionViewModel>().Single();
+		ui.Pump();
+		Assert.Contains(ui.Window.GetVisualDescendants().OfType<Avalonia.Controls.TextBlock>(), t => t.IsEffectivelyVisible && t.Text == "Pictures of the damage and your own fields");
 		ui.Snapshot("17b-editor-photos-with-photo");
 	}
 

@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
-             xmlns:v="using:Sde.App.Views"
              xmlns:maps="using:Sde.App.Maps"
              xmlns:app="using:Sde.App"
              x:Class="Sde.App.Views.MapView"
@@ -78,7 +77,7 @@
                 <CheckBox IsChecked="{Binding IsOn}" Margin="0,0,0,2" AutomationProperties.Name="{Binding SpokenName}">
                   <Grid ColumnDefinitions="Auto,*,Auto">
                     <Ellipse Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center"
-                             Fill="{Binding ColourKey, Converter={x:Static v:MapConverters.ResourceBrush}}" />
+                             app:ThemeBrush.Fill="{Binding ColourKey}" />
                     <TextBlock Grid.Column="1" Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Column="2" Classes="muted" Text="{Binding Count}" Margin="8,0,0,0" VerticalAlignment="Center" />
                   </Grid>
