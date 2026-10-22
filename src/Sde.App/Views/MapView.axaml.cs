@@ -2,8 +2,10 @@ using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Sde.App.Maps;
 using Sde.App.ViewModels;
+using Sde.Reports;
 
 namespace Sde.App.Views;
 
@@ -123,6 +125,7 @@ public partial class MapView : UserControl
 		_vm.ShowViewRequested += ShowView;
 		_vm.MoveAnswered += Surface.ClearPendingMove;
 		_vm.PropertyChanged += VmChanged;
+		_vm.PrintScene = BuildPrintScene;
 		Surface.Tiles = _vm.Tiles;
 		Surface.Basemap = _vm.Basemap;
 		ApplyMode();
@@ -157,6 +160,10 @@ public partial class MapView : UserControl
 		_vm.ShowViewRequested -= ShowView;
 		_vm.MoveAnswered -= Surface.ClearPendingMove;
 		_vm.PropertyChanged -= VmChanged;
+		if (_vm.PrintScene == BuildPrintScene)
+		{
+			_vm.PrintScene = null;
+		}
 		Surface.Tiles = null;
 		_vm = null;
 	}
@@ -237,6 +244,19 @@ public partial class MapView : UserControl
 		{
 			return;
 		}
+		(List<MapMarker> markers, IReadOnlyDictionary<Guid, string> labels) = BuildMarkers(ActualThemeVariant);
+		Surface.MarkerLabels = labels == null ? null : _vm.StructuresLayer.Labels;
+		Surface.Markers = markers;
+		Surface.Highlighted = _vm.Selected?.Id;
+		ShowSelection();
+	}
+
+	/// <summary>
+	/// The structure dots to draw: each in the colour of its result class (the theme's), or in its category's colour
+	/// when the structures are coloured by something else, with its label when labels are on.
+	/// </summary>
+	private (List<MapMarker> Markers, IReadOnlyDictionary<Guid, string> Labels) BuildMarkers(ThemeVariant theme)
+	{
 		Dictionary<string, IBrush> brushes = new();
 		IReadOnlyDictionary<Guid, string> fills = _vm.ColoursByResult ? null : _vm.StructureFills();
 		IReadOnlyDictionary<Guid, string> labels = _vm.StructureLabels();
@@ -256,16 +276,93 @@ public partial class MapView : UserControl
 			}
 			if (!brushes.TryGetValue(key, out IBrush fill))
 			{
-				fill = fills == null
-					? this.TryFindResource(key, ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.Gray
-					: LegendLineViewModel.Brush(key);
+				fill = fills == null ? ThemeBrushFor(key, theme) : LegendLineViewModel.Brush(key);
 				brushes[key] = fill;
 			}
 			markers.Add(new MapMarker(p.Id, p.Latitude, p.Longitude, fill, labels != null && labels.TryGetValue(p.Id, out string text) ? text : null));
 		}
-		Surface.MarkerLabels = labels == null ? null : _vm.StructuresLayer.Labels;
-		Surface.Markers = markers;
-		Surface.Highlighted = _vm.Selected?.Id;
-		ShowSelection();
+		return (markers, labels);
+	}
+
+	private IBrush ThemeBrushFor(string key, ThemeVariant theme) => this.TryFindResource(key, theme, out object r) && r is IBrush b ? b : Brushes.Gray;
+
+	// ───────────── Printing ─────────────
+
+	/// <summary>The map as it is on screen, in the light theme's colours (paper is white), with its legend.</summary>
+	private MapPrintScene BuildPrintScene()
+	{
+		if (_vm == null)
+		{
+			return null;
+		}
+		(List<MapMarker> markers, IReadOnlyDictionary<Guid, string> labels) = BuildMarkers(ThemeVariant.Light);
+		// The picture is drawn off the UI thread: brushes that belong to no thread.
+		Dictionary<IBrush, IBrush> frozen = new Dictionary<IBrush, IBrush>();
+		for (int i = 0; i < markers.Count; i++)
+		{
+			IBrush fill = markers[i].Fill ?? Brushes.Gray;
+			if (!frozen.TryGetValue(fill, out IBrush still))
+			{
+				Color c = fill is ISolidColorBrush solid ? solid.Color : Colors.Gray;
+				still = new Avalonia.Media.Immutable.ImmutableSolidColorBrush(c, fill.Opacity);
+				frozen[fill] = still;
+			}
+			markers[i] = markers[i] with { Fill = still };
+		}
+		(double x, double y, double resolution) = Surface.ViewInMetres;
+		IReadOnlyList<object> layers = _vm.MapLayers();
+		return new MapPrintScene
+		{
+			CenterX = x,
+			CenterY = y,
+			Resolution = resolution,
+			ScreenWidth = Surface.Bounds.Width,
+			ScreenHeight = Surface.Bounds.Height,
+			Basemap = _vm.Basemap,
+			Overlays = layers.OfType<MapTileLayer>().Where(l => l.Visible).ToList(),
+			Layers = layers.OfType<MapFeatureLayer>().Where(l => l.Visible).ToList(),
+			Markers = markers,
+			MarkerLabels = labels == null ? null : _vm.StructuresLayer.Labels,
+			Legend = PrintLegend(),
+		};
+	}
+
+	/// <summary>The printed legend: the structures (by result, or by the field they are coloured by), then each layer shown, top first.</summary>
+	private List<MapLegendGroup> PrintLegend()
+	{
+		List<MapLegendGroup> groups = new List<MapLegendGroup>();
+		if (_vm.StructuresLayer?.IsVisible ?? true)
+		{
+			List<MapLegendItem> items = _vm.ColoursByResult
+				? _vm.Classes.Where(c => c.IsOn && c.Count > 0).Select(c => new MapLegendItem(c.Label, MapLegendShape.Dot, Hex(ThemeBrushFor(c.ColourKey, ThemeVariant.Light)), "#FFFFFF")).ToList()
+				: _vm.StructureLegend.Select(l => new MapLegendItem(l.Label, MapLegendShape.Dot, Hex(l.Fill), "#FFFFFF")).ToList();
+			string by = _vm.ColoursByResult ? "result" : (_vm.StructureLegendTitle ?? "").Replace("COLOURED BY ", "", StringComparison.Ordinal).ToLowerInvariant();
+			groups.Add(new MapLegendGroup("Structures, by " + by, items));
+		}
+		foreach (MapLayerViewModel layer in _vm.Layers.Where(l => !l.IsStructures && l.IsVisible))
+		{
+			if (layer.IsTiles)
+			{
+				groups.Add(new MapLegendGroup(layer.Name, new[] { new MapLegendItem("Flood hazard zones from FEMA's National Flood Hazard Layer", MapLegendShape.Area, "#5B8FD9B3", "#3D6FB8") }));
+			}
+			else if (layer.Data != null)
+			{
+				MapLegendShape shape = layer.GeometryKind switch
+				{
+					Sde.Gis.Features.GeometryKind.Point => MapLegendShape.Dot,
+					Sde.Gis.Features.GeometryKind.Line => MapLegendShape.Line,
+					_ => MapLegendShape.Area,
+				};
+				groups.Add(new MapLegendGroup(layer.Name, layer.Legend.Select(l => new MapLegendItem(l.Label, shape, Hex(l.Fill), Hex(l.Stroke))).ToList()));
+			}
+		}
+		return groups;
+	}
+
+	/// <summary>"#RRGGBBAA" for a solid brush (grey otherwise).</summary>
+	private static string Hex(IBrush brush)
+	{
+		Color c = brush is ISolidColorBrush s ? s.Color : Colors.Gray;
+		return $"#{c.R:X2}{c.G:X2}{c.B:X2}{(byte)Math.Round(c.A * (brush?.Opacity ?? 1)):X2}";
 	}
 }

@@ -72,6 +72,12 @@
           <c:Icon Kind="ZoomOut" />
         </Button>
         <Button Content="Show all" Command="{Binding FitToStructuresCommand}" AutomationProperties.Name="Zoom to show all structures" />
+        <Button Command="{Binding PrintMapCommand}" ToolTip.Tip="Print the map to a PDF" AutomationProperties.Name="Print the map to a PDF">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="Print" />
+            <TextBlock Text="Print…" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Grid>
 

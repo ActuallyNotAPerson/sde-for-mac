@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.PrintMapSheetView"
+             x:DataType="sh:PrintMapSheetViewModel">
+  <StackPanel Spacing="14">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="A Letter-size PDF of the area the map shows now, with a legend, a scale bar, a north arrow, the sources and the date." />
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Title" />
+      <TextBox Text="{Binding MapTitle}" AutomationProperties.Name="Title of the printed map" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Page" />
+      <ListBox Classes="segmented" SelectedIndex="{Binding OrientationIndex}" HorizontalAlignment="Left" AutomationProperties.Name="Portrait or landscape">
+        <ListBoxItem Content="Portrait" />
+        <ListBoxItem Content="Landscape" />
+      </ListBox>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Save as PDF…" Command="{Binding PrintCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

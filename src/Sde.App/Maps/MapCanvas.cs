@@ -50,7 +50,7 @@ public sealed partial class MapCanvas : Panel, IDisposable
 	private const double FeatureHitRadius = 6;
 
 	/// <summary>A structure dot's diameter in pixels.</summary>
-	private const double DotDiameter = 13;
+	internal const double DotDiameter = 13;
 
 	/// <summary>A press that moves less than this (pixels) is a click, not a drag.</summary>
 	private const double DragThreshold = 5;
@@ -222,6 +222,9 @@ public sealed partial class MapCanvas : Panel, IDisposable
 
 	/// <summary>The map scale denominator at the centre (24000 for 1:24,000).</summary>
 	public double Scale => WebMercator.Scale(Viewport.Resolution, CenterLatitude);
+
+	/// <summary>The middle of the view in Web Mercator metres, and metres per pixel (for printing the same area).</summary>
+	public (double X, double Y, double Resolution) ViewInMetres => (Viewport.CenterX, Viewport.CenterY, Viewport.Resolution);
 
 	/// <summary>The area in view, in longitude and latitude.</summary>
 	public MapExtent Extent
@@ -618,39 +621,16 @@ public sealed partial class MapCanvas : Panel, IDisposable
 		{
 			return;
 		}
-		Dictionary<MColor, IStyle> dots = new Dictionary<MColor, IStyle>();
-		List<IFeature> features = new List<IFeature>(_markers.Count);
-		List<IFeature> labels = new List<IFeature>();
 		STRtree<int> index = new STRtree<int>();
 		(double X, double Y)[] metres = new (double, double)[_markers.Count];
 		for (int i = 0; i < _markers.Count; i++)
 		{
-			MapMarker m = _markers[i];
-			(double x, double y) = WebMercator.ToMetres(m.Longitude, m.Latitude);
+			(double x, double y) = WebMercator.ToMetres(_markers[i].Longitude, _markers[i].Latitude);
 			metres[i] = (x, y);
 			index.Insert(new Envelope(x, x, y, y), i);
-			MColor fill = ToEngine(m.Fill, new MColor(128, 128, 128));
-			if (!dots.TryGetValue(fill, out IStyle dot))
-			{
-				dot = new SymbolStyle
-				{
-					SymbolType = SymbolType.Ellipse,
-					SymbolScale = DotDiameter / SymbolStyle.DefaultWidth,
-					Fill = new Brush(fill),
-					Outline = new Pen(_theme.DotOutline, 1.8),
-				};
-				dots[fill] = dot;
-			}
-			PointFeature f = new PointFeature(x, y);
-			f.Styles.Add(dot);
-			features.Add(f);
-			if (_markerLabels != null && !string.IsNullOrWhiteSpace(m.Label))
-			{
-				PointFeature label = new PointFeature(x, y);
-				label["text"] = m.Label;
-				labels.Add(label);
-			}
 		}
+		List<IFeature> features = StructureDots.Dots(_markers, _theme);
+		List<IFeature> labels = StructureDots.LabelPoints(_markers);
 		index.Build();
 		_markerIndex = index;
 		_markerMetres = metres;
@@ -659,24 +639,7 @@ public sealed partial class MapCanvas : Panel, IDisposable
 		_structures.Features = features;
 		_structures.DataHasChanged();
 		_structureLabels?.Dispose();
-		_structureLabels = null;
-		if (_markerLabels != null)
-		{
-			_structureLabels = new MemoryLayer("Structure labels")
-			{
-				Features = labels,
-				Style = new MapLabelStyle
-				{
-					Text = f => f["text"] as string,
-					Size = _markerLabels.Size > 0 ? _markerLabels.Size : 11,
-					Color = _theme.Text,
-					Halo = _markerLabels.Halo ? _theme.Halo : null,
-					HaloWidth = _markerLabels.HaloWidth,
-					Rise = DotDiameter / 2 + 3,
-				},
-			};
-			_structureLabels.Attribution.Enabled = false;
-		}
+		_structureLabels = _markerLabels == null ? null : StructureDots.LabelLayer(labels, _markerLabels, _theme);
 		ShowRings();
 		Arrange();
 	}
@@ -758,7 +721,7 @@ public sealed partial class MapCanvas : Panel, IDisposable
 	private IBrush Resource(string key) =>
 		this.TryFindResource(key, ActualThemeVariant, out object r) && r is IBrush b ? b : null;
 
-	private static MColor ToEngine(IBrush brush, MColor fallback) =>
+	internal static MColor ToEngine(IBrush brush, MColor fallback) =>
 		brush is ISolidColorBrush s ? new MColor(s.Color.R, s.Color.G, s.Color.B, (int)Math.Round(s.Color.A * s.Opacity)) : fallback;
 
 	protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

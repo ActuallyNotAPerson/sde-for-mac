@@ -440,3 +440,68 @@ internal sealed class MapTheme
 		},
 	};
 }
+
+/// <summary>The structure dots (and their labels) as the engine draws them, on screen and in print.</summary>
+internal static class StructureDots
+{
+	/// <summary>One dot per marker, in its fill, with an outline in the theme's card colour.</summary>
+	public static List<IFeature> Dots(IReadOnlyList<MapMarker> markers, MapTheme theme)
+	{
+		Dictionary<Color, IStyle> dots = new Dictionary<Color, IStyle>();
+		List<IFeature> features = new List<IFeature>(markers.Count);
+		foreach (MapMarker m in markers)
+		{
+			(double x, double y) = WebMercator.ToMetres(m.Longitude, m.Latitude);
+			Color fill = MapCanvas.ToEngine(m.Fill, new Color(128, 128, 128));
+			if (!dots.TryGetValue(fill, out IStyle dot))
+			{
+				dot = new SymbolStyle
+				{
+					SymbolType = SymbolType.Ellipse,
+					SymbolScale = MapCanvas.DotDiameter / SymbolStyle.DefaultWidth,
+					Fill = new Brush(fill),
+					Outline = new Pen(theme.DotOutline, 1.8),
+				};
+				dots[fill] = dot;
+			}
+			PointFeature f = new PointFeature(x, y);
+			f.Styles.Add(dot);
+			features.Add(f);
+		}
+		return features;
+	}
+
+	/// <summary>A label point for each marker that has a label.</summary>
+	public static List<IFeature> LabelPoints(IReadOnlyList<MapMarker> markers)
+	{
+		List<IFeature> labels = new List<IFeature>();
+		foreach (MapMarker m in markers.Where(m => !string.IsNullOrWhiteSpace(m.Label)))
+		{
+			(double x, double y) = WebMercator.ToMetres(m.Longitude, m.Latitude);
+			PointFeature label = new PointFeature(x, y);
+			label["text"] = m.Label;
+			labels.Add(label);
+		}
+		return labels;
+	}
+
+	/// <summary>The labels layer, sitting just above the dots.</summary>
+	public static MemoryLayer LabelLayer(List<IFeature> labels, Sde.Gis.Styles.LabelStyle style, MapTheme theme)
+	{
+		MemoryLayer layer = new MemoryLayer("Structure labels")
+		{
+			Features = labels,
+			Style = new MapLabelStyle
+			{
+				Text = f => f["text"] as string,
+				Size = style.Size > 0 ? style.Size : 11,
+				Color = theme.Text,
+				Halo = style.Halo ? theme.Halo : null,
+				HaloWidth = style.HaloWidth,
+				Rise = MapCanvas.DotDiameter / 2 + 3,
+			},
+		};
+		layer.Attribution.Enabled = false;
+		return layer;
+	}
+}

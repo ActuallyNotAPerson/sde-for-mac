@@ -22,6 +22,7 @@ public sealed class MapSheetTemplates : IDataTemplate
 		[typeof(MoveStructureSheetViewModel)] = () => new MoveStructureSheetView(),
 		[typeof(SelectByLocationSheetViewModel)] = () => new SelectByLocationSheetView(),
 		[typeof(CopyValuesSheetViewModel)] = () => new CopyValuesSheetView(),
+		[typeof(PrintMapSheetViewModel)] = () => new PrintMapSheetView(),
 	};
 
 	public bool Match(object data) => data != null && Views.ContainsKey(data.GetType());
