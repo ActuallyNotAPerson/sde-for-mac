@@ -2,57 +2,59 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
              xmlns:v="using:Sde.App.Views"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.DashboardView"
              x:DataType="vm:DashboardViewModel">
   <UserControl.Resources>
     <!-- One bar: the label, the bar and the numbers in words. The bar is decoration for people who can see it. -->
     <DataTemplate x:Key="BarRow" x:DataType="vm:BarRowViewModel">
-      <Grid ColumnDefinitions="170,*,170" Margin="0,3" AutomationProperties.Name="{Binding SpokenName}">
+      <Grid ColumnDefinitions="170,*,170" Margin="0,4" AutomationProperties.Name="{Binding SpokenName}">
         <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-        <v:StackedBar Grid.Column="1" Height="14" Margin="10,0" Segments="{Binding Segments}" AutomationProperties.AccessibilityView="Raw" />
+        <v:StackedBar Grid.Column="1" Height="12" Margin="10,0" Segments="{Binding Segments}" AutomationProperties.AccessibilityView="Raw" />
         <TextBlock Grid.Column="2" Classes="muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
       </Grid>
     </DataTemplate>
   </UserControl.Resources>
 
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="28,22,28,18" Spacing="14">
-      <Grid ColumnDefinitions="*,Auto">
-        <StackPanel Spacing="2">
-          <TextBlock Classes="h1" Text="Event dashboard" />
-          <TextBlock Classes="secondary" Text="The numbers for every structure in this database, in one place." />
-          <TextBlock Classes="secondary" Text="{Binding Dates}" IsVisible="{Binding HasDates}" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center" Width="260">
-          <TextBlock Classes="eyebrow" Text="EVENT NAME (OPTIONAL)" />
+    <StackPanel Margin="{StaticResource PagePadding}" Spacing="14">
+      <!-- The title band says "Dashboard"; the header says what it covers and takes the event's name -->
+      <c:PageHeader Margin="0">
+        <c:PageHeader.Subtitle>The numbers for every structure in this database, in one place.</c:PageHeader.Subtitle>
+        <StackPanel Classes="field" Width="260" Margin="0">
+          <Panel Classes="fieldHead"><TextBlock Classes="fieldLabel" Text="Event name (optional)" /></Panel>
           <TextBox Text="{Binding EventName}" PlaceholderText="Shown on the summary" AutomationProperties.Name="Event name" />
         </StackPanel>
-      </Grid>
+      </c:PageHeader>
+      <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasDates}" Margin="0,-8,0,0">
+        <c:Icon Kind="Event" Size="14" Classes="tertiary" VerticalAlignment="Center" />
+        <TextBlock Classes="secondary" Text="{Binding Dates}" VerticalAlignment="Center" />
+      </StackPanel>
 
       <!-- Headline numbers -->
       <UniformGrid Columns="4" Margin="-6,0">
-        <Border Classes="card" Margin="6" Padding="16,12" AutomationProperties.Name="{Binding Structures, StringFormat='Structures: {0}'}">
+        <Border Classes="card" Margin="6" AutomationProperties.Name="{Binding Structures, StringFormat='Structures: {0}'}">
           <StackPanel Spacing="2">
             <TextBlock Classes="kpi" Text="{Binding Structures}" />
             <TextBlock Classes="medium" Text="Structures" />
-            <TextBlock Classes="muted" Text="{Binding StructuresNote}" />
+            <TextBlock Classes="muted" Text="{Binding StructuresNote}" TextTrimming="CharacterEllipsis" />
           </StackPanel>
         </Border>
-        <Border Classes="card" Margin="6" Padding="16,12">
+        <Border Classes="card" Margin="6">
           <StackPanel Spacing="2">
             <TextBlock Classes="kpi" Text="{Binding SubstantialText}" Foreground="{DynamicResource StatusSubstantialFg}" />
             <TextBlock Classes="medium" Text="Substantially damaged" />
-            <TextBlock Classes="muted" Text="{Binding SubstantialNote}" />
+            <TextBlock Classes="muted" Text="{Binding SubstantialNote}" TextTrimming="CharacterEllipsis" />
           </StackPanel>
         </Border>
-        <Border Classes="card" Margin="6" Padding="16,12">
+        <Border Classes="card" Margin="6">
           <StackPanel Spacing="2">
             <TextBlock Classes="kpi" Text="{Binding BuildingValue}" />
             <TextBlock Classes="medium" Text="Building value" />
             <TextBlock Classes="muted" Text="Of assessed structures" />
           </StackPanel>
         </Border>
-        <Border Classes="card" Margin="6" Padding="16,12">
+        <Border Classes="card" Margin="6">
           <StackPanel Spacing="2">
             <TextBlock Classes="kpi" Text="{Binding RepairCost}" />
             <TextBlock Classes="medium" Text="Repair cost" />
@@ -64,60 +66,63 @@
       <!-- Reports and GIS files -->
       <Border Classes="card">
         <StackPanel Spacing="10">
-          <TextBlock Classes="h3" Text="Share this event" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Classes="primary" Content="Event summary PDF…" Command="{Binding SummaryPdfCommand}" IsEnabled="{Binding HasAnything}" />
-            <Button Content="GeoPackage for GIS…" Command="{Binding GeoPackageCommand}" IsEnabled="{Binding HasAnything}" />
-            <Button Content="GeoJSON…" Command="{Binding GeoJsonCommand}" IsEnabled="{Binding HasAnything}" />
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h3" Text="Share this event" />
+            <TextBlock Classes="muted" TextWrapping="Wrap"
+                       Text="The GIS files hold one point per assessed structure in latitude and longitude (WGS 84), with a QGIS style file beside them. Structures without coordinates are left out." />
           </StackPanel>
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="The GIS files hold one point per assessed structure in latitude and longitude (WGS 84), with a QGIS style file beside them. Structures without coordinates are left out." />
+          <WrapPanel>
+            <Button Classes="primary" Margin="0,0,8,6" Command="{Binding SummaryPdfCommand}" IsEnabled="{Binding HasAnything}" AutomationProperties.Name="Event summary PDF">
+              <StackPanel Orientation="Horizontal" Spacing="6"><c:Icon Kind="Pdf" Size="14" /><TextBlock Text="Event summary PDF…" /></StackPanel>
+            </Button>
+            <Button Margin="0,0,8,6" Command="{Binding GeoPackageCommand}" IsEnabled="{Binding HasAnything}" AutomationProperties.Name="GeoPackage for GIS">
+              <StackPanel Orientation="Horizontal" Spacing="6"><c:Icon Kind="Layers" Size="14" /><TextBlock Text="GeoPackage for GIS…" /></StackPanel>
+            </Button>
+            <Button Margin="0,0,8,6" Command="{Binding GeoJsonCommand}" IsEnabled="{Binding HasAnything}" AutomationProperties.Name="GeoJSON">
+              <StackPanel Orientation="Horizontal" Spacing="6"><c:Icon Kind="Export" Size="14" /><TextBlock Text="GeoJSON…" /></StackPanel>
+            </Button>
+          </WrapPanel>
           <CheckBox IsChecked="{Binding IncludeOwnerNames}" Content="Include owner names" AutomationProperties.Name="Include owner names in the GIS files" />
-          <Border Classes="subtle" IsVisible="{Binding IncludeOwnerNames}">
-            <TextBlock Text="{Binding OwnerWarning}" TextWrapping="Wrap" Foreground="{DynamicResource StatusCloseFg}" />
-          </Border>
+          <c:Banner Tone="Warning" IsVisible="{Binding IncludeOwnerNames}" Text="{Binding OwnerWarning}" />
           <TextBlock Text="{Binding LastResult}" IsVisible="{Binding HasResult}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
         </StackPanel>
       </Border>
 
       <Border Classes="card" IsVisible="{Binding !HasAnything}">
-        <StackPanel Spacing="4" HorizontalAlignment="Center" Margin="0,30">
-          <TextBlock Classes="h3" Text="No structures yet" HorizontalAlignment="Center" />
-          <TextBlock Classes="secondary" Text="Add or import structures and their assessments, and the numbers appear here." HorizontalAlignment="Center" />
-        </StackPanel>
+        <c:EmptyState Icon="Dashboard" Title="No structures yet" Text="Add or import structures and their assessments, and the numbers appear here." />
       </Border>
 
       <!-- Bars -->
       <StackPanel Spacing="14" IsVisible="{Binding HasAnything}">
         <Grid ColumnDefinitions="*,*">
           <Border Classes="card" Margin="0,0,7,0">
-            <StackPanel Spacing="6">
+            <StackPanel Spacing="8">
               <TextBlock Classes="h3" Text="Results" />
               <ItemsControl ItemsSource="{Binding ByResult}" ItemTemplate="{StaticResource BarRow}" />
             </StackPanel>
           </Border>
           <Border Grid.Column="1" Classes="card" Margin="7,0,0,0">
-            <StackPanel Spacing="6">
+            <StackPanel Spacing="8">
               <TextBlock Classes="h3" Text="Assessed and not yet assessed" />
               <ItemsControl ItemsSource="{Binding Progress}" ItemTemplate="{StaticResource BarRow}" />
             </StackPanel>
           </Border>
         </Grid>
         <Border Classes="card">
-          <StackPanel Spacing="6">
+          <StackPanel Spacing="8">
             <TextBlock Classes="h3" Text="Streets with the most assessments (top 10)" />
             <ItemsControl ItemsSource="{Binding ByStreet}" ItemTemplate="{StaticResource BarRow}" />
           </StackPanel>
         </Border>
         <Grid ColumnDefinitions="*,*">
           <Border Classes="card" Margin="0,0,7,0">
-            <StackPanel Spacing="6">
+            <StackPanel Spacing="8">
               <TextBlock Classes="h3" Text="By community" />
               <ItemsControl ItemsSource="{Binding ByCommunity}" ItemTemplate="{StaticResource BarRow}" />
             </StackPanel>
           </Border>
           <Border Grid.Column="1" Classes="card" Margin="7,0,0,0">
-            <StackPanel Spacing="6">
+            <StackPanel Spacing="8">
               <TextBlock Classes="h3" Text="By inspector" />
               <ItemsControl ItemsSource="{Binding ByInspector}" ItemTemplate="{StaticResource BarRow}" />
             </StackPanel>

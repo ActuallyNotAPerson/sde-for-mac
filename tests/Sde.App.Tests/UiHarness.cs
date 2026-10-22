@@ -74,6 +74,9 @@ public sealed class UiSession : IDisposable
 		Application.Current!.RequestedThemeVariant = theme ?? ThemeVariant.Light;
 		Dialogs = new TestDialogs();
 		Services = new AppServices(Dialogs);
+		// A made-up name: without one, edit history, "deleted by" and locks carry the Mac account's full name, which must
+		// never reach a screenshot in the docs.
+		Services.SetYourName("Reviewer A");
 		Main = new MainViewModel(Services);
 		Window = new MainWindow { DataContext = Main, Width = width, Height = height };
 		Window.Show();

@@ -3,17 +3,15 @@
              xmlns:app="using:Sde.App"
              xmlns:vm="using:Sde.App.ViewModels"
              xmlns:interop="using:Sde.Interop"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.EnterpriseImportView"
              x:DataType="vm:EnterpriseImportViewModel">
   <Border Classes="card">
     <StackPanel Spacing="12">
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h2" Text="Create structures from a parcel spreadsheet" />
-        <TextBlock Classes="muted" TextWrapping="Wrap"
-                   Text="SDE's “Enterprise Import”: turn an assessor's or GIS export (.xlsx or .csv) into structures, one per row, so inspectors start with the address, owner and flood-zone details filled in." />
-      </StackPanel>
-
-      <Button Content="Choose spreadsheet…" Command="{Binding ChooseFileCommand}" IsVisible="{Binding !HasFile}" />
+      <c:CardHeader Icon="Structures" Title="Create structures from a parcel spreadsheet"
+                    Text="SDE's “Enterprise Import”: turn an assessor's or GIS export (.xlsx or .csv) into structures, one per row, so inspectors start with the address, owner and flood-zone details filled in.">
+        <Button Content="Choose spreadsheet…" Command="{Binding ChooseFileCommand}" IsVisible="{Binding !HasFile}" />
+      </c:CardHeader>
 
       <StackPanel Spacing="14" IsVisible="{Binding HasFile}">
         <!-- File, sheet, header row -->

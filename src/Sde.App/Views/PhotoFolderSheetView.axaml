@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.PhotoFolderSheetView"
              x:DataType="sh:PhotoFolderSheetViewModel">
-  <StackPanel Spacing="12" Width="680">
+  <StackPanel Spacing="12">
     <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" />
     <TextBlock Classes="muted" TextWrapping="Wrap"
                Text="Matched by a record ID, parcel number or address in the file name, otherwise by the photo's GPS position (within 40 m). Photos that match no structure, or two structures equally, are left out." />

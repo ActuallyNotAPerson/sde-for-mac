@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
+using Sde.App.Controls;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Sde.App.ViewModels;
@@ -9,6 +11,9 @@ namespace Sde.App.Views;
 public partial class StructuresView : UserControl
 {
 	private StructuresViewModel _subscribed;
+
+	/// <summary>Each column's header text, as written in the view (the sorted one also shows a caret).</summary>
+	private readonly Dictionary<DataGridColumn, string> _headers = new();
 
 	public StructuresView()
 	{
@@ -46,7 +51,7 @@ public partial class StructuresView : UserControl
 		}
 	}
 
-	/// <summary>Shows the chosen columns and marks the sorted one with an arrow.</summary>
+	/// <summary>Shows the chosen columns and marks the sorted one with a caret (up for ascending, down for descending).</summary>
 	private void ApplyColumns()
 	{
 		if (Vm == null)
@@ -61,13 +66,26 @@ public partial class StructuresView : UserControl
 				continue;
 			}
 			c.IsVisible = Vm.IsColumnVisible(key);
-			if (c.Header is string header)
+			if (!_headers.TryGetValue(c, out string text))
 			{
-				string bare = header.TrimEnd(' ', '▲', '▼');
-				c.Header = Vm.SortKey == key ? bare + (Vm.SortDescending ? " ▼" : " ▲") : bare;
+				text = c.Header as string;
+				_headers[c] = text;
 			}
+			c.Header = Vm.SortKey == key ? SortedHeader(text, Vm.SortDescending) : text;
 		}
 	}
+
+	/// <summary>A sorted column's header: its text and a caret in the accent colour.</summary>
+	private static Control SortedHeader(string text, bool descending) => new StackPanel
+	{
+		Orientation = Orientation.Horizontal,
+		Spacing = 4,
+		Children =
+		{
+			new TextBlock { Text = text, Classes = { "sortedHeader" }, VerticalAlignment = VerticalAlignment.Center },
+			new Icon { Kind = descending ? "CaretDown" : "CaretUp", Size = 12, Classes = { "accent" }, VerticalAlignment = VerticalAlignment.Center },
+		},
+	};
 
 	/// <summary>Header clicks sort in the view model (so the list's order is also the order reports print in).</summary>
 	private void OnSorting(object sender, DataGridColumnEventArgs e)

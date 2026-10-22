@@ -1,0 +1,189 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Sde.App.Controls">
+  <!--
+    The assessment editor.
+      Border.editorBar (the strip under the title band: what the structure is, save state and the actions);
+      Border.stepRail with ListBox.steps (each step: Border.stepIcon, title and status; Grid.narrow shows icons only);
+      Border.resultPanel (the live result on the right) with Border.resultCard, ProgressBar.threshold and
+      Border.thresholdTick; Border.dropZone (photos); Border.tableRow (a row of the damage and cost tables) with
+      Button.tick (the 0 to 100 presets under a damage slider).
+  -->
+
+  <!-- The strip under the title band -->
+  <Style Selector="Border.editorBar">
+    <Setter Property="Background" Value="{DynamicResource BgSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="20,0,16,0" />
+    <Setter Property="Height" Value="46" />
+  </Style>
+
+  <!-- The step rail -->
+  <Style Selector="Border.stepRail">
+    <Setter Property="Width" Value="212" />
+    <Setter Property="Background" Value="{DynamicResource BgSidebar}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="0,0,1,0" />
+  </Style>
+  <Style Selector="Grid.narrow Border.stepRail">
+    <Setter Property="Width" Value="64" />
+  </Style>
+  <Style Selector="Grid.narrow StackPanel.stepText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="ListBox.steps">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Margin" Value="10,12" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem">
+    <Setter Property="Padding" Value="8,7" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource BgHover}" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, ListBox.steps ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter, ListBox.steps ListBoxItem:selected:focus /template/ ContentPresenter#PART_ContentPresenter, ListBox.steps ListBoxItem:selected:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+  </Style>
+  <Style Selector="Border.stepIcon">
+    <Setter Property="Width" Value="30" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Background" Value="{DynamicResource BgSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.stepIcon c|Icon">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:selected Border.stepIcon">
+    <Setter Property="Background" Value="{DynamicResource AccentFill}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentFill}" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:selected Border.stepIcon c|Icon">
+    <Setter Property="Foreground" Value="{DynamicResource OnAccent}" />
+  </Style>
+  <Style Selector="ListBox.steps TextBlock.stepTitle">
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+  <Style Selector="ListBox.steps ListBoxItem:selected TextBlock.stepTitle">
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.stepStatus">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.stepStatus.done">
+    <Setter Property="Foreground" Value="{DynamicResource SuccessFg}" />
+  </Style>
+  <Style Selector="TextBlock.stepStatus.check">
+    <Setter Property="Foreground" Value="{DynamicResource WarningFg}" />
+  </Style>
+  <Style Selector="TextBlock.stepStatus.required">
+    <Setter Property="Foreground" Value="{DynamicResource DangerFg}" />
+  </Style>
+  <!-- A dot on the step's icon when something needs attention, for the icons-only rail -->
+  <Style Selector="Ellipse.stepDot">
+    <Setter Property="Width" Value="8" />
+    <Setter Property="Height" Value="8" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Margin" Value="0,-2,-2,0" />
+    <Setter Property="IsVisible" Value="False" />
+    <Setter Property="Stroke" Value="{DynamicResource BgSidebar}" />
+    <Setter Property="StrokeThickness" Value="1.5" />
+  </Style>
+  <Style Selector="Grid.narrow Ellipse.stepDot.check">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Fill" Value="{DynamicResource WarningFg}" />
+  </Style>
+  <Style Selector="Grid.narrow Ellipse.stepDot.required">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Fill" Value="{DynamicResource DangerFg}" />
+  </Style>
+
+  <!-- The live result on the right -->
+  <Style Selector="Border.resultPanel">
+    <Setter Property="Width" Value="300" />
+    <Setter Property="Background" Value="{DynamicResource BgSidebar}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+  </Style>
+  <Style Selector="Border.resultCard">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusCard}" />
+    <Setter Property="Padding" Value="16,14,16,16" />
+  </Style>
+  <Style Selector="ProgressBar.threshold">
+    <Setter Property="Height" Value="8" />
+    <Setter Property="MinHeight" Value="8" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}" />
+    <Setter Property="Background" Value="{DynamicResource BgSurface}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.thresholdTick">
+    <Setter Property="Width" Value="2" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="CornerRadius" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Rows of the editor's tables (damage by element, cost adjustments) -->
+  <Style Selector="Border.tableRow">
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Padding" Value="0,7" />
+  </Style>
+  <Style Selector="Border.tableHead">
+    <Setter Property="Padding" Value="0,4,0,8" />
+  </Style>
+  <Style Selector="Border.tableFoot">
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Padding" Value="0,10,0,0" />
+  </Style>
+
+  <!-- 0, 25, 50, 75, 100 under a damage slider: small, quiet, clickable; left out when the editor is narrow -->
+  <Style Selector="Grid.narrow c|TickPanel">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Button.tick">
+    <Setter Property="Padding" Value="3,0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+    <Setter Property="FontFeatures" Value="+tnum" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.tick /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+  </Style>
+  <Style Selector="Button.tick:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.tick:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+  </Style>
+
+  <!-- Where photos are dropped -->
+  <Style Selector="Border.dropZone">
+    <Setter Property="Background" Value="{DynamicResource BgSubtle}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrong}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusCard}" />
+    <Setter Property="Padding" Value="20,18" />
+  </Style>
+</Styles>

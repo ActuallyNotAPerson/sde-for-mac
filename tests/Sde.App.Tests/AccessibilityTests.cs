@@ -57,7 +57,11 @@ public class AccessibilityTests
 		ui.Main.ShowCommand.Execute(ViewModels.Page.ImportExport);
 		Check("Import & export");
 		ui.Main.ShowCommand.Execute(ViewModels.Page.Settings);
-		Check("Settings");
+		foreach (SettingsCategoryItem category in ui.Main.Settings.Categories)
+		{
+			ui.Main.Settings.SelectedCategory = category;
+			Check("Settings/" + category.Title);
+		}
 
 		// The import page, empty and then with a file, every field group open, values to match and a preview.
 		ui.Main.ShowCommand.Execute(ViewModels.Page.SourceImport);

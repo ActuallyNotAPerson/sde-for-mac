@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.FieldHelpSheetView"
              x:DataType="sh:FieldHelpSheetViewModel">
-  <StackPanel Spacing="12" Width="520">
+  <StackPanel Spacing="12">
     <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
     <TextBlock Classes="muted" Text="{Binding Where}" TextWrapping="Wrap" />
     <TextBlock Classes="secondary" Text="{Binding MissingMessage}" TextWrapping="Wrap" IsVisible="{Binding ManualMissing}" />

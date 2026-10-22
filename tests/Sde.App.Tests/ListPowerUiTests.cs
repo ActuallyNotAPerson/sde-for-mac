@@ -37,7 +37,11 @@ public class ListPowerUiTests
 		Assert.Equal(new[] { "48 Mill Creek Street", "123 River Street", "700 Riverside" }, s.Rows.Select(r => r.Address));
 		ui.Pump();
 		DataGrid grid = ui.Window.GetVisualDescendants().OfType<DataGrid>().Single();
-		Assert.Equal("Structure ▲", grid.Columns.Single(c => c.SortMemberPath == "Address").Header);
+		// The sorted column shows a caret: up for ascending.
+		StackPanel header = Assert.IsType<StackPanel>(grid.Columns.Single(c => c.SortMemberPath == "Address").Header);
+		Assert.Equal("Structure", header.Children.OfType<TextBlock>().Single().Text);
+		Assert.Equal("CaretUp", header.Children.OfType<Sde.App.Controls.Icon>().Single().Kind);
+		Assert.Equal("Damaged", grid.Columns.Single(c => c.SortMemberPath == "Damaged").Header);
 	}
 
 	[AvaloniaFact]

@@ -48,13 +48,18 @@ The sidebar on the left switches between pages:
 | Page | What it's for | Shortcut |
 |---|---|---|
 | **Structures** | The list of every structure with its latest result. This is home. | ⌘1 |
-| **Map** | Every structure on a map, coloured by result. | ⌘4 |
-| **Event dashboard** | Totals for the event, and files to share. | |
-| **Import & export** | Exchanging data with FEMA's SDE, spreadsheets, photos and GIS. | ⌘2 |
-| **Settings** | Your name, default values, the database, letters and other options. | ⌘3 |
-| **Recently deleted** | What you deleted in the last 30 days. | |
+| **Map** | Every structure on a map, coloured by result. | ⌘2 |
+| **Dashboard** | Totals for the event, and files to share. | ⌘3 |
+| **Review** | Assessments waiting for review, and the checks that flag problems. | ⌘4 |
+| **Compliance** | Follow-up on substantially damaged structures: permits, deadlines, ICC claims. | ⌘5 |
+| **Assignments** | Teams and the structures assigned to them. | ⌘6 |
+| **Import & export** | Exchanging data with FEMA's SDE, spreadsheets, photos and GIS. | ⌘7 |
+| **Settings** | Your name, default values, letters, the phone form, backups and other options. | ⌘8 |
+| **Recently deleted** | What you deleted in the last 30 days. | ⌘9 |
 
-The bottom of the sidebar shows which database is open and how many structures and assessments it holds.
+The bar across the top shows where you are (for example **Structures › 123 River Street**; click **Structures** to go
+back), a search field that finds structures, pages and commands (⌘K), and **New**. The top of the sidebar chooses the
+event, and the bottom shows which database is open and how many structures it holds.
 
 ![The Structures list](screenshots/01-structures.png)
 
@@ -67,7 +72,7 @@ you want to be sure before closing the lid.
 - Photos are kept in an `attachments` folder next to the database file.
 - Automatic backups are kept in a `Backups` folder next to the database file.
 
-**Settings > Database** shows the file and the photos folder, each with **Show in Finder**.
+**Settings > Backups** shows the database file and the photos folder, with **Show in Finder**.
 
 ---
 
@@ -75,26 +80,28 @@ you want to be sure before closing the lid.
 Do this once at the start of each event. It takes about ten minutes and saves a lot of typing later.
 
 ### 2.1 Make a database for the event
-1. Choose **File > New Database…** (or **Settings > Database > New empty database…**).
+1. Choose **File > New Database…** (or **Settings > Backups > New empty database…**).
 2. In the save panel, make a new folder named for the event (for example `2026-09 River flood`) and save the database
    inside it. Its photos and backups will go into the same folder, so the whole event stays together.
 3. SDE switches to the new, empty database. To go back to another one, use **File > Open Recent** or **File > Open
    Database…** (⌘O).
 
 ### 2.2 Tell SDE who you are
-1. Open **Settings** (⌘3).
-2. Under **Preferences**, check **Your name**. It starts as your Mac account's name and is shown in each assessment's
+1. Open **Settings** (⌘8). It opens at **General**.
+2. Check **Your name**. It starts as your Mac account's name and is shown in each assessment's
    history next to the changes you make.
 
 ### 2.3 Fill in default values
 Default values are filled into every new structure and assessment, so you type what is the same for every building
 in this event only once (FEMA calls this *Enter Default Data*).
 
-1. In **Settings > Default values**, fill in what is the same for most buildings: for example the community, the
+1. In **Settings > Defaults**, fill in what is the same for most buildings: for example the community, the
    FIRM panel information, the cause and date of the damage, and the cost data. They save as you type.
-2. Turn on **Fill new structures with my default values** under **Preferences**.
+2. Turn on **Fill new structures with my default values** at the top of the same page.
 
 ### 2.4 Optional preferences
+These are in **Settings > General**.
+
 - **Check that latitude and longitude are inside the structure's state**: FEMA's *Lat/Long Validation*. Turn it on to
   catch coordinates typed with a wrong sign or swapped.
 - **Your fields**: three extra fields on every assessment. Name them for what your office tracks, such as *Permit
@@ -105,9 +112,9 @@ in this event only once (FEMA calls this *Enter Default Data*).
 ### 2.5 Things to set up only if you need them
 | If you will… | Set it up in | Guide |
 |---|---|---|
-| Send letters to owners | Settings > Owner letters | [Chapter 11](#11-owner-letters) |
-| Track substantial improvement permits | Settings > Substantial improvement | [Chapter 12](#12-substantial-improvement) |
-| Count damage from several events together | Settings > Cumulative damage | [Chapter 14](#14-cumulative-damage) |
+| Send letters to owners | Settings > Reports & letters | [Chapter 11](#11-owner-letters) |
+| Track substantial improvement permits | Settings > Reports & letters | [Chapter 12](#12-substantial-improvement) |
+| Count damage from several events together | Settings > Reports & letters | [Chapter 14](#14-cumulative-damage) |
 | Use your community's depth-damage table | Settings > Depth tables | [Step 6 in chapter 4](#step-6-damage-by-element) |
 | Let inspectors use phones | Settings > Phone form | [Chapter 15](#15-the-phone-form) |
 
@@ -517,7 +524,7 @@ community's counsel before you send any letters**; the starter text is a plain-E
 advice. Every placeholder is listed in [Owner letters](LETTERS.md).
 
 ### Set up the templates (once)
-1. Open **Settings > Owner letters** and click **Create starter templates**. You get three: *Substantial damage
+1. Open **Settings > Reports & letters** and, under **Owner letters**, click **Create starter templates**. You get three: *Substantial damage
    notice*, *Not substantially damaged notice* and *Substantial improvement determination*.
 2. Click **Show folder** and edit them in Word or Pages (save as `.docx`): your letterhead, your ordinance's
    requirements, how to appeal and by when.
@@ -543,7 +550,7 @@ Substantial improvement (SI) tracking compares the cost of improvement projects 
 It is a separate finding: it never changes a damage assessment, its percent damaged or FEMA's result.
 
 ### Set the rules (once per database)
-In **Settings > Substantial improvement**:
+In **Settings > Reports & letters**, under **Substantial improvement**:
 - **Threshold**: percent of market value (the NFIP minimum is 50 percent; your ordinance may be stricter).
 - **Look-back period** in years. **0** counts each project on its own.
 - Tick **Add earlier projects in the look-back period to the new one** if your ordinance counts improvements
@@ -589,7 +596,8 @@ Some ordinances count damage from several events together. This is **off** unles
 separate finding: each assessment keeps FEMA's own percent damaged and result, and FEMA's reports and exports don't
 change.
 
-1. Open **Settings > Cumulative damage** and tick **Count damage cumulatively**.
+1. Open **Settings > Reports & letters** and, under **Cumulative damage**, turn on **Count damage from several events
+   together**.
 2. Choose the **Method**, the **Look-back period** in years (**0** counts every event on record) and the
    **threshold** your ordinance uses.
 3. An assessment's result panel now also shows the cumulative total over the look-back period. Each event is counted
@@ -632,7 +640,7 @@ SDE backs up the database and its photos into a `Backups` folder next to the dat
 day, and when you quit if anything changed. It keeps the 14 newest. Photos in backups take no extra space.
 
 ### Restoring a backup
-1. Choose **File > Restore from Backup…** (or **Settings > Database > Restore from backup…**).
+1. Choose **File > Restore from Backup…** (or **Settings > Backups > Restore from backup…**).
 2. Pick the backup by its date and time.
 3. SDE backs up the current state first (labelled *before restore*), so a restore can itself be undone, then reopens
    the database.
@@ -703,7 +711,8 @@ adds one.
 | ⌘E | Export everything to an SDE folder |
 | ⌘F | Find (search the list) |
 | ⌘Z / ⇧⌘Z | Undo / redo |
-| ⌘1 / ⌘2 / ⌘3 / ⌘4 | Structures / Import & export / Settings / Map |
+| ⌘1 to ⌘9 | The pages in the sidebar, top to bottom |
+| ⌘K | Search structures, pages and commands |
 | ⌘[ / ⌘] | Previous / next step in the editor |
 | 0 to 4 | On a damage slider: 0, 25, 50, 75 or 100 percent |
 | Return | Open the selected structure |

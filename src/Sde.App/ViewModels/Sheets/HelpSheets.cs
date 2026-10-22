@@ -39,11 +39,18 @@ public abstract partial class ManualSheetViewModel : SheetViewModel
 }
 
 /// <summary>Help, then FEMA SDE User Manual, when the manual PDF is not here: says so and offers FEMA's page.</summary>
-public sealed class ManualMissingSheetViewModel(AppServices app) : ManualSheetViewModel(app, "FEMA SDE User Manual");
+public sealed class ManualMissingSheetViewModel(AppServices app) : ManualSheetViewModel(app, "FEMA SDE User Manual")
+{
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+}
 
-/// <summary>The "?" beside a field: what to enter and why, the manual page, and a button to open the manual there.</summary>
+/// <summary>The info button beside a field: what to enter and why, the manual page, and a button to open the manual there.</summary>
 public sealed partial class FieldHelpSheetViewModel : ManualSheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	public FieldHelpSheetViewModel(AppServices app, FieldHelpEntry entry, string label = null)
 		: base(app, "Help: " + (label ?? entry.Label))
 	{
@@ -64,6 +71,9 @@ public sealed partial class FieldHelpSheetViewModel : ManualSheetViewModel
 /// <summary>Help, then SDE Help: every field's help in one searchable list.</summary>
 public sealed partial class HelpIndexSheetViewModel : ManualSheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	public HelpIndexSheetViewModel(AppServices app)
 		: base(app, "SDE Help")
 	{
@@ -118,6 +128,9 @@ public sealed record WalkthroughPage(string Heading, string Body);
 /// <summary>The walkthrough shown on first launch and from Help: a few short pages with Back and Next.</summary>
 public sealed partial class WalkthroughSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	/// <summary>The result of the sheet when "Open the sample database" was chosen.</summary>
 	public const string OpenSampleResult = "sample";
 

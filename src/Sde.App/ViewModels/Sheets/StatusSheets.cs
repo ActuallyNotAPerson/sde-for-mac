@@ -8,6 +8,9 @@ namespace Sde.App.ViewModels.Sheets;
 /// <summary>Asks why a Final or Letter sent assessment is being reopened (the reason goes into its history).</summary>
 public sealed partial class ReopenSheetViewModel(string address, AssessmentStatus current) : SheetViewModel("Reopen this assessment?")
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Small;
+
 	public string Message => $"{address} is {AssessmentStatuses.Label(current)}. Say why it needs to change; the reason is kept in its history.";
 
 	[ObservableProperty]
@@ -42,6 +45,9 @@ public sealed class HistoryRowViewModel(EditHistoryRecord row)
 /// <summary>Who changed what on an assessment, and when.</summary>
 public sealed class HistorySheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	public HistorySheetViewModel(string address, IEnumerable<EditHistoryRecord> rows)
 		: base("History of " + address)
 	{

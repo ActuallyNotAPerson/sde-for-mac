@@ -23,7 +23,7 @@ deleting, and import and export stay on the Mac.
 
 ### On the Mac
 
-1. Open **Settings** and find **Phone form**.
+1. Open **Settings** and choose **Phone form**.
 2. Press **Start phone form**. SDE shows a QR code, the address phones use (for example `http://192.168.1.20:52814/`) and
    a 6-digit PIN.
 3. The first time, macOS may ask whether SDE may accept incoming network connections, or find devices on your local

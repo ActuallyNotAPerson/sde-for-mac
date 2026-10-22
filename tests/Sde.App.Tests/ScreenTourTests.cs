@@ -47,6 +47,19 @@ public class ScreenTourTests
 		ui.Services.SetYourName("Reviewer A");
 		ui.Main.ShowCommand.Execute(Page.Settings);
 		ui.Snapshot("31-settings");
+		ui.Main.Settings.Show(SettingsCategory.Defaults);
+		ui.Snapshot("31b-settings-defaults");
+		ui.Main.Settings.Show(SettingsCategory.ReportsAndLetters);
+		ui.Snapshot("31c-settings-reports");
+		ui.Main.Settings.Show(SettingsCategory.PhoneForm);
+		ui.Snapshot("31d-settings-phone-form");
+		ui.Main.Settings.Show(SettingsCategory.AiAssistants);
+		ui.Snapshot("31e-settings-placeholder");
+		ui.Main.Settings.Show(SettingsCategory.General);
+
+		// Empty states
+		ui.Main.ShowCommand.Execute(Page.Trash);
+		ui.Snapshot("52b-recently-deleted-empty");
 
 		Assert.True(BindingErrors.Instance.Messages.IsEmpty, string.Join("\n", BindingErrors.Instance.Messages.Distinct().Take(20)));
 	}
@@ -62,6 +75,18 @@ public class ScreenTourTests
 		ui.Main.OpenAssessment(ui.Main.Structures.Rows.First(r => r.Address.StartsWith("48")).AssessmentID!.Value);
 		ui.Main.Editor.SelectedSection = ui.Main.Editor.Sections.OfType<DamageSectionViewModel>().Single();
 		ui.Snapshot("41-dark-editor-damage");
+		ui.Main.Editor.SelectedSection = ui.Main.Editor.Sections[1];
+		ui.Snapshot("42-dark-editor-building");
+		ui.Main.ShowCommand.Execute(Page.Dashboard);
+		ui.Snapshot("43-dark-dashboard");
+		ui.Main.ShowCommand.Execute(Page.ImportExport);
+		ui.Snapshot("44-dark-import-export");
+		ui.Main.ShowCommand.Execute(Page.Settings);
+		ui.Snapshot("45-dark-settings");
+		ui.Main.Settings.Show(SettingsCategory.PhoneForm);
+		ui.Snapshot("45b-dark-settings-phone-form");
+		ui.Main.ShowCommand.Execute(Page.Trash);
+		ui.Snapshot("46-dark-recently-deleted-empty");
 		Assert.True(BindingErrors.Instance.Messages.IsEmpty, string.Join("\n", BindingErrors.Instance.Messages.Distinct().Take(20)));
 	}
 

@@ -348,6 +348,7 @@ public class FieldDataUiTests
 		Assert.Equal(new[] { 0m, 4m }, stored.Rows.Select(r => r.DepthFt));
 		Assert.Equal(DepthTableBuildingType.Residential, stored.BuildingType);
 		ui.Main.ShowCommand.Execute(Page.Settings);
+		ui.Main.Settings.Show(SettingsCategory.DepthTables);
 		ui.Pump();
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
 

@@ -120,6 +120,9 @@ public sealed class ErrorPresenter
 /// <summary>The error sheet: a message, with the technical details folded away.</summary>
 public sealed partial class ErrorSheetViewModel(ErrorDescription error) : SheetViewModel(error.Title)
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	public ErrorDescription Error { get; } = error;
 
 	public string Message => Error.Message;

@@ -30,6 +30,10 @@
     <Setter Property="MinHeight" Value="32" />
     <Setter Property="Padding" Value="12,0,4,0" />
   </Style>
+  <!-- No line between column headers (columns can still be resized at their edges) -->
+  <Style Selector="DataGridColumnHeader /template/ Rectangle#VerticalSeparator">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
   <Style Selector="DataGridColumnHeader:sortascending, DataGridColumnHeader:sortdescending">
     <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
   </Style>
@@ -43,5 +47,27 @@
   </Style>
   <Style Selector="DataGridColumnHeader:sortdescending /template/ Path#SortIcon">
     <Setter Property="Data" Value="{StaticResource IconCaretDown}" />
+  </Style>
+
+  <!-- A cell's text in a template column: the same inset as a text column, one line, trimmed -->
+  <Style Selector="TextBlock.cell">
+    <Setter Property="Margin" Value="12,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+  <!-- A sorted column's header text (the caret beside it comes from the view) -->
+  <Style Selector="TextBlock.sortedHeader">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+
+  <!-- The strip above a table: counts and sort on the left; the "N selected" bar covers it while rows are checked -->
+  <Style Selector="Border.tableBar">
+    <Setter Property="Background" Value="{DynamicResource BgSurface}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderDefault}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="14,0" />
+  </Style>
+  <Style Selector="Border.tableBar.selection">
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
   </Style>
 </Styles>

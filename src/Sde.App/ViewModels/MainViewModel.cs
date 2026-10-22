@@ -148,6 +148,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			item.IsActive = item.Page == active;
 		}
 		OnPropertyChanged(nameof(PageTitle));
+		OnPropertyChanged(nameof(PageParent));
+		OnPropertyChanged(nameof(HasPageParent));
 	}
 
 	partial void OnActivePageChanged(Page value) => UpdateSidebar();
@@ -163,6 +165,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			newValue.PropertyChanged += OnEditorPropertyChanged;
 		}
 		OnPropertyChanged(nameof(PageTitle));
+		OnPropertyChanged(nameof(PageParent));
+		OnPropertyChanged(nameof(HasPageParent));
 	}
 
 	/// <summary>The title band follows the open assessment's address as it is typed.</summary>
@@ -181,6 +185,33 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Page.SourceImport => "Import inspections or parcels",
 		_ => SidebarItems.FirstOrDefault(i => i.Page == SidebarPage(ActivePage))?.Title ?? "Structures",
 	};
+
+	/// <summary>
+	/// The page the title band's breadcrumb leads back to ("Structures" above an open assessment, "Import &amp; export"
+	/// above the import page), or null on a page of its own.
+	/// </summary>
+	public string PageParent => ActivePage switch
+	{
+		Page.Editor when Editor != null => "Structures",
+		Page.SourceImport => "Import & export",
+		_ => null,
+	};
+
+	public bool HasPageParent => PageParent != null;
+
+	/// <summary>The breadcrumb: back to the page this one belongs to (saving the open assessment first).</summary>
+	[RelayCommand]
+	private void GoToParent()
+	{
+		if (ActivePage == Page.Editor && Editor != null)
+		{
+			Editor.CloseCommand.Execute(null);
+		}
+		else if (ActivePage == Page.SourceImport)
+		{
+			Show(Page.ImportExport);
+		}
+	}
 
 	/// <summary>Esc: closes the command palette if it is open, otherwise cancels the sheet on top.</summary>
 	[RelayCommand]

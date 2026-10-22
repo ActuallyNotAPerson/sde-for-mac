@@ -1,26 +1,23 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svc="using:Sde.App.Services"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.PhoneFormPanel"
              x:DataType="svc:PhoneFormService">
   <Border Classes="card">
-    <StackPanel Spacing="10">
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h2" Text="Phone form" />
-        <TextBlock Classes="muted" TextWrapping="Wrap"
-                   Text="Lets inspectors find or add structures, fill in fields and take photos in a phone's web browser, over this Mac's Wi-Fi network. Each change shows in edit history as Phone, with the name typed on the phone. Off until you start it; it stops by itself after 12 hours and when SDE quits." />
-      </StackPanel>
-      <TextBlock Classes="issue recommended" TextWrapping="Wrap" Text="Traffic is not encrypted; use it only on a network you trust." />
+    <StackPanel Spacing="12">
+      <c:CardHeader Icon="Phone" Title="Pair a phone"
+                    Text="Lets inspectors find or add structures, fill in fields and take photos in a phone's web browser, over this Mac's Wi-Fi network. Each change shows in edit history as Phone, with the name typed on the phone. Off until you start it; it stops by itself after 12 hours and when SDE quits.">
+        <Button Classes="primary" Content="Start phone form" Command="{Binding StartCommand}" IsVisible="{Binding IsStopped}" />
+      </c:CardHeader>
+      <c:Banner Tone="Warning" Text="Traffic is not encrypted. Use it only on a network you trust." />
 
       <!-- Stopped -->
-      <StackPanel Spacing="8" IsVisible="{Binding IsStopped}">
-        <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding LastStopped}" IsVisible="{Binding LastStopped, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-        <Button Classes="primary" Content="Start phone form" Command="{Binding StartCommand}" HorizontalAlignment="Left" />
-      </StackPanel>
+      <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding LastStopped}" IsVisible="{Binding LastStopped, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
       <!-- Running -->
       <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsRunning}">
-        <Border Background="{DynamicResource QrBackground}" CornerRadius="8" Padding="8" VerticalAlignment="Top" Margin="0,0,20,0">
+        <Border Background="{DynamicResource QrBackground}" BorderBrush="{DynamicResource BorderDefault}" BorderThickness="1" CornerRadius="10" Padding="10" VerticalAlignment="Top" Margin="0,0,20,0">
           <Image Source="{Binding QrCode}" Width="200" Height="200" RenderOptions.BitmapInterpolationMode="None"
                  AutomationProperties.Name="QR code to pair a phone" />
         </Border>
@@ -28,9 +25,9 @@
           <TextBlock Classes="fieldLabel" Text="Scan the QR code with the phone's camera, or open this address and type the PIN" TextWrapping="Wrap" />
           <SelectableTextBlock Classes="xl semibold" Text="{Binding Address}" AutomationProperties.Name="Phone form address" />
           <TextBlock Classes="fieldLabel" Text="PIN" Margin="0,8,0,0" />
-          <SelectableTextBlock Classes="display bold" Text="{Binding Pin}" FontFamily="Menlo, Consolas, monospace" AutomationProperties.Name="Pairing PIN" />
+          <SelectableTextBlock Classes="display" Text="{Binding Pin}" FontFamily="Menlo, Consolas, monospace" AutomationProperties.Name="Pairing PIN" />
           <TextBlock Classes="muted" TextWrapping="Wrap" Text="The QR code and PIN work once, for 10 minutes; a new one appears after each phone pairs." />
-          <TextBlock Classes="issue required" TextWrapping="Wrap" Text="{Binding PinWarning}" IsVisible="{Binding HasPinWarning}" />
+          <c:Banner Tone="Danger" Text="{Binding PinWarning}" IsVisible="{Binding HasPinWarning}" Margin="0,4,0,0" />
           <TextBlock Classes="secondary" Text="{Binding TimeLeft}" Margin="0,6,0,0" />
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
             <Button Content="New code" Command="{Binding NewCodeCommand}" AutomationProperties.Name="New pairing code" />
@@ -45,13 +42,16 @@
         <ItemsControl ItemsSource="{Binding Phones}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="svc:PairedPhoneViewModel">
-              <DockPanel Margin="0,2">
-                <Button DockPanel.Dock="Right" Content="Revoke" Command="{Binding RevokeCommand}" AutomationProperties.Name="{Binding RevokeLabel}" />
-                <StackPanel VerticalAlignment="Center">
-                  <TextBlock Classes="medium" Text="{Binding Name}" />
-                  <TextBlock Classes="muted" Text="{Binding Details}" />
-                </StackPanel>
-              </DockPanel>
+              <Border Classes="rule" Padding="0,8">
+                <DockPanel>
+                  <Button DockPanel.Dock="Right" Classes="danger" Content="Revoke" Command="{Binding RevokeCommand}" AutomationProperties.Name="{Binding RevokeLabel}" VerticalAlignment="Center" />
+                  <Border Classes="rowIcon" DockPanel.Dock="Left" Margin="0,0,12,0"><c:Icon Kind="Phone" Size="16" /></Border>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Classes="medium" Text="{Binding Name}" />
+                    <TextBlock Classes="muted" Text="{Binding Details}" />
+                  </StackPanel>
+                </DockPanel>
+              </Border>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>

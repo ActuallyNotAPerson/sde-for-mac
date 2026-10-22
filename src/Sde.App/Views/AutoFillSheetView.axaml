@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.AutoFillSheetView"
              x:DataType="sh:AutoFillSheetViewModel">
-  <StackPanel Spacing="12" Width="660">
+  <StackPanel Spacing="12">
     <TextBlock Classes="secondary" TextWrapping="Wrap">
       <Run Text="Coordinates from the U.S. Census Bureau geocoder and flood data from FEMA's National Flood Hazard Layer, for " /><Run Text="{Binding Address}" FontWeight="{StaticResource FontWeightMedium}" /><Run Text="." />
     </TextBlock>

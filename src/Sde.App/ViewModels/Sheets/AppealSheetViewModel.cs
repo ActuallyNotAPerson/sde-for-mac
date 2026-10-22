@@ -76,6 +76,9 @@ public sealed class BidRowViewModel(ContractorBidRecord bid, BidWhatIf whatIf, b
 /// </summary>
 public sealed partial class AppealSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private static readonly CultureInfo Us = CultureInfo.GetCultureInfo("en-US");
 	private readonly AppServices _app;
 	private readonly Guid _assessmentId;

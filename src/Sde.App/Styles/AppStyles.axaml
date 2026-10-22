@@ -1,11 +1,14 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Sde.App.Controls">
   <!--
     Surfaces and forms.
       Border.card (surface, hairline border, 10 px radius, CardPadding); card.flush (no padding, for a table);
       card.compact (CardPaddingCompact); Border.subtle (an inset inside a card); Border.pill (a status pill);
       Border.divider (a 1 px line); Border.rule (a line above its content).
-      StackPanel.field (one labelled input, 240 wide; field.wide 496) with TextBlock.fieldLabel, help and issue.
+      StackPanel.field (one labelled input, 240 wide; field.wide 496) with a fieldHead row (TextBlock.fieldLabel and
+      the help button), help and issue. In an ItemsControl.fields (whose panel is a c:FieldGrid) a field fills its column instead (field.wide, the whole
+      row).
   -->
 
   <!-- Cards and insets -->
@@ -75,7 +78,17 @@
   <Style Selector="StackPanel.field.wide">
     <Setter Property="Width" Value="496" />
   </Style>
+  <!-- Styles follow the logical tree, where an item's parent is its ItemsControl, not the panel: hence the class -->
+  <Style Selector="ItemsControl.fields StackPanel.field, ItemsControl.fields StackPanel.field.wide">
+    <Setter Property="Width" Value="NaN" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+  </Style>
+  <Style Selector=":is(Panel).fieldHead">
+    <Setter Property="MinHeight" Value="18" />
+  </Style>
   <Style Selector="TextBlock.fieldLabel">
+    <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="FontSize" Value="{StaticResource FontSizeFootnote}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
@@ -109,7 +122,36 @@
     <Setter Property="TextAlignment" Value="Right" />
   </Style>
 
+  <!-- Settings rows, in the style of System Settings: a card.flush holding a StackPanel.settingsGroup of rows -->
+  <Style Selector="StackPanel.settingsGroup > Border.settingsRow">
+    <Setter Property="Padding" Value="16,12" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+  </Style>
+  <Style Selector="StackPanel.settingsGroup > Border.settingsRow:nth-last-child(1)">
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
   <!-- Lists -->
+  <!-- A row of a plain list in a card.flush (Recently deleted, database backups): an icon, two lines, actions -->
+  <Style Selector="Border.listRow">
+    <Setter Property="Padding" Value="16,12" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+  </Style>
+  <Style Selector="Border.rowIcon">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Background" Value="{DynamicResource BgSubtle}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.rowIcon c|Icon">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
   <Style Selector="ListBox.rows">
     <Setter Property="Background" Value="Transparent" />
   </Style>
@@ -119,17 +161,6 @@
   </Style>
   <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter">
     <Setter Property="Background" Value="{DynamicResource SelectedRow}" />
-  </Style>
-  <Style Selector="ListBox.steps">
-    <Setter Property="Background" Value="Transparent" />
-  </Style>
-  <Style Selector="ListBox.steps ListBoxItem">
-    <Setter Property="Padding" Value="10,8" />
-    <Setter Property="Margin" Value="0,1" />
-    <Setter Property="CornerRadius" Value="8" />
-  </Style>
-  <Style Selector="ListBox.steps ListBoxItem:selected /template/ ContentPresenter">
-    <Setter Property="Background" Value="{DynamicResource BgSurface}" />
   </Style>
 
   <!-- Accessibility: macOS exposes the text box inside a NumericUpDown / CalendarDatePicker, not the control itself,

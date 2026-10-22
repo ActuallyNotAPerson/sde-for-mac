@@ -2,40 +2,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
              xmlns:v="using:Sde.App.Views"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.ImportExportView"
              x:DataType="vm:ImportExportViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="28,22,28,28" Spacing="16" MaxWidth="1000" HorizontalAlignment="Left">
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h1" Text="Import &amp; export" />
-        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                   Text="Exchange data with FEMA's SDE (Windows), your state, and other tools. Exports in SDE format can be imported by FEMA's SDE 3.0." />
-      </StackPanel>
+    <StackPanel Margin="{StaticResource PagePadding}" Spacing="14" MaxWidth="1000" HorizontalAlignment="Left">
+      <!-- The title band says "Import & export"; the header says what it is for -->
+      <c:PageHeader Margin="0" Subtitle="Exchange data with FEMA's SDE (Windows), your state, and other tools. Exports in SDE format can be imported by FEMA's SDE 3.0." />
 
       <!-- What the last action did -->
-      <Border Classes="subtle" Padding="12,8" IsVisible="{Binding LastResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-        <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" />
-          <Button Grid.Column="1" Classes="link" Content="Dismiss" Command="{Binding DismissResultCommand}" />
-        </Grid>
-      </Border>
+      <c:Banner Tone="Info" Text="{Binding LastResult}" IsVisible="{Binding LastResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                AutomationProperties.LiveSetting="Polite">
+        <Button Classes="link" Content="Dismiss" Command="{Binding DismissResultCommand}" />
+      </c:Banner>
 
       <!-- SDE exchange -->
       <Border Classes="card">
         <StackPanel Spacing="12">
-          <StackPanel Spacing="2">
-            <TextBlock Classes="h2" Text="FEMA SDE data" />
-            <TextBlock Classes="muted" TextWrapping="Wrap" Text="The same format as SDE's “Export SDE data” / “Import SDE data”: a folder with Export.json and the photos." />
-          </StackPanel>
+          <c:CardHeader Icon="ImportExport" Title="FEMA SDE data"
+                        Text="The same format as SDE's “Export SDE data” and “Import SDE data”: a folder with Export.json and the photos." />
           <Grid ColumnDefinitions="*,*" >
-            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+            <Border Classes="subtle" Margin="0,0,6,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Export" />
                 <TextBlock Classes="muted" TextWrapping="Wrap" Text="Everything in this database. To export only some structures, check them on the Structures page and use Export." />
-                <Button Classes="primary" Content="Export all to an SDE folder…" Command="{Binding ExportAllCommand}" />
+                <Button Classes="primary" Content="Export all to an SDE folder…" Command="{Binding ExportAllCommand}" HorizontalAlignment="Left" />
               </StackPanel>
             </Border>
-            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+            <Border Grid.Column="1" Classes="subtle" Margin="6,0,0,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Import" />
                 <TextBlock Classes="muted" TextWrapping="Wrap" Text="You'll see what's inside before anything is added. You can also drop a folder or .mdb file on this page." />
@@ -92,44 +86,33 @@
 
       <!-- Inspections or parcels from another system -->
       <Border Classes="card">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Spacing="2" Margin="0,0,16,0">
-            <TextBlock Classes="h2" Text="Inspections or parcels" />
-            <TextBlock Classes="muted" TextWrapping="Wrap"
-                       Text="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures (.xlsx, .xls, .csv or .dbf). Import an updated file at any time: only what changed in it is updated, and your edits in SDE are kept." />
-          </StackPanel>
-          <Button Grid.Column="1" Classes="primary" Content="Import inspections or parcels…" Command="{Binding OpenSourceImportCommand}" VerticalAlignment="Center" />
-        </Grid>
+        <c:CardHeader Icon="Table" Title="Inspections or parcels"
+                      Text="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures (.xlsx, .xls, .csv or .dbf). Import an updated file at any time: only what changed in it is updated, and your edits in SDE are kept.">
+          <Button Classes="primary" Content="Import inspections or parcels…" Command="{Binding OpenSourceImportCommand}" />
+        </c:CardHeader>
       </Border>
 
       <!-- A folder of field photos -->
       <Border Classes="card">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Spacing="2" Margin="0,0,16,0">
-            <TextBlock Classes="h2" Text="Photos from the field" />
-            <TextBlock Classes="muted" TextWrapping="Wrap"
-                       Text="Attach a folder of photos to the right structures: by a record ID, parcel number or address in each file name, or by the photo's GPS position. You'll see every match before anything is attached." />
-          </StackPanel>
-          <Button Grid.Column="1" Content="Match a photo folder to structures…" Command="{Binding MatchPhotoFolderCommand}" VerticalAlignment="Center" />
-        </Grid>
+        <c:CardHeader Icon="Camera" Title="Photos from the field"
+                      Text="Attach a folder of photos to the right structures: by a record ID, parcel number or address in each file name, or by the photo's GPS position. You'll see every match before anything is attached.">
+          <Button Content="Match a photo folder to structures…" Command="{Binding MatchPhotoFolderCommand}" />
+        </c:CardHeader>
       </Border>
 
       <!-- Spreadsheets and maps -->
       <Border Classes="card">
         <StackPanel Spacing="12">
-          <StackPanel Spacing="2">
-            <TextBlock Classes="h2" Text="Spreadsheets &amp; maps" />
-            <TextBlock Classes="muted" TextWrapping="Wrap" Text="For your own analysis, your GIS, or sharing results with people who don't use SDE." />
-          </StackPanel>
+          <c:CardHeader Icon="Layers" Title="Spreadsheets &amp; maps" Text="For your own analysis, your GIS, or sharing results with people who don't use SDE." />
           <Grid ColumnDefinitions="*,*">
-            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+            <Border Classes="subtle" Margin="0,0,6,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Excel" />
                 <TextBlock Classes="muted" TextWrapping="Wrap" Text="Every assessment as one row, with the same 218 columns as SDE's “Export to Excel”." />
                 <Button Content="Export to Excel…" Command="{Binding ExportExcelCommand}" />
               </StackPanel>
             </Border>
-            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+            <Border Grid.Column="1" Classes="subtle" Margin="6,0,0,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Google Earth map" />
                 <TextBlock Classes="muted" TextWrapping="Wrap" Text="A pin for each assessment, coloured by % damaged. Structures need a latitude and longitude." />
@@ -188,13 +171,10 @@
       <!-- Settings file -->
       <Border Classes="card">
         <StackPanel Spacing="12">
-          <StackPanel Spacing="2">
-            <TextBlock Classes="h2" Text="Share your setup" />
-            <TextBlock Classes="muted" TextWrapping="Wrap"
-                       Text="Give colleagues your saved notes, spreadsheet mappings and default values (e.g. your community's details). Uses SDE's user-settings file, so it also works with FEMA's SDE." />
-          </StackPanel>
+          <c:CardHeader Icon="Settings" Title="Share your setup"
+                        Text="Give colleagues your saved notes, spreadsheet mappings and default values (for example your community's details). Uses SDE's user-settings file, so it also works with FEMA's SDE." />
           <Grid ColumnDefinitions="*,*">
-            <Border Classes="subtle" Margin="0,0,8,0" Padding="14">
+            <Border Classes="subtle" Margin="0,0,6,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Export" />
                 <CheckBox Content="Saved notes" IsChecked="{Binding SettingsIncludeNotes}" />
@@ -203,7 +183,7 @@
                 <Button Content="Save settings file…" Command="{Binding ExportSettingsFileCommand}" />
               </StackPanel>
             </Border>
-            <Border Grid.Column="1" Classes="subtle" Margin="8,0,0,0" Padding="14">
+            <Border Grid.Column="1" Classes="subtle" Margin="6,0,0,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Import" />
                 <TextBlock Classes="muted" TextWrapping="Wrap" Text="Notes and mappings are added to yours. Default values replace yours; you'll be asked first." />
