@@ -1,0 +1,47 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Tables (DataGrid, on top of its Fluent theme): rows at least 34 px (TableRowHeight), body text with tabular numbers,
+    a quiet 12 px header on the surface colour (in dark mode too), a caret for the sorted column, hover and selection in
+    the tokens' colours, and hairline row separators when GridLinesVisibility shows them.
+  -->
+
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="TextElement.FontFeatures" Value="+tnum" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderSubtle}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource BorderSubtle}" />
+  </Style>
+
+  <Style Selector="DataGridCell">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="MinHeight" Value="{StaticResource TableRowHeight}" />
+  </Style>
+  <!-- A cell's focus shows as the row's selection; no extra box -->
+  <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeFootnote}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="12,0,4,0" />
+  </Style>
+  <Style Selector="DataGridColumnHeader:sortascending, DataGridColumnHeader:sortdescending">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="DataGridColumnHeader /template/ Path#SortIcon">
+    <Setter Property="Height" Value="10" />
+    <Setter Property="Width" Value="10" />
+    <Setter Property="Fill" Value="{DynamicResource Accent}" />
+  </Style>
+  <Style Selector="DataGridColumnHeader:sortascending /template/ Path#SortIcon">
+    <Setter Property="Data" Value="{StaticResource IconCaretUp}" />
+  </Style>
+  <Style Selector="DataGridColumnHeader:sortdescending /template/ Path#SortIcon">
+    <Setter Property="Data" Value="{StaticResource IconCaretDown}" />
+  </Style>
+</Styles>

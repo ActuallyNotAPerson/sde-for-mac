@@ -19,10 +19,10 @@
               <DataTemplate x:DataType="vm:DeletedItemViewModel">
                 <Grid ColumnDefinitions="110,*,Auto" Margin="16,10">
                   <Border Classes="pill" Background="{DynamicResource SubtleBg}" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <TextBlock Text="{Binding Kind}" FontSize="12" />
+                    <TextBlock Classes="sm" Text="{Binding Kind}" />
                   </Border>
                   <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
-                    <TextBlock Text="{Binding Label}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="medium" Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
                     <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
                       <Run Text="{Binding When}" /><Run Text=" · " /><Run Text="{Binding DaysLeft}" />
                     </TextBlock>

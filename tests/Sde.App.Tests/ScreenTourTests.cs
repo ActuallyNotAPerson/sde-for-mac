@@ -43,6 +43,8 @@ public class ScreenTourTests
 
 		ui.Main.ShowCommand.Execute(Page.ImportExport);
 		ui.Snapshot("30-import-export");
+		// A made-up name: without one the field shows the Mac account's full name, which must never reach the docs.
+		ui.Services.SetYourName("Reviewer A");
 		ui.Main.ShowCommand.Execute(Page.Settings);
 		ui.Snapshot("31-settings");
 

@@ -20,8 +20,7 @@
             <Grid ColumnDefinitions="30,1.4*,1.4*,1.6*,60" Margin="0,3">
               <CheckBox IsChecked="{Binding Include}" IsEnabled="{Binding CanInclude}" AutomationProperties.Name="{Binding IncludeLabel}" />
               <TextBlock Grid.Column="1" Text="{Binding FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
-              <TextBlock Grid.Column="2" Text="{Binding Structure}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"
-                         FontWeight="Medium" Classes.muted="{Binding IsProblem}" />
+              <TextBlock Classes="medium" Grid.Column="2" Text="{Binding Structure}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" Classes.muted="{Binding IsProblem}" />
               <TextBlock Grid.Column="3" Text="{Binding Reason}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0"
                          Classes="secondary" Classes.issue="{Binding IsProblem}" Classes.recommended="{Binding IsProblem}" />
               <TextBlock Grid.Column="4" Text="{Binding Distance}" Classes="muted" VerticalAlignment="Center" TextAlignment="Right" />

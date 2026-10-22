@@ -21,7 +21,7 @@
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Spacing="8">
               <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Classes="semibold" Text="{Binding FileName}" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding TableSummary}" Classes="muted" VerticalAlignment="Center" />
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="16">
@@ -101,7 +101,7 @@
             <TextBlock Classes="h3" Text="What will be created" />
             <TextBlock Text="{Binding MappingProblems}" Classes="issue required" TextWrapping="Wrap"
                        IsVisible="{Binding MappingProblems, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{Binding PreviewSummary}" FontWeight="SemiBold" />
+            <TextBlock Classes="semibold" Text="{Binding PreviewSummary}" />
             <Grid ColumnDefinitions="30,44,2.2*,1.4*,2*">
               <TextBlock Grid.Column="1" Classes="eyebrow" Text="ROW" />
               <TextBlock Grid.Column="2" Classes="eyebrow" Text="ADDRESS" />

@@ -4,7 +4,7 @@
              x:Class="Sde.App.Views.OwnerLettersSheetView"
              x:DataType="sh:OwnerLettersSheetViewModel">
   <StackPanel Spacing="12" Width="660">
-    <TextBlock Text="{Binding CountText}" FontWeight="Medium" TextWrapping="Wrap" />
+    <TextBlock Classes="medium" Text="{Binding CountText}" TextWrapping="Wrap" />
     <ItemsControl ItemsSource="{Binding Kinds}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="sh:LetterKindRowViewModel">
@@ -26,7 +26,7 @@
     <Border Classes="subtle">
       <StackPanel Spacing="6">
         <TextBlock Classes="h3" Text="From" />
-        <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap" Text="Filled into the letters and remembered for this database. A community name left blank uses each structure's NFIP community name." />
+        <TextBlock Classes="muted xs" TextWrapping="Wrap" Text="Filled into the letters and remembered for this database. A community name left blank uses each structure's NFIP community name." />
         <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4">
           <TextBlock Classes="fieldLabel" Text="Community" />
           <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Office" />
@@ -46,9 +46,9 @@
       </StackPanel>
     </Border>
 
-    <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap"
+    <TextBlock Classes="muted xs" TextWrapping="Wrap"
                Text="The letters use FEMA's result for each assessment. Review the templates with your community's counsel before sending any letters." />
-    <TextBlock Text="{Binding ResultText}" FontWeight="Medium" TextWrapping="Wrap" IsVisible="{Binding ResultText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <TextBlock Classes="medium" Text="{Binding ResultText}" TextWrapping="Wrap" IsVisible="{Binding ResultText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
     <TextBlock Text="{Binding WarningText}" Foreground="{DynamicResource RequiredFg}" TextWrapping="Wrap" IsVisible="{Binding WarningText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
     <DockPanel>
       <Button DockPanel.Dock="Left" Content="Mark as sent…" Command="{Binding MarkSentCommand}" IsVisible="{Binding HasWritten}"

@@ -25,15 +25,15 @@
       <Border Classes="card">
         <StackPanel Spacing="10">
           <TextBlock Classes="h2" Text="Preferences" />
-          <StackPanel Classes="field">
+          <StackPanel Classes="field" Width="320">
             <TextBlock Classes="fieldLabel" Text="Your name" />
-            <TextBox Text="{Binding YourName}" Width="320" HorizontalAlignment="Left" AutomationProperties.Name="Your name, shown in edit history" />
+            <TextBox Text="{Binding YourName}" AutomationProperties.Name="Your name, shown in edit history" />
             <TextBlock Classes="help" Text="Shown in each assessment's history next to the changes you make." />
           </StackPanel>
           <ToggleSwitch IsChecked="{Binding UseDefaults}" OnContent="" OffContent="">
             <ToggleSwitch.Content>
               <StackPanel>
-                <TextBlock Text="Fill new structures with my default values" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Fill new structures with my default values" />
                 <TextBlock Classes="muted" Text="Saves typing when assessing many buildings after one event." />
               </StackPanel>
             </ToggleSwitch.Content>
@@ -41,7 +41,7 @@
           <ToggleSwitch IsChecked="{Binding CheckLatLong}" OnContent="" OffContent="">
             <ToggleSwitch.Content>
               <StackPanel>
-                <TextBlock Text="Check that latitude and longitude are inside the structure's state" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Check that latitude and longitude are inside the structure's state" />
                 <TextBlock Classes="muted" Text="FEMA's “Lat/Long Validation”." />
               </StackPanel>
             </ToggleSwitch.Content>

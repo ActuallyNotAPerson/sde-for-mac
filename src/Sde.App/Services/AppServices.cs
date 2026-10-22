@@ -17,6 +17,12 @@ public interface IDialogs
 
 	void Notify(string title, string message, bool isError = false);
 
+	/// <summary>
+	/// A message with one action, such as "Undo", which runs <paramref name="action"/>. The window shows it as a toast
+	/// with a button; where there are no toasts (the tests' dialogs) it is an ordinary <see cref="Notify(string, string, bool)"/>.
+	/// </summary>
+	void Notify(string title, string message, string actionText, Action action, bool isError = false) => Notify(title, message, isError);
+
 	/// <summary>Opens a file with its default app (e.g. a PDF in Preview).</summary>
 	void Open(string path);
 

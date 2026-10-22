@@ -319,7 +319,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		bool Flood() => Assessment.CauseofDamageID is LookupIds.CauseFlood or LookupIds.CauseFloodAndWind;
 
 		// 1. Location & owner
-		SectionViewModel location = AddSection(new SectionViewModel(this, "Location & owner", "Where is the building and who owns it?", "⌂"));
+		SectionViewModel location = AddSection(new SectionViewModel(this, "Location & owner", "Where is the building and who owns it?", "MapPin"));
 		location.Groups.Add(new FieldGroupViewModel("Structure address", "Shared by every assessment of this building.", new FieldViewModel[]
 		{
 			PText("Street number", nameof(PropertyRecord.StreetNumber)),
@@ -361,7 +361,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		}));
 
 		// 2. Building
-		SectionViewModel building = AddSection(new SectionViewModel(this, "Building", "What kind of building is it?", "▤"));
+		SectionViewModel building = AddSection(new SectionViewModel(this, "Building", "What kind of building is it?", "Building"));
 		bool Res() => Property.StructureTypeID == 1;
 		bool NonRes() => Property.StructureTypeID == 2;
 		building.Groups.Add(new FieldGroupViewModel("Type", "These choices pick FEMA's cost breakdown for the building.", new FieldViewModel[]
@@ -393,7 +393,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		}));
 
 		// 3. Inspection & damage event
-		SectionViewModel inspection = AddSection(new SectionViewModel(this, "Inspection", "Who inspected, when, and what caused the damage", "✎"));
+		SectionViewModel inspection = AddSection(new SectionViewModel(this, "Inspection", "Who inspected, when, and what caused the damage", "Clipboard"));
 		inspection.Groups.Add(new FieldGroupViewModel("Inspection", null, new FieldViewModel[]
 		{
 			AText("Inspector", nameof(AssessmentRecord.InspectorName)),
@@ -417,7 +417,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		}));
 
 		// 4. Flood zone
-		SectionViewModel nfip = AddSection(new SectionViewModel(this, "Flood zone", "NFIP community and FIRM information", "≈"));
+		SectionViewModel nfip = AddSection(new SectionViewModel(this, "Flood zone", "NFIP community and FIRM information", "Flood"));
 		nfip.Groups.Add(new FieldGroupViewModel("NFIP community", null, new FieldViewModel[]
 		{
 			Track(new TextFieldViewModel("NFIP community ID", P, pt, nameof(PropertyRecord.NFIPCID)) { MaxLength = 6, Placeholder = "6 digits" }),

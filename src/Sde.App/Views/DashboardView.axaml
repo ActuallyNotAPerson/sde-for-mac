@@ -33,29 +33,29 @@
       <UniformGrid Columns="4" Margin="-6,0">
         <Border Classes="card" Margin="6" Padding="16,12" AutomationProperties.Name="{Binding Structures, StringFormat='Structures: {0}'}">
           <StackPanel Spacing="2">
-            <TextBlock Text="{Binding Structures}" FontSize="26" FontWeight="SemiBold" />
-            <TextBlock Text="Structures" FontWeight="Medium" />
+            <TextBlock Classes="kpi" Text="{Binding Structures}" />
+            <TextBlock Classes="medium" Text="Structures" />
             <TextBlock Classes="muted" Text="{Binding StructuresNote}" />
           </StackPanel>
         </Border>
         <Border Classes="card" Margin="6" Padding="16,12">
           <StackPanel Spacing="2">
-            <TextBlock Text="{Binding SubstantialText}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource StatusSubstantialFg}" />
-            <TextBlock Text="Substantially damaged" FontWeight="Medium" />
+            <TextBlock Classes="kpi" Text="{Binding SubstantialText}" Foreground="{DynamicResource StatusSubstantialFg}" />
+            <TextBlock Classes="medium" Text="Substantially damaged" />
             <TextBlock Classes="muted" Text="{Binding SubstantialNote}" />
           </StackPanel>
         </Border>
         <Border Classes="card" Margin="6" Padding="16,12">
           <StackPanel Spacing="2">
-            <TextBlock Text="{Binding BuildingValue}" FontSize="26" FontWeight="SemiBold" />
-            <TextBlock Text="Building value" FontWeight="Medium" />
+            <TextBlock Classes="kpi" Text="{Binding BuildingValue}" />
+            <TextBlock Classes="medium" Text="Building value" />
             <TextBlock Classes="muted" Text="Of assessed structures" />
           </StackPanel>
         </Border>
         <Border Classes="card" Margin="6" Padding="16,12">
           <StackPanel Spacing="2">
-            <TextBlock Text="{Binding RepairCost}" FontSize="26" FontWeight="SemiBold" />
-            <TextBlock Text="Repair cost" FontWeight="Medium" />
+            <TextBlock Classes="kpi" Text="{Binding RepairCost}" />
+            <TextBlock Classes="medium" Text="Repair cost" />
             <TextBlock Classes="muted" Text="Of assessed structures" />
           </StackPanel>
         </Border>

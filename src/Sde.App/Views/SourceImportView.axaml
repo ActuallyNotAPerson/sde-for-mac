@@ -2,11 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:Sde.App"
              xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.SourceImportView"
              x:DataType="vm:SourceImportViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="28,18,28,28" Spacing="16" MaxWidth="1120" HorizontalAlignment="Left">
-      <Button Classes="subtle" Content="‹ Import &amp; export" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="-10,0,0,0" />
+      <Button Classes="subtle" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="-10,0,0,0" AutomationProperties.Name="Back to Import and export">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Icon Kind="CaretLeft" Size="14" />
+          <TextBlock Text="Import &amp; export" />
+        </StackPanel>
+      </Button>
       <StackPanel Spacing="2">
         <TextBlock Classes="h1" Text="Import inspections or parcels" />
         <TextBlock Classes="secondary" TextWrapping="Wrap"
@@ -31,7 +37,7 @@
               <StackPanel Spacing="2">
                 <TextBlock Classes="h2" Text="1. The file" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                  <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" />
+                  <TextBlock Classes="semibold" Text="{Binding FileName}" />
                   <TextBlock Text="{Binding TableSummary}" Classes="muted" VerticalAlignment="Center" />
                 </StackPanel>
               </StackPanel>
@@ -44,7 +50,7 @@
             <Border Classes="subtle" Padding="14">
               <StackPanel Spacing="8">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="Profile" VerticalAlignment="Center" FontWeight="Medium" />
+                  <TextBlock Classes="medium" Text="Profile" VerticalAlignment="Center" />
                   <ComboBox ItemsSource="{Binding SavedProfiles}" SelectedItem="{Binding SelectedProfile}" MinWidth="220" PlaceholderText="None saved yet" AutomationProperties.Name="Saved profile" />
                   <TextBlock Text="Save as" VerticalAlignment="Center" Classes="secondary" Margin="8,0,0,0" />
                   <TextBox Text="{Binding ProfileName}" Width="200" AutomationProperties.Name="Profile name" />
@@ -78,7 +84,7 @@
               <TextBlock Classes="muted" TextWrapping="Wrap" Text="The source and record ID link each assessment or structure to its record. With an inspection ID too, every inspection of a record becomes its own assessment." />
             </StackPanel>
             <Grid ColumnDefinitions="170,320,40,170,320" RowDefinitions="Auto,Auto" RowSpacing="10">
-              <TextBlock Text="Source" VerticalAlignment="Center" FontWeight="Medium" />
+              <TextBlock Classes="medium" Text="Source" VerticalAlignment="Center" />
               <TextBox Grid.Column="1" Text="{Binding SourceName}" PlaceholderText="e.g. Permits, County assessor"
                        ToolTip.Tip="The system or list the file comes from. It's shown next to each record ID and keeps two sources' record IDs apart."
                        AutomationProperties.Name="Source name" />
@@ -111,7 +117,7 @@
               <ComboBox Grid.Column="4" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding FilterColumn}" HorizontalAlignment="Stretch"
                         ToolTip.Tip="For example Inspection Type, to leave out other kinds of inspection" AutomationProperties.Name="Filter column" />
 
-              <TextBlock Grid.Row="1" Text="Record ID" VerticalAlignment="Center" FontWeight="Medium" />
+              <TextBlock Classes="medium" Grid.Row="1" Text="Record ID" VerticalAlignment="Center" />
               <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding RecordIdColumn}" HorizontalAlignment="Stretch" AutomationProperties.Name="Record ID column" />
               <TextBlock Grid.Row="1" Grid.Column="3" Text="Inspection ID" VerticalAlignment="Center" IsVisible="{Binding IsInspectionsMode}" />
               <ComboBox Grid.Row="1" Grid.Column="4" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding InspectionIdColumn}" HorizontalAlignment="Stretch"
@@ -214,7 +220,7 @@
                 <DataTemplate x:DataType="vm:SourceValueRowViewModel">
                   <Grid ColumnDefinitions="200,240,130,*" ColumnSpacing="10" Margin="0,3">
                     <TextBlock Text="{Binding FieldLabel}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Column="1" Text="{Binding Text}" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="medium" Grid.Column="1" Text="{Binding Text}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Column="2" Text="{Binding CountText}" Classes="muted" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="3" ItemsSource="{Binding Choices}" SelectedItem="{Binding Choice}" IsVisible="{Binding HasChoices}" MinWidth="300"
                               AutomationProperties.Name="{Binding AccessibleName}" />
@@ -239,13 +245,13 @@
                        IsVisible="{Binding MappingProblems, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             <Border Classes="subtle" Padding="14,10" IsVisible="{Binding NeedsBuildingValueConfirmation}">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                <TextBlock Text="{Binding BuildingValueQuestion}" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="{Binding BuildingValueQuestion}" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Content="Confirm building value…" Command="{Binding ConfirmBuildingValueCommand}" />
               </Grid>
             </Border>
             <TextBlock Text="{Binding ShapeNotes}" Classes="issue recommended" TextWrapping="Wrap"
                        IsVisible="{Binding ShapeNotes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{Binding PreviewSummary}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Classes="semibold" Text="{Binding PreviewSummary}" TextWrapping="Wrap" />
             <Grid ColumnDefinitions="30,190,1.4*,150,270,1.6*" ColumnSpacing="8">
               <TextBlock Grid.Column="1" Classes="eyebrow" Text="RECORD ID" />
               <TextBlock Grid.Column="2" Classes="eyebrow" Text="STRUCTURE" />
@@ -265,7 +271,7 @@
                     <TextBlock Grid.Column="3" Text="{Binding Status}" Classes="secondary" VerticalAlignment="Top" Margin="0,4,0,0" />
                     <Border Grid.Column="4" Classes="pill" VerticalAlignment="Top" HorizontalAlignment="Left"
                             app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
-                      <TextBlock Text="{Binding Result}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis"
+                      <TextBlock Classes="sm medium" Text="{Binding Result}" TextTrimming="CharacterEllipsis"
                                  app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
                     </Border>
                     <TextBlock Grid.Column="5" Text="{Binding Note}" Classes="issue" Classes.required="{Binding IsProblem}" Classes.recommended="{Binding !IsProblem}"
@@ -278,7 +284,7 @@
             <!-- What the last import did -->
             <Border Classes="subtle" Padding="14,10" IsVisible="{Binding HasResult}">
               <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Classes="primary" Content="{Binding ReviewText}" Command="{Binding ReviewCommand}" />
               </Grid>
             </Border>

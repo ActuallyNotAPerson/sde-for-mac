@@ -12,6 +12,7 @@ public partial class App : Application
 {
 	private MainViewModel _main;
 
+	/// <summary>The application menu's About and Settings…: the Settings page (it shows the version).</summary>
 	private void OnAboutClicked(object sender, EventArgs e) => _main?.ShowCommand.Execute(Page.Settings);
 
 	public override void Initialize() => AvaloniaXamlLoader.Load(this);

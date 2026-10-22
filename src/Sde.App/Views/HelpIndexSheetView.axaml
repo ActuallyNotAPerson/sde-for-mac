@@ -14,7 +14,7 @@
         <ListBox.ItemTemplate>
           <DataTemplate DataType="help:FieldHelpEntry">
             <StackPanel Margin="2">
-              <TextBlock Text="{Binding Label}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="medium" Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
               <TextBlock Classes="muted" Text="{Binding Step}" TextTrimming="CharacterEllipsis" />
             </StackPanel>
           </DataTemplate>
