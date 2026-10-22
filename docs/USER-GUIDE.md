@@ -462,7 +462,7 @@ sheet and worksheets. With an event chosen in the sidebar, it shows that event's
    many are assigned, assessed and done.
 6. To take structures off a team, tick them and click **Take the ticked structures off the team…**.
 
-![Assignments](screenshots/113-assignments.png)
+![Assignments](screenshots/115-assignments.png)
 
 ---
 

@@ -67,7 +67,7 @@ public class AssignmentsUiTests
 		Assert.Equal(AssignmentStatuses.Done, ui.Store.GetAssignment(first.Stop.Assignment.AssignmentID).Status);
 		Assert.Contains("1 done", page.SelectedTeam.ProgressText);
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
-		ui.Snapshot("113-assignments");
+		ui.Snapshot("115-assignments");
 
 		// The route sheet as a PDF.
 		string pdf = Path.Combine(ui.Folder, "route.pdf");
