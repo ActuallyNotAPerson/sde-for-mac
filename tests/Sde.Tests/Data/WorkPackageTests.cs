@@ -134,6 +134,25 @@ public class WorkPackageTests
 	}
 
 	[Fact]
+	public void CheckingIn_RefusesAnAssessmentAnOlderAppChangedAtTheOffice()
+	{
+		using Trip trip = new Trip();
+		WorkPackages.CheckOut(trip.Office.Store, new[] { trip.Id }, trip.OutPath, "Team 1");
+		// SDE for Mac 2.0 knows nothing of check-outs or version numbers: it saves the row and sets LastUpdate.
+		using (Microsoft.Data.Sqlite.SqliteConnection c = trip.Office.Store.Database.Connect())
+		{
+			Dapper.SqlMapper.Execute(c, "UPDATE Assessment SET InspectorName = 'Edited in 2.0', LastUpdate = @now WHERE AssessmentID = @id",
+				new { now = new DateTime(2030, 1, 2, 3, 4, 5), id = trip.Id });
+		}
+		trip.WorkInTheField();
+
+		CheckInResult result = WorkPackages.CheckIn(trip.Office.Store, trip.BackPath);
+		Assert.Equal(0, result.CheckedIn);
+		Assert.Contains(result.Refused, r => r.Contains("changed here"));
+		Assert.Equal("Edited in 2.0", trip.Office.Store.LoadAssessment(trip.Id).Assessment.InspectorName);
+	}
+
+	[Fact]
 	public void TakingBackEarly_ThenCopyingChosenValuesFromThePackage()
 	{
 		using Trip trip = new Trip();

@@ -49,6 +49,15 @@ public sealed class WorkPackageItem
 	public long Version { get; set; }
 
 	public long PropertyVersion { get; set; }
+
+	/// <summary>
+	/// The assessment's and the structure's LastUpdate when they left. Older versions of SDE for Mac (2.0 and before)
+	/// don't keep version numbers but do set LastUpdate, so this is how check-in notices that one changed them here.
+	/// Null in packages made before it was recorded.
+	/// </summary>
+	public DateTime? LastUpdate { get; set; }
+
+	public DateTime? PropertyLastUpdate { get; set; }
 }
 
 /// <summary>What a check-in did.</summary>
@@ -142,6 +151,8 @@ public static class WorkPackages
 				Address = Address(f),
 				Version = stamp.Assessment,
 				PropertyVersion = stamp.Property,
+				LastUpdate = stamp.AssessmentLastUpdate,
+				PropertyLastUpdate = stamp.PropertyLastUpdate,
 			});
 		}
 
@@ -238,7 +249,9 @@ public static class WorkPackages
 					result.Refused.Add($"{item.Address}: deleted here while it was out.");
 					continue;
 				}
-				if (now.Assessment != r.Version || now.Property != r.PropertyVersion)
+				if (now.Assessment != r.Version || now.Property != r.PropertyVersion
+					|| (item.LastUpdate != null && now.AssessmentLastUpdate != item.LastUpdate)
+					|| (item.PropertyLastUpdate != null && now.PropertyLastUpdate != item.PropertyLastUpdate))
 				{
 					result.Refused.Add($"{item.Address}: changed here while it was out. Take it back and copy the field's values over one by one.");
 					continue;
