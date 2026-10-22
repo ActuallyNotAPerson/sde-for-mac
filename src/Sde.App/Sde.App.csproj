@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Sde.App.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AvaloniaResource Include="Assets/**" />
     <EmbeddedResource Include="Help/field-help.json" LogicalName="field-help.json" />
   </ItemGroup>
@@ -29,14 +33,19 @@
     <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="QRCoder" />
+    <PackageReference Include="Mapsui.Avalonia12" />
+    <PackageReference Include="Mapsui.Nts" />
     <PackageReference Include="AvaloniaUI.DiagnosticsSupport">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
+  <Import Project="LeaveOutSvg.props" />
+
   <ItemGroup>
     <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+    <ProjectReference Include="../Sde.Gis/Sde.Gis.csproj" />
     <ProjectReference Include="../Sde.Reports/Sde.Reports.csproj" />
     <ProjectReference Include="../Sde.Interop/Sde.Interop.csproj" />
     <ProjectReference Include="../Sde.Field/Sde.Field.csproj" />

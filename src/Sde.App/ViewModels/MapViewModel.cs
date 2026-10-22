@@ -228,6 +228,12 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	public bool HasStructures => TotalCount > 0;
 
+	/// <summary>Writes each structure's address beside its dot (when zoomed in to street level).</summary>
+	[ObservableProperty]
+	public partial bool ShowAddressLabels { get; set; }
+
+	partial void OnShowAddressLabelsChanged(bool value) => MarkersChanged?.Invoke();
+
 	public string CountText => $"{ShownCount} of {OnMapCount} on the map";
 
 	/// <summary>The map should redraw its dots.</summary>

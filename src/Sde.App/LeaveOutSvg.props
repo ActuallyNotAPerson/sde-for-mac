@@ -1,0 +1,17 @@
+<Project>
+
+  <!--
+    The map library (Mapsui) depends on Svg.Skia for SVG symbols, which SDE never draws. Svg.Custom under it is MS-PL,
+    outside the MIT, Apache and BSD licences SDE ships, so none of these packages' files are copied: not into SDE.app
+    (Sde.App.csproj imports this), and not into the test projects that run the app (they import it too, so the tests
+    see the same files the app has). NoSvgTests checks both.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Svg.Skia" ExcludeAssets="all" />
+    <PackageReference Include="Svg.Custom" ExcludeAssets="all" />
+    <PackageReference Include="Svg.Model" ExcludeAssets="all" />
+    <PackageReference Include="ShimSkiaSharp" ExcludeAssets="all" />
+    <PackageReference Include="ExCSS" ExcludeAssets="all" />
+  </ItemGroup>
+
+</Project>

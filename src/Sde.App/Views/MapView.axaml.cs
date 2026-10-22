@@ -20,7 +20,7 @@ public partial class MapView : UserControl
 	public MapView()
 	{
 		InitializeComponent();
-		Surface.MarkerClicked += id => _vm?.ClickStructure(id);
+		Surface.MarkerClicked += (id, add) => _vm?.ClickStructure(id);
 		Surface.MapClicked += (lat, lon) => _vm?.ClickMap(lat, lon);
 		Surface.AreaSelected += (ids, add) => _vm?.SelectArea(ids.ToList(), add);
 		Surface.SizeChanged += OnCanvasSizeChanged;
@@ -66,6 +66,8 @@ public partial class MapView : UserControl
 	{
 		base.OnDetachedFromVisualTree(e);
 		Detach();
+		// The page closed: stop the map engine (its redraw loop, downloads and layers).
+		Surface.Dispose();
 	}
 
 	private void Detach()
@@ -117,8 +119,10 @@ public partial class MapView : UserControl
 				fill = this.TryFindResource("Status" + p.Class + "Fg", ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.Gray;
 				brushes[p.Class] = fill;
 			}
-			markers.Add(new MapMarker(p.Id, p.Latitude, p.Longitude, fill));
+			markers.Add(new MapMarker(p.Id, p.Latitude, p.Longitude, fill, _vm.ShowAddressLabels ? p.Address : null));
 		}
+		// Addresses only once zoomed in to street level (1:8,000 or closer), where they have room.
+		Surface.MarkerLabels = _vm.ShowAddressLabels ? new Sde.Gis.Styles.LabelStyle { Field = "Address", MinScale = 8000 } : null;
 		Surface.Markers = markers;
 	}
 }

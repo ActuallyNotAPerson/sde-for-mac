@@ -85,6 +85,7 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+          <CheckBox IsChecked="{Binding ShowAddressLabels}" Content="Show addresses on the map" AutomationProperties.Name="Show addresses beside the dots when zoomed in" />
 
           <StackPanel Spacing="2" IsVisible="{Binding HasUnplaced}">
             <TextBlock Classes="medium" Text="{Binding UnplacedText}" TextWrapping="Wrap" />
