@@ -187,6 +187,8 @@
           <CheckBox Content="With photos" IsChecked="{Binding Submission.IncludePhotos}" />
           <CheckBox Content="Include incomplete assessments" IsChecked="{Binding Submission.IncludeIncomplete}" />
         </StackPanel>
+        <CheckBox Content="Add marked-up copies of photos" IsChecked="{Binding Submission.IncludeMarkedUpCopies}" IsEnabled="{Binding !Submission.IsWriting}"
+                  ToolTip.Tip="A Marked-up photos folder with the marks drawn on. FEMA's package keeps the original photos either way." />
         <StackPanel Spacing="4" IsVisible="{Binding Submission.ProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
           <ProgressBar Value="{Binding Submission.ProgressValue}" Maximum="100" Height="6" IsVisible="{Binding Submission.IsWriting}" AutomationProperties.Name="Progress" />
           <TextBlock Classes="muted" Text="{Binding Submission.ProgressText}" TextTrimming="CharacterEllipsis" />

@@ -113,6 +113,31 @@ public static class PhotoMarkupRenderer
 		Internal.PhotoPrep.Prepare(photoPath, markup, maxEdge);
 
 	/// <summary>
+	/// Draws markup onto an upright picture already encoded (the JPEG from <see cref="Render"/>), as JPEG bytes the same
+	/// size: the markup sheet redraws from one decoded copy instead of reading the photo file again. Null when the bytes
+	/// aren't a picture.
+	/// </summary>
+	public static byte[] DrawOnto(byte[] picture, PhotoMarkup markup)
+	{
+		if (picture == null)
+		{
+			return null;
+		}
+		using SKBitmap bitmap = SKBitmap.Decode(picture);
+		if (bitmap == null)
+		{
+			return null;
+		}
+		using (SKCanvas canvas = new SKCanvas(bitmap))
+		{
+			Draw(canvas, markup, bitmap.Width, bitmap.Height);
+		}
+		using SKImage image = SKImage.FromBitmap(bitmap);
+		using SKData data = image.Encode(SKEncodedImageFormat.Jpeg, Internal.PhotoPrep.JpegQuality);
+		return data.ToArray();
+	}
+
+	/// <summary>
 	/// Writes a marked-up JPEG copy of a photo (upright, at most <paramref name="maxEdge"/> pixels on the long side).
 	/// Returns false when the photo can't be read.
 	/// </summary>

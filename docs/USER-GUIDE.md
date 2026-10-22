@@ -270,6 +270,8 @@ longitude. **Look up online…** fills in the coordinates from the address ([cha
 **NFIP community ID**, **Community name**, **FIRM panel number**, **Panel suffix**, **FIRM panel date**, **FIRM zone**,
 **Base flood elevation (BFE)**, **Regulatory floodway**, **Elevation of lowest floor** and **Datum**. **Look up
 online…** proposes values from FEMA's National Flood Hazard Layer for you to confirm.
+**Elevation certificate…** reads these values from a filled elevation certificate (see
+[Elevation certificates](#elevation-certificates)).
 
 ### Step 5: Cost & depreciation
 1. **Square footage.** Add the building's footprint as shapes (**+ Rectangle**, **+ L-shape**, **+ T-shape**,
@@ -342,6 +344,21 @@ structure and tick the steps to copy. The location, owner and damage are never c
 - **Remove** moves a photo to Recently deleted, so it can be restored for 30 days.
 
 ![Photo order](screenshots/61-photo-order.png)
+
+### Marking up a photo
+Click the pencil at the top of a photo to draw on it: a **Water line** where the water reached (with an optional
+label such as "Water 2 ft 6 in"), an **Arrow**, a **Box**, an **Ellipse** or **Text**.
+
+1. Choose what to draw and a colour. A water line is blue and the others red unless you pick a colour.
+2. Drag across the photo: along the water line, from an arrow's tail to its point, or from one corner of a box or
+   ellipse to the other. For text, type the words first, then click where they go.
+3. **Undo** takes back the last change and **Clear all** takes every mark off. Click **Save**.
+
+The photo file itself never changes. The thumbnail, the printed reports and the submission folder's marked-up copies
+draw the marks on, while FEMA's export keeps the original photo. The marks of a Final or Letter sent assessment can be
+looked at but not changed.
+
+![Photo markup](screenshots/61b-photo-markup.png)
 
 ### Matching a whole folder of photos to structures
 When field teams bring back a folder of photos:
@@ -457,6 +474,45 @@ leaves your Mac. Nothing changes until you confirm it.
 
 **Check before you rely on it.** The NFHL is FEMA's online flood map. It can differ from the effective FIRM your
 community has adopted (for example while a map revision is pending), so confirm against the effective FIRM.
+
+### Elevation certificates
+SDE reads FEMA's fillable elevation certificate (FEMA Form FF-206-FY-22-152) once a surveyor has filled it in.
+
+1. Open the assessment, go to **Flood zone** and click **Elevation certificate…** (or choose it from the **⋯** menu).
+2. Choose the PDF. SDE lists each **FIELD** with its value **NOW** and the value on the **CERTIFICATE**: the location,
+   community ID, FIRM panel and suffix, base flood elevation, first floor elevation and datum. Values that already
+   match are left unticked.
+3. If the address on the certificate doesn't match the structure, SDE says so. Check you chose the right certificate.
+4. Tick the values to use and click **Save**, or click **Keep the PDF only** to keep the certificate without changing
+   any value.
+
+When SDE can't read the PDF (a scan, or a copy that was printed to PDF), it shows an entry sheet instead: type the
+values from the certificate and click **Save**. Either way the PDF is kept with the structure and the history lists
+the changes as an EC import.
+
+![Elevation certificate](screenshots/64b-elevation-certificate.png)
+
+### Flood depth from high-water marks
+SDE can estimate each structure's flood depth from where the water reached.
+
+1. On Structures, check the structures (or filter the list), then choose **Change ▾ > Flood depth from high-water
+   marks…**. For one structure, use the editor's **⋯** menu.
+2. Choose where the water surface comes from:
+   - **High-water marks file**: a CSV or GeoJSON file with each mark's latitude, longitude and elevation in feet
+     (USGS exports read as they are). Say which datum the marks use when the file doesn't.
+   - **USGS high-water marks**: click **Load USGS events**, choose the event and the states, then **Download marks**.
+     This needs an internet connection; SDE asks USGS's Short-Term Network for the marks.
+   - **Water-surface grid**: a GeoTIFF of water-surface elevations (not depths), in feet or metres.
+3. **Options for marks** sets how far to look (**Search radius**), how many of the **Nearest marks** to use and the
+   **Worst quality** of mark to trust.
+4. SDE proposes the flood elevation and the depth above the lowest floor for each structure, with a **CONFIDENCE** and
+   **HOW** it got there. Structures with no lowest floor elevation, or too far from any mark, say why.
+5. Tick the depths to use and click **Save the ticked depths**. The history lists them as the depth tool's.
+
+When an event's marks use a different datum from your elevation certificates, set the event's **datum offset** (see
+[Events](#26-events)).
+
+![Flood depth](screenshots/65b-flood-depth.png)
 
 ---
 

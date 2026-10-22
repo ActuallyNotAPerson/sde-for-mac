@@ -8,6 +8,7 @@ using Sde.App.ViewModels.Sheets;
 using Sde.Calculation.Models;
 using Sde.Core;
 using Sde.Core.Assessments;
+using Sde.Core.Photos;
 using Sde.Core.Records;
 using Sde.Data;
 
@@ -805,15 +806,38 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	private void LoadPhotos()
 	{
 		Photos.Clear();
+		Dictionary<string, string> markups = _app.Store.GetPhotoMarkups(Assessment.AssessmentID);
 		// The report order: the starred photo first, then the others in their stored order (see MovePhoto).
 		foreach (AttachmentRecord a in File.Attachments.Where(a => a.Active).OrderByDescending(a => a.DefaultImage))
 		{
-			Photos.Add(NewPhotoVm(a));
+			Photos.Add(NewPhotoVm(a, PhotoMarkup.Parse(markups.GetValueOrDefault(Path.GetFileName(a.FileName ?? "")))));
 		}
 		RefreshPhotoPositions();
 	}
 
-	private PhotoViewModel NewPhotoVm(AttachmentRecord a) => new(a, _app.Store.PhotoPath(a), Edited, MakeDefaultPhoto, RemovePhoto, p => _app.Dialogs.Open(p.Path)) { Mover = MovePhoto };
+	private PhotoViewModel NewPhotoVm(AttachmentRecord a, PhotoMarkup markup = null) =>
+		new(a, _app.Store.PhotoPath(a), Edited, MakeDefaultPhoto, RemovePhoto, p => _app.Dialogs.Open(p.Path), markup) { Mover = MovePhoto, MarkUpAction = MarkUpPhotoAsync };
+
+	/// <summary>
+	/// A photo's Mark up…: the markup sheet for it (a new photo is saved with the assessment first, so its marks have a
+	/// photo to belong to). A locked assessment's marks can be looked at but not changed.
+	/// </summary>
+	private async Task MarkUpPhotoAsync(PhotoViewModel photo)
+	{
+		if (IsDraft)
+		{
+			_dirty = true;
+		}
+		Save();
+		if (IsDraft || SaveState != "Saved")
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new PhotoMarkupSheetViewModel(_app, photo.Path, IsLocked)) is PhotoMarkup saved)
+		{
+			photo.SetMarkup(saved);
+		}
+	}
 
 	public static readonly string[] PhotoPatterns = { "*.jpg", "*.jpeg", "*.png", "*.heic", "*.gif", "*.bmp", "*.tif", "*.tiff" };
 

@@ -57,7 +57,7 @@ public class FieldDataInUiTests
 			r.IsChecked = false;
 		}
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
-		ui.Snapshot("64-elevation-certificate");
+		ui.Snapshot("64b-elevation-certificate");
 		sheet.SaveCommand.Execute(null);
 		await import;
 		ui.Pump();
@@ -125,7 +125,7 @@ public class FieldDataInUiTests
 		Assert.Contains("2.5 ft above the floor", row.Proposed);
 		Assert.Contains("2 marks", sheet.MarksSummary);
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
-		ui.Snapshot("65-flood-depth");
+		ui.Snapshot("65b-flood-depth");
 		sheet.SaveCommand.Execute(null);
 		await depth;
 

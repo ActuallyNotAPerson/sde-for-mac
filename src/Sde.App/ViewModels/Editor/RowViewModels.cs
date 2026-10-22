@@ -2,7 +2,9 @@ using System.Globalization;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Sde.Core.Photos;
 using Sde.Core.Records;
+using Sde.Reports;
 
 namespace Sde.App.ViewModels.Editor;
 
@@ -285,7 +287,7 @@ public sealed partial class PhotoViewModel : ObservableObject
 	private readonly Action<PhotoViewModel> _remove;
 	private readonly Action<PhotoViewModel> _open;
 
-	public PhotoViewModel(AttachmentRecord attachment, string path, Action edited, Action<PhotoViewModel> makeDefault, Action<PhotoViewModel> remove, Action<PhotoViewModel> open)
+	public PhotoViewModel(AttachmentRecord attachment, string path, Action edited, Action<PhotoViewModel> makeDefault, Action<PhotoViewModel> remove, Action<PhotoViewModel> open, PhotoMarkup markup = null)
 	{
 		_open = open;
 		Attachment = attachment;
@@ -293,11 +295,15 @@ public sealed partial class PhotoViewModel : ObservableObject
 		_edited = edited;
 		_makeDefault = makeDefault;
 		_remove = remove;
-		ThumbnailLoaded = LoadThumbnailAsync(path);
+		Markup = markup;
+		ThumbnailLoaded = LoadThumbnailAsync(path, markup);
 	}
 
-	/// <summary>Decodes a small preview off the UI thread, so opening an assessment with many photos is instant.</summary>
-	private async Task LoadThumbnailAsync(string path)
+	/// <summary>
+	/// Decodes a small preview off the UI thread, so opening an assessment with many photos is instant. A marked-up
+	/// photo's preview has its marks drawn on.
+	/// </summary>
+	private async Task LoadThumbnailAsync(string path, PhotoMarkup markup)
 	{
 		Bitmap thumbnail = await Task.Run(() =>
 		{
@@ -306,6 +312,10 @@ public sealed partial class PhotoViewModel : ObservableObject
 				if (!File.Exists(path))
 				{
 					return null;
+				}
+				if (markup != null && !markup.IsEmpty && PhotoMarkupRenderer.Render(path, markup, 480) is (byte[] jpeg, _, _))
+				{
+					return new Bitmap(new MemoryStream(jpeg));
 				}
 				using FileStream s = File.OpenRead(path);
 				return Bitmap.DecodeToWidth(s, 360);
@@ -323,7 +333,29 @@ public sealed partial class PhotoViewModel : ObservableObject
 	public string Path { get; }
 
 	/// <summary>Completes when the preview has been decoded (or found unreadable).</summary>
-	public Task ThumbnailLoaded { get; }
+	public Task ThumbnailLoaded { get; private set; }
+
+	/// <summary>The marks drawn on the photo (null or empty: none).</summary>
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasMarkup), nameof(MarkUpLabel))]
+	public partial PhotoMarkup Markup { get; private set; }
+
+	public bool HasMarkup => Markup?.IsEmpty == false;
+
+	public string MarkUpLabel => HasMarkup ? $"Change the marks on {FileName}" : $"Mark up {FileName}";
+
+	/// <summary>Opens the markup sheet (set by the editor).</summary>
+	public Func<PhotoViewModel, Task> MarkUpAction { get; init; }
+
+	/// <summary>After the markup sheet saved: keeps the marks and redraws the preview with them.</summary>
+	public void SetMarkup(PhotoMarkup markup)
+	{
+		Markup = markup;
+		ThumbnailLoaded = LoadThumbnailAsync(Path, markup);
+	}
+
+	[RelayCommand]
+	private Task MarkUp() => MarkUpAction?.Invoke(this) ?? Task.CompletedTask;
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(HasThumbnail))]

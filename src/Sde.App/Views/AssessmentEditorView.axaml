@@ -401,16 +401,20 @@
                 <DataTemplate x:DataType="ed:PhotoViewModel">
                   <Border Classes="card compact photoCard" Width="236" Margin="0,0,12,12" Padding="8" DragDrop.AllowDrop="True">
                     <StackPanel Spacing="6">
-                      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
                         <Border Classes="dragHandle" Background="Transparent" Padding="4,0" Cursor="SizeAll" ToolTip.Tip="Drag to change the order" VerticalAlignment="Center">
                           <c:Icon Kind="DragHandle" Size="16" Classes="tertiary" />
                         </Border>
                         <TextBlock Grid.Column="1" Text="{Binding PositionText}" Classes="muted" VerticalAlignment="Center" Margin="4,0,0,0" />
-                        <Button Grid.Column="2" Classes="icon sm" Command="{Binding MoveEarlierCommand}"
+                        <Button Grid.Column="2" Classes="icon sm" Command="{Binding MarkUpCommand}" Margin="0,0,6,0"
+                                AutomationProperties.Name="{Binding MarkUpLabel}" ToolTip.Tip="Mark up: water line, arrows, boxes, text">
+                          <c:Icon Kind="Edit" Size="14" Classes.accent="{Binding HasMarkup}" />
+                        </Button>
+                        <Button Grid.Column="3" Classes="icon sm" Command="{Binding MoveEarlierCommand}"
                                 AutomationProperties.Name="{Binding MoveEarlierLabel}" ToolTip.Tip="Move earlier">
                           <c:Icon Kind="CaretLeft" Size="14" />
                         </Button>
-                        <Button Grid.Column="3" Classes="icon sm" Command="{Binding MoveLaterCommand}"
+                        <Button Grid.Column="4" Classes="icon sm" Command="{Binding MoveLaterCommand}"
                                 AutomationProperties.Name="{Binding MoveLaterLabel}" ToolTip.Tip="Move later">
                           <c:Icon Kind="CaretRight" Size="14" />
                         </Button>

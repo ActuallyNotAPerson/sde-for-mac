@@ -136,7 +136,7 @@ public sealed class EventRowViewModel(EventRecord e, int count, Func<EventRecord
 	public string Detail { get; } = string.Join(" · ", new[] { e.Kind, e.ToDetails().DateRange, $"{count:N0} assessment{(count == 1 ? "" : "s")}" }
 		.Where(x => !string.IsNullOrWhiteSpace(x)));
 
-	public string EditName => "Edit " + e.Label;
+	public string EditName { get; } = "Edit " + e.Label;
 
 	public IAsyncRelayCommand EditCommand { get; } = new AsyncRelayCommand(() => edit(e));
 }
