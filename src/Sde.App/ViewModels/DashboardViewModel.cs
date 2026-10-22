@@ -160,6 +160,7 @@ public sealed partial class DashboardViewModel : ViewModelBase
 			ShowStatuses(inEvent);
 		}
 		LoadCompliance();
+		LoadTeams();
 		OnPropertyChanged(nameof(IsAllEvents));
 		OnPropertyChanged(nameof(Subtitle));
 		OnPropertyChanged(nameof(ProgressTitle));

@@ -139,6 +139,13 @@
             </StackPanel>
           </Border>
         </Grid>
+        <Border Classes="card" IsVisible="{Binding HasTeams}">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Field teams" />
+            <TextBlock Classes="muted" Text="Structures each team has, and how many have an assessment since they were assigned." TextWrapping="Wrap" />
+            <ItemsControl ItemsSource="{Binding ByTeam}" ItemTemplate="{StaticResource BarRow}" />
+          </StackPanel>
+        </Border>
         <Border Classes="card">
           <StackPanel Spacing="8">
             <TextBlock Classes="h3" Text="Streets with the most assessments (top 10)" />

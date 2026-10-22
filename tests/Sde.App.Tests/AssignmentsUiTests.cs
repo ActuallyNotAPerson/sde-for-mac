@@ -69,6 +69,16 @@ public class AssignmentsUiTests
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
 		ui.Snapshot("115-assignments");
 
+		// The Dashboard shows the team's progress.
+		ui.Main.ShowCommand.Execute(Page.Dashboard);
+		ui.Pump();
+		Assert.True(ui.Main.Dashboard.HasTeams);
+		BarRowViewModel north = Assert.Single(ui.Main.Dashboard.ByTeam);
+		Assert.Equal("Team North", north.Label);
+		Assert.Equal("3 of 3 assessed, 1 done", north.Detail);
+		ui.Main.ShowCommand.Execute(Page.Assignments);
+		ui.Pump();
+
 		// The route sheet as a PDF.
 		string pdf = Path.Combine(ui.Folder, "route.pdf");
 		ui.Dialogs.Answers.Enqueue(pdf);

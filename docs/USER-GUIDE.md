@@ -486,7 +486,7 @@ sheet and worksheets. With an event chosen in the sidebar, it shows that event's
 4. **Route sheet…** saves a one-page list of the stops, and **Worksheets…** a page per structure with a short code the
    phone form's search accepts. The pin beside a structure opens directions in Maps.
 5. As the team works, set each structure's **Status**: Assigned, Visited, Done or Skipped. The team's line shows how
-   many are assigned, assessed and done.
+   many are assigned, assessed and done, and the Dashboard has a **Field teams** chart with the same numbers.
 6. To take structures off a team, tick them and click **Take the ticked structures off the team…**.
 
 ![Assignments](screenshots/115-assignments.png)
