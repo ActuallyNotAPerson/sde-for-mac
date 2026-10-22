@@ -119,6 +119,13 @@ public sealed partial class MapViewModel : ViewModelBase
 			}
 		};
 		app.DatabaseChanged += ResetLayers;
+		app.Scope.Changed += () =>
+		{
+			if (IsActive)
+			{
+				Reload();
+			}
+		};
 		_basemap = Maps.Basemaps.UsgsTopo;
 	}
 
@@ -257,7 +264,8 @@ public sealed partial class MapViewModel : ViewModelBase
 		ReadLayers();
 		Guid? selected = Selected?.Id;
 		Guid? target = PlaceTarget?.Id;
-		_all = _app.Store.ListMapPoints()
+		// The event chosen in the sidebar limits the dots to its assessments.
+		_all = (_app.Scope.IsAll ? _app.Store.ListMapPoints() : _app.Store.ListMapPoints(id => _app.Scope.Includes(id)))
 			.Select(r => new MapPointViewModel(r, Determinations.Classify(r.DamageMessage, r.PercentDamage)))
 			.ToList();
 		TotalCount = _all.Count;

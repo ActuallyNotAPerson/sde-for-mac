@@ -42,6 +42,33 @@ public sealed partial class SdeStore
 			r.PercentDamage is decimal pd ? JetScaling.WithScale(pd, 1) : null, r.DamageMessage)).ToList());
 	}
 
+	/// <summary>
+	/// The same, limited to assessments <paramref name="includeAssessment"/> accepts (the event chosen in the sidebar):
+	/// each structure shows its latest such assessment, and structures with none are left out.
+	/// </summary>
+	public List<MapPointRow> ListMapPoints(Func<Guid, bool> includeAssessment)
+	{
+		ArgumentNullException.ThrowIfNull(includeAssessment);
+		const string sql = """
+			SELECT p.PropertyID, a.AssessmentID,
+			       TRIM(COALESCE(p.StreetNumber, '') || ' ' || COALESCE(p.StreetName, '') || ' ' || COALESCE(s.LookupFieldName, '')) AS Address,
+			       p.City, p.Latitude, p.Longitude, a.PercentDamage, a.DamageMessage, p.StreetName, p.StreetNumber
+			FROM Property p
+			JOIN Assessment a ON a.PropertyID = p.PropertyID AND a.Active = 1
+			LEFT JOIN Lookup s ON s.LookupID = p.StreetSuffixID
+			WHERE p.Active = 1
+			ORDER BY a.DateofInspection DESC, a.LastUpdate DESC
+			""";
+		return Database.Read(c => c.Query<MapRow>(sql)
+			.Where(r => r.AssessmentID is Guid id && includeAssessment(id))
+			.GroupBy(r => r.PropertyID)
+			.Select(g => g.First())
+			.OrderBy(r => r.StreetName, StringComparer.Ordinal).ThenBy(r => r.StreetNumber, StringComparer.Ordinal)
+			.Select(r => new MapPointRow(r.PropertyID, r.AssessmentID, r.Address, r.City, r.Latitude, r.Longitude,
+				r.PercentDamage is decimal pd ? JetScaling.WithScale(pd, 1) : null, r.DamageMessage))
+			.ToList());
+	}
+
 	private sealed class MapRow
 	{
 		public Guid PropertyID { get; set; }
@@ -52,5 +79,7 @@ public sealed partial class SdeStore
 		public decimal? Longitude { get; set; }
 		public decimal? PercentDamage { get; set; }
 		public string DamageMessage { get; set; }
+		public string StreetName { get; set; }
+		public string StreetNumber { get; set; }
 	}
 }

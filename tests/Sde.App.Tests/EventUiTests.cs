@@ -84,6 +84,10 @@ public class EventUiTests
 		Assert.Equal(2, ui.Main.SidebarItems.Single(i => i.Page == Page.Structures).Count);
 		Assert.Equal(e.EventID.ToString("D"), ui.Store.GetSetting<string>(Services.EventScope.SettingKey));
 
+		ui.Main.ShowCommand.Execute(Page.Map);
+		ui.Pump();
+		Assert.Equal(2, ui.Main.Map.TotalCount);
+
 		ui.Main.ShowCommand.Execute(Page.Dashboard);
 		ui.Pump();
 		DashboardViewModel d = ui.Main.Dashboard;
