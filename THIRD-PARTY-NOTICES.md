@@ -87,6 +87,25 @@ XmpCore's `.nuspec` has no license expression, only a link to Adobe's license fo
 (https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html). Its README says the same BSD license applies; Adobe
 publishes its XMP Toolkit SDK under BSD-3-Clause (https://github.com/adobe/XMP-Toolkit-SDK).
 
+### Maps and GIS (Sde.Gis)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| NetTopologySuite (geometry and spatial operations) | 2.6.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite |
+| NetTopologySuite.Features (pulled in by the two readers below) | 2.2.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.Features |
+| NetTopologySuite.IO.Esri.Shapefile (reads and writes Shapefiles) | 1.2.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.IO.Esri |
+| NetTopologySuite.IO.GeoJSON4STJ (reads and writes GeoJSON) | 4.0.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.IO.GeoJSON |
+| BitMiracle.LibTiff.NET (reads GeoTIFF grids) | 2.4.660 | BSD-3-Clause ("New BSD") | https://bitmiracle.com/libtiff/ |
+
+NetTopologySuite.IO.Esri.Shapefile is used rather than NetTopologySuite.IO.ShapeFile, which is LGPL. BitMiracle.LibTiff.NET's
+`.nuspec` has no license expression, only a link to its license (https://bitmiracle.github.io/libtiff.net/help/articles/license.html),
+which is the three-clause BSD license; LibTiff.NET is based in part on LibTIFF (Copyright (c) 1988-1997 Sam Leffler, Copyright
+(c) 1991-1997 Silicon Graphics, Inc.) and on the Independent JPEG Group's software, under their own permissive licenses.
+
+SDE converts coordinates with its own code (EPSG Guidance Note 7-2's formulas), not a projection library. The parameters of
+the State Plane, UTM and Albers coordinate systems it knows by EPSG code (`src/Sde.Gis/Projections/EpsgUs.csv`) are taken
+from the EPSG Dataset (https://epsg.org), © IOGP, used under the EPSG Dataset terms of use.
+
 ### Microsoft libraries pulled in by the packages above
 
 | Package | Version | License | Project |

@@ -1,0 +1,26 @@
+{
+ "currentVersion": 10.31,
+ "id": 3,
+ "name": "Cedar Ford Flood Zones",
+ "type": "Feature Layer",
+ "geometryType": "esriGeometryPolygon",
+ "maxRecordCount": 2,
+ "supportedQueryFormats": "JSON, geoJSON",
+ "fields": [
+  {
+   "name": "OBJECTID",
+   "type": "esriFieldTypeOID",
+   "alias": "OBJECTID"
+  },
+  {
+   "name": "FLD_ZONE",
+   "type": "esriFieldTypeString",
+   "alias": "Flood zone"
+  },
+  {
+   "name": "STATIC_BFE",
+   "type": "esriFieldTypeDouble",
+   "alias": "Static BFE"
+  }
+ ]
+}

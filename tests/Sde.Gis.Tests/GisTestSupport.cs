@@ -83,6 +83,32 @@ internal static class Gdal
 	/// <summary>ogrinfo, or null when GDAL isn't installed.</summary>
 	public static string OgrInfo => _ogrinfo.Value;
 
+	/// <summary>A GDAL program (gdallocationinfo, gdalinfo and so on) from the same place as ogrinfo, or null.</summary>
+	public static string Tool(string name)
+	{
+		if (OgrInfo == null)
+		{
+			return null;
+		}
+		string path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(OgrInfo), name);
+		return File.Exists(path) ? path : null;
+	}
+
+	/// <summary>Runs a GDAL program; returns its exit code and output.</summary>
+	public static (int ExitCode, string Output) Run(string tool, params string[] args)
+	{
+		ProcessStartInfo psi = new ProcessStartInfo(tool) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+		SetQgisEnvironment(psi, tool);
+		foreach (string a in args)
+		{
+			psi.ArgumentList.Add(a);
+		}
+		using Process p = Process.Start(psi);
+		string output = p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
+		p.WaitForExit();
+		return (p.ExitCode, output);
+	}
+
 	private static IEnumerable<string> QgisApps() =>
 		Directory.Exists("/Applications") ? Directory.EnumerateDirectories("/Applications", "QGIS*.app").OrderByDescending(d => d) : Enumerable.Empty<string>();
 

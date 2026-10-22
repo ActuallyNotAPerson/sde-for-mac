@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "id": 14, "geometry": {"type": "Polygon", "coordinates": [[[-84.0484, 39.63], [-84.048, 39.63], [-84.048, 39.6304], [-84.0484, 39.6304], [-84.0484, 39.63]]]}, "properties": {"OBJECTID": 14, "FLD_ZONE": "X", "STATIC_BFE": -9999.0}}]}

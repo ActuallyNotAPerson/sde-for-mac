@@ -1,0 +1,67 @@
+{
+ "currentVersion": 11.3,
+ "id": 0,
+ "name": "Cedar Ford Parcels",
+ "type": "Feature Layer",
+ "geometryType": "esriGeometryPolygon",
+ "description": "Synthetic parcels for SDE's tests.",
+ "copyrightText": "Cedar Ford County GIS (synthetic)",
+ "minScale": 50000,
+ "maxScale": 0,
+ "maxRecordCount": 2,
+ "supportedQueryFormats": "JSON, geoJSON, PBF",
+ "advancedQueryCapabilities": {
+  "supportsPagination": true,
+  "supportsOrderBy": true
+ },
+ "objectIdField": "OBJECTID",
+ "fields": [
+  {
+   "name": "OBJECTID",
+   "type": "esriFieldTypeOID",
+   "alias": "OBJECTID"
+  },
+  {
+   "name": "PARCEL_ID",
+   "type": "esriFieldTypeString",
+   "alias": "Parcel number",
+   "length": 20
+  },
+  {
+   "name": "LAND_VAL",
+   "type": "esriFieldTypeDouble",
+   "alias": "Land value"
+  },
+  {
+   "name": "SALE_DATE",
+   "type": "esriFieldTypeDate",
+   "alias": "Sale date",
+   "length": 8
+  },
+  {
+   "name": "ACRES",
+   "type": "esriFieldTypeSingle",
+   "alias": "Acres"
+  },
+  {
+   "name": "OWNER_TYPE",
+   "type": "esriFieldTypeString",
+   "alias": "Owner type"
+  },
+  {
+   "name": "Shape",
+   "type": "esriFieldTypeGeometry",
+   "alias": "Shape"
+  }
+ ],
+ "extent": {
+  "xmin": -9356400.5,
+  "ymin": 4808900.25,
+  "xmax": -9355900.75,
+  "ymax": 4809300.5,
+  "spatialReference": {
+   "wkid": 102100,
+   "latestWkid": 3857
+  }
+ }
+}

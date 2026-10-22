@@ -518,7 +518,7 @@ internal static class GeoPackageDb
 	/// <param name="counts">Whether to count each table's features (skipped for quick lookups; the count is then -1).</param>
 	public static List<GeoPackageTableInfo> ListFeatureTables(SqliteConnection c, SqliteTransaction tx = null, string onlyTable = null, bool counts = true)
 	{
-		List<(string Table, string Identifier, string Description, string LastChange, double? MinX, double? MinY, double? MaxX, double? MaxY, string Column, string Type, int Srs)> rows = new();
+		List<ContentsRow> rows = new List<ContentsRow>();
 		using (SqliteCommand cmd = c.CreateCommand())
 		{
 			cmd.Transaction = tx;
@@ -532,13 +532,13 @@ internal static class GeoPackageDb
 			using SqliteDataReader r = cmd.ExecuteReader();
 			while (r.Read())
 			{
-				rows.Add((r.GetString(0), r.IsDBNull(1) ? null : r.GetString(1), r.IsDBNull(2) ? null : r.GetString(2), r.IsDBNull(3) ? null : r.GetString(3),
+				rows.Add(new ContentsRow(r.GetString(0), r.IsDBNull(1) ? null : r.GetString(1), r.IsDBNull(2) ? null : r.GetString(2), r.IsDBNull(3) ? null : r.GetString(3),
 					r.IsDBNull(4) ? null : r.GetDouble(4), r.IsDBNull(5) ? null : r.GetDouble(5), r.IsDBNull(6) ? null : r.GetDouble(6), r.IsDBNull(7) ? null : r.GetDouble(7),
 					r.GetString(8), r.GetString(9), r.GetInt32(10)));
 			}
 		}
 		List<GeoPackageTableInfo> tables = new List<GeoPackageTableInfo>();
-		foreach (var row in rows)
+		foreach (ContentsRow row in rows)
 		{
 			(FieldList fields, _, string fid) = ReadColumns(c, tx, row.Table, row.Column);
 			long count = counts ? Convert.ToInt64(Scalar(c, tx, $"SELECT COUNT(*) FROM {Quote(row.Table)}"), CultureInfo.InvariantCulture) : -1;
@@ -558,6 +558,10 @@ internal static class GeoPackageDb
 		}
 		return tables;
 	}
+
+	/// <summary>One feature table's row of gpkg_contents joined with gpkg_geometry_columns.</summary>
+	private readonly record struct ContentsRow(string Table, string Identifier, string Description, string LastChange, double? MinX, double? MinY,
+		double? MaxX, double? MaxY, string Column, string Type, int Srs);
 
 	/// <summary>
 	/// A table's attribute columns as fields (in table order, leaving out the primary key, the geometry column and
