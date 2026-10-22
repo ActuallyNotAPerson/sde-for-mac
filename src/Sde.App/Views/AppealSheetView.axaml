@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.AppealSheetView"
              x:DataType="sh:AppealSheetViewModel">
-  <StackPanel Spacing="12" Width="700">
+  <StackPanel Spacing="12">
     <StackPanel Spacing="2">
       <TextBlock Classes="semibold" Text="{Binding Address}" />
       <TextBlock Classes="secondary" Text="{Binding CurrentText}" TextWrapping="Wrap" />

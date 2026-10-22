@@ -4,7 +4,7 @@ using Sde.App.ViewModels.Sheets;
 
 namespace Sde.App.ViewModels.Editor;
 
-/// <summary>The "?" beside each field.</summary>
+/// <summary>The info button beside each field.</summary>
 public sealed partial class AssessmentEditorViewModel
 {
 	/// <summary>Shows what to enter in a field, with the manual page, in a sheet.</summary>

@@ -68,6 +68,9 @@ public sealed partial class ProposalRowViewModel : ObservableObject
 /// </summary>
 public sealed partial class AutoFillSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private readonly AppServices _app;
 	private readonly PropertyRecord _property;
 	private CancellationTokenSource _cancel;
@@ -230,6 +233,9 @@ public sealed partial class StructureProposalsViewModel : ObservableObject
 /// </summary>
 public sealed partial class BulkAutoFillSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private readonly AppServices _app;
 
 	public BulkAutoFillSheetViewModel(AppServices app, IReadOnlyList<StructureProposalsViewModel> structures)
@@ -358,6 +364,9 @@ public sealed partial class PhotoMatchRowViewModel : ObservableObject
 /// </summary>
 public sealed partial class PhotoFolderSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private readonly AppServices _app;
 	private readonly string _folder;
 

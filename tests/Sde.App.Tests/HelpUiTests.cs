@@ -96,7 +96,7 @@ public class HelpUiTests
 			AssessmentEditorViewModel e = OpenRanch(ui);
 			e.SelectedSection = e.Sections[0];
 			Button help = HelpButton(ui, "Street name");
-			Assert.Equal("?", help.Content);
+			Assert.Equal("Info", Assert.IsType<Sde.App.Controls.Icon>(help.Content).Kind);   // an info icon, named "Help for Street name"
 			Click(help);
 			ui.Pump();
 

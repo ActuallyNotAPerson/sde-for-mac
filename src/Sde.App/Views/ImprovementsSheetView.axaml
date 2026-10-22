@@ -4,7 +4,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.ImprovementsSheetView"
              x:DataType="sh:ImprovementsSheetViewModel">
-  <StackPanel Spacing="12" Width="700">
+  <StackPanel Spacing="12">
     <StackPanel Spacing="2">
       <TextBlock Classes="semibold" Text="{Binding Address}" />
       <TextBlock Classes="muted" Text="{Binding SettingsText}" TextWrapping="Wrap" />

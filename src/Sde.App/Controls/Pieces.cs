@@ -312,3 +312,34 @@ public class PageHeader : ContentControl
 		set => SetValue(SubtitleProperty, value);
 	}
 }
+
+/// <summary>
+/// The top of a card: an icon in a tinted tile, the card's title and a sentence about it, with the card's main
+/// buttons (the content) on the right. Used on the long pages (Import &amp; export, Settings) so each card reads at a glance.
+/// </summary>
+public class CardHeader : ContentControl
+{
+	public static readonly StyledProperty<string> IconProperty = AvaloniaProperty.Register<CardHeader, string>(nameof(Icon));
+
+	public static readonly StyledProperty<string> TitleProperty = AvaloniaProperty.Register<CardHeader, string>(nameof(Title));
+
+	public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<CardHeader, string>(nameof(Text));
+
+	public string Icon
+	{
+		get => GetValue(IconProperty);
+		set => SetValue(IconProperty, value);
+	}
+
+	public string Title
+	{
+		get => GetValue(TitleProperty);
+		set => SetValue(TitleProperty, value);
+	}
+
+	public string Text
+	{
+		get => GetValue(TextProperty);
+		set => SetValue(TextProperty, value);
+	}
+}

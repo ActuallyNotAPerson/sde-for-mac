@@ -6,36 +6,26 @@
              x:Class="Sde.App.Views.SourceImportView"
              x:DataType="vm:SourceImportViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="28,18,28,28" Spacing="16" MaxWidth="1120" HorizontalAlignment="Left">
-      <Button Classes="subtle" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="-10,0,0,0" AutomationProperties.Name="Back to Import and export">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <c:Icon Kind="CaretLeft" Size="14" />
-          <TextBlock Text="Import &amp; export" />
-        </StackPanel>
-      </Button>
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h1" Text="Import inspections or parcels" />
-        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                   Text="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures. Each one remembers its source and record ID, so importing an updated file later only changes what changed in it: your edits in SDE are kept, and a blank cell never clears anything." />
-      </StackPanel>
+    <StackPanel Margin="{StaticResource PagePadding}" Spacing="14" MaxWidth="1120" HorizontalAlignment="Left">
+      <!-- The title band shows "Import & export › Import inspections or parcels" (the breadcrumb goes back) -->
+      <c:PageHeader Margin="0"
+                    Subtitle="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures. Each one remembers its source and record ID, so importing an updated file later only changes what changed in it: your edits in SDE are kept, and a blank cell never clears anything." />
 
       <!-- No file yet -->
       <Border Classes="card" IsVisible="{Binding !HasFile}">
-        <StackPanel Spacing="12">
-          <TextBlock Classes="h2" Text="Start with a file" />
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="Export the inspections or parcels from the system that holds them (a permit system's inspection report, an assessor roll, a spreadsheet, a shapefile's .dbf) as Excel, CSV or DBF. It can have one row per record, or one row per checklist item. You can also drop the file on this page." />
-          <Button Classes="primary" Content="Choose file…" Command="{Binding ChooseFileCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
+        <c:EmptyState Icon="Import" Title="Start with a file" MaxWidth="560"
+                      Text="Export the inspections or parcels from the system that holds them (a permit system's inspection report, an assessor roll, a spreadsheet, a shapefile's .dbf) as Excel, CSV or DBF. It can have one row per record, or one row per checklist item. You can also drop the file on this page.">
+          <Button Classes="primary" Content="Choose file…" Command="{Binding ChooseFileCommand}" />
+        </c:EmptyState>
       </Border>
 
-      <StackPanel Spacing="16" IsVisible="{Binding HasFile}">
+      <StackPanel Spacing="14" IsVisible="{Binding HasFile}">
         <!-- 1. The export and the profile -->
         <Border Classes="card">
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="2">
-                <TextBlock Classes="h2" Text="1. The file" />
+                <TextBlock Classes="title" Text="1. The file" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <TextBlock Classes="semibold" Text="{Binding FileName}" />
                   <TextBlock Text="{Binding TableSummary}" Classes="muted" VerticalAlignment="Center" />
@@ -80,7 +70,7 @@
         <Border Classes="card">
           <StackPanel Spacing="12">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="2. What the file is and how it's laid out" />
+              <TextBlock Classes="title" Text="2. What the file is and how it's laid out" />
               <TextBlock Classes="muted" TextWrapping="Wrap" Text="The source and record ID link each assessment or structure to its record. With an inspection ID too, every inspection of a record becomes its own assessment." />
             </StackPanel>
             <Grid ColumnDefinitions="170,320,40,170,320" RowDefinitions="Auto,Auto" RowSpacing="10">
@@ -149,7 +139,7 @@
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="2">
-                <TextBlock Classes="h2" Text="3. Where each SDE field comes from" />
+                <TextBlock Classes="title" Text="3. Where each SDE field comes from" />
                 <TextBlock Classes="muted" TextWrapping="Wrap"
                            Text="Pick the column for each field, or type a value to use for every record (e.g. the cause of damage, or the base cost). Checklist items appear as “Checklist: …” columns. Anything left out can be filled in later in SDE. Importing structures uses only the structure's fields." />
               </StackPanel>
@@ -207,7 +197,7 @@
         <Border Classes="card" IsVisible="{Binding HasValues}">
           <StackPanel Spacing="10">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="4. The file's words, SDE's choices" />
+              <TextBlock Classes="title" Text="4. The file's words, SDE's choices" />
               <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding ValuesSummary}" />
             </StackPanel>
             <Grid ColumnDefinitions="200,240,130,*" ColumnSpacing="10">
@@ -237,7 +227,7 @@
         <Border Classes="card">
           <StackPanel Spacing="10">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="5. What will happen" />
+              <TextBlock Classes="title" Text="5. What will happen" />
               <TextBlock Classes="muted" TextWrapping="Wrap" Text="Each record is matched by its source and record (and inspection) ID. A new record goes to a structure already in SDE only when it matches exactly one (as chosen under New records match); a Final assessment is never changed." />
             </StackPanel>
             <TextBlock Text="Working it out…" Classes="muted" IsVisible="{Binding IsBusy}" />

@@ -1,16 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.OutputSettingsPanel"
              x:DataType="vm:OutputSettingsViewModel">
-  <StackPanel Spacing="16">
+  <StackPanel Spacing="14">
     <Border Classes="card">
-      <StackPanel Spacing="10">
-        <StackPanel Spacing="2">
-          <TextBlock Classes="h2" Text="Substantial improvement" />
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="How improvement projects are counted for this database (in an assessment, More actions, then Improvements and SI). The NFIP minimum is 50 percent of market value, counting each project on its own. Your ordinance may be stricter." />
-        </StackPanel>
+      <StackPanel Spacing="12">
+        <c:CardHeader Icon="Building" Title="Substantial improvement"
+                      Text="How improvement projects are counted for this database (in an assessment, More actions, then Improvements and SI). The NFIP minimum is 50 percent of market value, counting each project on its own. Your ordinance may be stricter." />
         <WrapPanel>
           <StackPanel Classes="field">
             <TextBlock Classes="fieldLabel" Text="Threshold" />
@@ -37,12 +35,9 @@
     </Border>
 
     <Border Classes="card">
-      <StackPanel Spacing="10">
-        <StackPanel Spacing="2">
-          <TextBlock Classes="h2" Text="Owner letters" />
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="Word (.docx) templates for letters to owners (Structures, Export, then Owner letters). Edit them in Word or Pages. A placeholder such as «OwnerName» is filled in for each structure." />
-        </StackPanel>
+      <StackPanel Spacing="12">
+        <c:CardHeader Icon="Letter" Title="Owner letters"
+                      Text="Word (.docx) templates for letters to owners (Structures, Export, then Owner letters). Edit them in Word or Pages. A placeholder such as «OwnerName» is filled in for each structure." />
         <StackPanel Spacing="2">
           <TextBlock Classes="fieldLabel" Text="Templates folder" />
           <SelectableTextBlock Text="{Binding TemplatesFolder}" TextWrapping="Wrap" />
@@ -53,20 +48,15 @@
                   ToolTip.Tip="Adds the three starter letters. Templates already in the folder are never overwritten." />
           <Button Content="Show folder" Command="{Binding ShowTemplatesFolderCommand}" />
         </StackPanel>
-        <Border Background="{DynamicResource AccentSoft}" CornerRadius="6" Padding="12,8">
-          <TextBlock TextWrapping="Wrap"
-                     Text="The starter letters are a plain-English starting point based on FEMA P-758's sample notice. They are not legal advice. Review and adapt them with your community's counsel before you send any letters." />
-        </Border>
+        <c:Banner Tone="Accent" Icon="Info"
+                  Text="The starter letters are a plain-English starting point based on FEMA P-758's sample notice. They are not legal advice. Review and adapt them with your community's counsel before you send any letters." />
       </StackPanel>
     </Border>
 
     <Border Classes="card">
-      <StackPanel Spacing="10">
-        <StackPanel Spacing="2">
-          <TextBlock Classes="h2" Text="Cumulative damage" />
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="Off unless your ordinance counts damage from several events together. When on, an assessment's result panel also shows the cumulative total over the look-back period. This is a separate finding: each assessment keeps FEMA's own percent damaged and determination, and FEMA's reports and exports don't change." />
-        </StackPanel>
+      <StackPanel Spacing="12">
+        <c:CardHeader Icon="Layers" Title="Cumulative damage"
+                      Text="Off unless your ordinance counts damage from several events together. When on, an assessment's result panel also shows the cumulative total over the look-back period. This is a separate finding: each assessment keeps FEMA's own percent damaged and determination, and FEMA's reports and exports don't change." />
         <ToggleSwitch IsChecked="{Binding CumulativeEnabled}" OnContent="" OffContent="" AutomationProperties.Name="Count damage cumulatively">
           <ToggleSwitch.Content>
             <TextBlock Classes="medium" Text="Count damage from several events together" />

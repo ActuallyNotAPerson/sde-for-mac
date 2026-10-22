@@ -122,9 +122,11 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>Columns that can be shown or hidden, in order; true = shown by default.</summary>
 	private static readonly (string Key, string Header, bool Visible)[] OptionalColumns =
 	{
+		("Owner", "Owner", true),
 		("Community", "Community", true),
 		("Type", "Type", true),
 		("Inspected", "Inspected", true),
+		("Inspector", "Inspector", false),
 		("Status", "Status", true),
 		("Zip", "ZIP", false),
 		("Parcel", "Parcel", false),
@@ -250,7 +252,29 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	public partial int IncompleteCount { get; set; }
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasChecked), nameof(CheckedText))]
 	public partial int CheckedCount { get; set; }
+
+	/// <summary>True while any structure is checked (the selection bar shows).</summary>
+	public bool HasChecked => CheckedCount > 0;
+
+	/// <summary>"3 selected", for the selection bar.</summary>
+	public string CheckedText => $"{CheckedCount:N0} selected";
+
+	/// <summary>"3 structures", or "2 of 3 structures" while a search or filter hides some.</summary>
+	public string CountText => Rows.Count == _all.Count
+		? $"{_all.Count:N0} structure{(_all.Count == 1 ? "" : "s")}"
+		: $"{Rows.Count:N0} of {_all.Count:N0} structure{(_all.Count == 1 ? "" : "s")}";
+
+	/// <summary>The selection bar's Clear: unchecks every structure, shown or not.</summary>
+	[RelayCommand]
+	private void ClearChecked()
+	{
+		foreach (StructureRowViewModel r in _all)
+		{
+			r.IsChecked = false;
+		}
+	}
 
 	public bool IsEmpty => _all.Count == 0;
 
@@ -471,6 +495,7 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		OnPropertyChanged(nameof(IsEmpty));
 		OnPropertyChanged(nameof(HasRows));
 		OnPropertyChanged(nameof(NoMatches));
+		OnPropertyChanged(nameof(CountText));
 		OnPropertyChanged(nameof(AllChecked));
 		OnPropertyChanged(nameof(ExtraFilterCount));
 		OnPropertyChanged(nameof(FiltersButtonText));
@@ -506,6 +531,8 @@ public sealed partial class StructuresViewModel : ViewModelBase
 
 	private string Text(StructureRowViewModel r) => SortKey switch
 	{
+		"Owner" => r.Owner ?? "",
+		"Inspector" => r.Inspector ?? "",
 		"Community" => r.Place ?? "",
 		"Type" => r.Type,
 		"Result" => r.Result,
@@ -565,6 +592,20 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		StatusFilter = 0;
 		_restoring = false;
 		Changed();
+	}
+
+	/// <summary>"Nothing matches", then Show everything: clears the search, the tiles' filter, every filter and the import list.</summary>
+	[RelayCommand]
+	private void ShowEverything()
+	{
+		_restoring = true;
+		Search = null;
+		Filter = StructureFilter.All;
+		TypeFilter = 0;
+		SourceFilter = 0;
+		_restoring = false;
+		ShowOnly(null, null);
+		ClearFilters();
 	}
 
 	// ───────────── Remembered state and saved views ─────────────

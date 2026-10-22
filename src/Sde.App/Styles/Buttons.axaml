@@ -4,7 +4,7 @@
   <!--
     Buttons. A plain <Button> is the default: white (dark grey in dark mode) with a border, 28 px high.
       Variants: accent (also "primary"), ghost (also "subtle"), link, danger (red text), destructive (solid red),
-                icon (square, no border), chip (small pill), nav (sidebar item; "active" when selected), help (round "?")
+                icon (square, no border), chip (small pill), nav (sidebar item; "active" when selected), help (the info icon by a field)
       Sizes:    sm (24 px), lg (32 px); they combine with the variants, for example Classes="icon sm".
     Menus: <DropDownButton> shows a chevron; DropDownButton.accent is the accent version. <SplitButton> likewise.
     A segmented control is a ListBox with Classes="segmented".
@@ -221,26 +221,26 @@
     <Setter Property="Foreground" Value="{DynamicResource Accent}" />
   </Style>
 
-  <!-- The small round "?" beside a field's label -->
+  <!-- The info icon beside a field's label: opens the field's help -->
   <Style Selector="Button.help">
     <Setter Property="Width" Value="18" />
     <Setter Property="Height" Value="18" />
     <Setter Property="MinHeight" Value="18" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}" />
-    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
-    <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Cursor" Value="Hand" />
   </Style>
   <Style Selector="Button.help /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
-    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
   </Style>
   <Style Selector="Button.help:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.help:pressed /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Background" Value="{DynamicResource AccentSoftHover}" />
+    <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
     <Setter Property="Foreground" Value="{DynamicResource Accent}" />
   </Style>
 

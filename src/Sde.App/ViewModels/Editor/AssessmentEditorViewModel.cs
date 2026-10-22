@@ -228,10 +228,19 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	// ───────────── Result panel ─────────────
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasPercent))]
 	public partial ResultState State { get; set; }
 
 	[ObservableProperty]
 	public partial string PercentText { get; set; }
+
+	/// <summary>The percent damaged for the result card's bar, from 0 to 100 (0 when there is no result).</summary>
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasPercent))]
+	public partial double PercentValue { get; set; }
+
+	/// <summary>Whether there is a percent to show on the result card's bar.</summary>
+	public bool HasPercent => State is ResultState.Substantial or ResultState.Close or ResultState.NotSubstantial;
 
 	[ObservableProperty]
 	public partial string Determination { get; set; }
@@ -648,17 +657,20 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		{
 			State = ResultState.Undetermined;
 			PercentText = "–";
+			PercentValue = 0;
 			StateHint = "Damage undetermined. The structure is reported with this reason and 0%.";
 		}
 		else if (a.DamageMessage == "Data Entry Incomplete" || Raw?.PercentDamaged == null)
 		{
 			State = ResultState.Incomplete;
 			PercentText = "–";
+			PercentValue = 0;
 			StateHint = "Enter the building value: square footage, base cost and depreciation, or choose another value basis.";
 		}
 		else
 		{
 			PercentText = pct.ToString("0.0") + "%";
+			PercentValue = (double)Math.Clamp(pct, 0m, 100m);
 			State = pct >= 50m ? ResultState.Substantial : pct >= 40m ? ResultState.Close : ResultState.NotSubstantial;
 			StateHint = State switch
 			{

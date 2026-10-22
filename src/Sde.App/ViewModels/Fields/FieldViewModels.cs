@@ -48,13 +48,13 @@ public abstract partial class FieldViewModel : ObservableObject
 	/// <summary>This field's key in <see cref="FieldCatalog"/> and the field help, e.g. "Property.StreetName".</summary>
 	public string HelpKey => (RecordType == typeof(PropertyRecord) ? "Property." : "Assessment.") + Member;
 
-	/// <summary>Set by the form that can show help for a field; without it the "?" button stays hidden.</summary>
+	/// <summary>Set by the form that can show help for a field; without it the info button stays hidden.</summary>
 	public Action<FieldViewModel> HelpHandler { get; set; }
 
-	/// <summary>The "?" beside the label is shown: there is help for this field and something to show it.</summary>
+	/// <summary>The info button beside the label is shown: there is help for this field and something to show it.</summary>
 	public bool HasHelp => HelpHandler != null && FieldHelp.Has(HelpKey);
 
-	/// <summary>The "?" button: opens what to enter here and the manual page.</summary>
+	/// <summary>The info button: opens what to enter here and the manual page.</summary>
 	[RelayCommand]
 	private void ShowHelp() => HelpHandler?.Invoke(this);
 

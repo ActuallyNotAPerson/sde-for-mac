@@ -52,6 +52,9 @@ public sealed record SiDeterminationRowViewModel(string When, string Result, str
 /// </summary>
 public sealed partial class ImprovementsSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private static readonly CultureInfo Us = CultureInfo.GetCultureInfo("en-US");
 	private readonly AppServices _app;
 	private readonly Guid _propertyId;

@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.OwnerLettersSheetView"
              x:DataType="sh:OwnerLettersSheetViewModel">
-  <StackPanel Spacing="12" Width="660">
+  <StackPanel Spacing="12">
     <TextBlock Classes="medium" Text="{Binding CountText}" TextWrapping="Wrap" />
     <ItemsControl ItemsSource="{Binding Kinds}">
       <ItemsControl.ItemTemplate>

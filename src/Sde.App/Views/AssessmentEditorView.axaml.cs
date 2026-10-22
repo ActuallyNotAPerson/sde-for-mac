@@ -27,6 +27,18 @@ public partial class AssessmentEditorView : UserControl
 		AddHandler(PointerPressedEvent, OnPhotoHandlePressed, RoutingStrategies.Tunnel);
 	}
 
+	/// <summary>
+	/// Below this width the step list shows icons only, so the step keeps room for two columns of fields whose longest
+	/// choices (such as "Shingles - Asphalt, Wood (Standard)") show in full. The editor is this wide in a 1384-wide window.
+	/// </summary>
+	private const double NarrowWidth = 1160;
+
+	protected override void OnSizeChanged(SizeChangedEventArgs e)
+	{
+		base.OnSizeChanged(e);
+		this.FindControl<Grid>("EditorGrid")?.Classes.Set("narrow", e.NewSize.Width < NarrowWidth);
+	}
+
 	/// <summary>What a photo being dragged to a new place carries (only within this window).</summary>
 	private static readonly DataFormat<PhotoViewModel> PhotoFormat = DataFormat.CreateInProcessFormat<PhotoViewModel>("sde-photo");
 

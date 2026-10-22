@@ -16,6 +16,15 @@
   <Style Selector="c|Icon.tertiary">
     <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
   </Style>
+  <Style Selector="c|Icon.success">
+    <Setter Property="Foreground" Value="{DynamicResource SuccessFg}" />
+  </Style>
+  <Style Selector="c|Icon.warning">
+    <Setter Property="Foreground" Value="{DynamicResource WarningFg}" />
+  </Style>
+  <Style Selector="c|Icon.danger">
+    <Setter Property="Foreground" Value="{DynamicResource DangerFg}" />
+  </Style>
 
   <!-- Sidebar -->
   <Style Selector="Border.sidebar">
@@ -89,6 +98,30 @@
     <Setter Property="BorderThickness" Value="0,0,0,1" />
     <Setter Property="Padding" Value="20,0,16,0" />
   </Style>
+  <!-- The breadcrumb's parent page ("Structures ›"): the title's size, quieter, a button -->
+  <Style Selector="Button.crumb">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSubheadline}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Margin" Value="-6,0,0,0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.crumb /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector="Button.crumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource BgHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="Button.crumb:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource BgPressed}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+
   <!-- The ⌘K field: looks like a search box, opens the palette -->
   <Style Selector="Button.searchField">
     <Setter Property="Width" Value="380" />

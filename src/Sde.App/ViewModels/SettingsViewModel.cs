@@ -135,6 +135,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		_checkLatLong = _prefs.LatLong;
 		_useDefaults = _prefs.UseDefaults;
 		LoadSnippets();
+		SelectedCategory = Categories[0];
 	}
 
 	public ObservableCollection<FieldGroupViewModel> DefaultGroups { get; } = new();
@@ -188,7 +189,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 	[RelayCommand]
 	private void RestoreBackup() => _ = _app.Sheets.ShowAsync(new Sheets.RestoreBackupSheetViewModel(_app));
 
-	/// <summary>The phone form (its own card on this page).</summary>
+	/// <summary>The phone form (Settings, Phone form).</summary>
 	public PhoneFormService PhoneForm => _app.PhoneForm;
 
 	public string AttachmentsPath => _app.Store.AttachmentsFolder;

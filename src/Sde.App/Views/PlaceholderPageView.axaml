@@ -6,7 +6,8 @@
              x:DataType="shell:PlaceholderPageViewModel">
   <!-- A page that is in the sidebar before its feature is built: what it will hold, as an empty state. -->
   <DockPanel Margin="{StaticResource PagePadding}">
-    <c:PageHeader DockPanel.Dock="Top" Title="{Binding Title}" Subtitle="{Binding Subtitle}" />
+    <!-- The title band shows the page's name; the header adds what it is for -->
+    <c:PageHeader DockPanel.Dock="Top" Subtitle="{Binding Subtitle}" />
     <Border Classes="card">
       <c:EmptyState Icon="{Binding Icon}" Title="{Binding EmptyTitle}" Text="{Binding EmptyText}" />
     </Border>

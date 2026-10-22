@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.BulkAutoFillSheetView"
              x:DataType="sh:BulkAutoFillSheetViewModel">
-  <StackPanel Spacing="12" Width="680">
+  <StackPanel Spacing="12">
     <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" />
     <TextBlock Classes="muted" TextWrapping="Wrap" Text="Values that would replace something already entered aren't ticked; tick them to use them." />
     <ScrollViewer MaxHeight="400">

@@ -1,32 +1,57 @@
+/*
+  The phone form. The same colours as the Mac app (src/Sde.App/Styles/Tokens.axaml), in light and dark: a light grey
+  page, white cards with hairline borders, the brand blue for actions. Controls are at least 48 px tall for fingers.
+*/
 :root {
-  --bg: #f5f5f7;
-  --card: #ffffff;
-  --text: #1d1d1f;
-  --muted: #5f6368;
-  --accent: #0a5cc2;
-  --accent-text: #ffffff;
-  --border: #c9ccd1;
-  --warn-bg: #fff4d6;
-  --warn-text: #5c4100;
-  --error-bg: #fde7e7;
-  --error-text: #8a1111;
-  --ok: #1b6e2d;
+  color-scheme: light dark;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --subtle: #f2f4f6;
+  --pressed: #ebeef2;
+  --border: #e2e5e9;
+  --border-strong: #c9cfd6;
+  --hairline: #eceef1;
+  --text: #16191d;
+  --text-2: #4b5360;
+  --text-3: #636c78;
+  --accent: #1e5aa8;
+  --accent-fill: #1e5aa8;
+  --accent-fill-pressed: #194e93;
+  --accent-soft: #e7eef8;
+  --on-accent: #ffffff;
+  --danger: #b42318;
+  --danger-bg: #fdecea;
+  --warning: #935400;
+  --warning-bg: #fff3dc;
+  --success: #1c7432;
+  --radius: 14px;
+  --radius-control: 10px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #161618;
-    --card: #232326;
-    --text: #f2f2f4;
-    --muted: #a6a8ad;
-    --accent: #4d9bff;
-    --accent-text: #0b0b0c;
-    --border: #45474c;
-    --warn-bg: #3b3011;
-    --warn-text: #ffe4a3;
-    --error-bg: #46191a;
-    --error-text: #ffc9c9;
-    --ok: #7fd794;
+    --bg: #16181b;
+    --surface: #212328;
+    --subtle: #272a30;
+    --pressed: #2b2f35;
+    --border: #31353b;
+    --border-strong: #464b53;
+    --hairline: #2a2d32;
+    --text: #eceef1;
+    --text-2: #b1b8c1;
+    --text-3: #959da7;
+    --accent: #80b1f0;
+    --accent-fill: #2c67b8;
+    --accent-fill-pressed: #3472c6;
+    --accent-soft: #1e3250;
+    --on-accent: #ffffff;
+    --danger: #ff8a80;
+    --danger-bg: #43211f;
+    --warning: #f2b65a;
+    --warning-bg: #3e3019;
+    --success: #7fd393;
+    --shadow: none;
   }
 }
 
@@ -38,135 +63,262 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 40px env(safe-area-inset-left);
+  font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  padding: 0 env(safe-area-inset-right) 48px env(safe-area-inset-left);
 }
 
 [hidden] { display: none !important; }
 
-.bar { padding: 14px 16px 6px; }
-.bar h1 { margin: 0; font-size: 22px; }
-.who { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+/* The top bar: the form's name and who this phone is paired as */
+.bar {
+  padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.bar h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.2px; }
+.who { margin: 2px 0 0; color: var(--text-2); font-size: 15px; }
 
-.notice {
-  margin: 8px 16px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--warn-bg);
-  color: var(--warn-text);
+/* Notices: the unencrypted connection (amber) and errors (red) */
+.notice, .message, .locked {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
   font-size: 15px;
 }
-
-.message {
-  margin: 8px 16px;
-  padding: 12px;
-  border-radius: 10px;
-  background: var(--error-bg);
-  color: var(--error-text);
+.notice::before, .message::before, .locked::before {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
 }
+.notice, .locked { background: var(--warning-bg); color: var(--text); }
+.notice::before, .locked::before { content: "!"; background: var(--warning); color: var(--warning-bg); }
+.message { background: var(--danger-bg); color: var(--text); }
+.message::before { content: "!"; background: var(--danger); color: var(--danger-bg); }
+.locked { margin: 10px 0 0; }
 
 main { padding: 0 16px; }
 
-section > h2, form > h2 { font-size: 20px; margin: 18px 0 8px; }
+/* Headings */
+section > h2, form > h2, #mine > h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.2px; margin: 24px 0 10px; }
+h3 { font-size: 17px; font-weight: 700; margin: 16px 0 6px; }
 
-h3 { font-size: 18px; margin: 16px 0 6px; }
+/* Cards: pairing, my assignments, adding a structure, photos, each step */
+#pair, #mine, #add-form, .photos, details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+#pair { margin: 16px 0 0; padding: 2px 16px 18px; }
+#pair > h2 { margin-top: 16px; }
+#mine { margin: 16px 0 0; padding: 2px 16px 16px; }
+#mine > h2 { margin-top: 16px; }
+#add-form { margin: 12px 0 0; padding: 2px 16px 16px; }
+#add-form > h2 { margin-top: 16px; }
 
-label { display: block; margin: 14px 0 4px; font-weight: 600; }
+/* Labels and help */
+label { display: block; margin: 16px 0 6px; font-size: 15px; font-weight: 600; color: var(--text); }
+#mine > label:first-of-type, #pair form > label:first-of-type { margin-top: 8px; }
+.hint, .summary, #photo-count, #pair-help { color: var(--text-2); margin: 6px 0 0; font-size: 15px; }
+.unit { color: var(--text-3); font-weight: 400; }
 
-.hint, .summary, #photo-count { color: var(--muted); margin: 4px 0; font-size: 15px; }
-
+/* Inputs */
 input[type=text], input[type=search], input[type=number], input[type=date], select, textarea {
   width: 100%;
   min-height: 48px;
-  padding: 10px 12px;
+  padding: 11px 14px;
   font: inherit;
   color: var(--text);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  -webkit-appearance: none;
+  appearance: none;
 }
-
-textarea { min-height: 96px; resize: vertical; }
-
-input[type=file] { font: inherit; min-height: 48px; width: 100%; }
+input[type=search]::-webkit-search-decoration { -webkit-appearance: none; }
+select {
+  padding-right: 40px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-3) 50%), linear-gradient(135deg, var(--text-3) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+textarea { min-height: 104px; resize: vertical; }
+input:disabled, select:disabled, textarea:disabled { background-color: var(--subtle); color: var(--text-3); }
+input[type=file] { font: inherit; font-size: 15px; min-height: 48px; width: 100%; color: var(--text-2); }
+input[type=file]::file-selector-button {
+  min-height: 44px;
+  margin-right: 12px;
+  padding: 8px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 0;
+  border-radius: var(--radius-control);
+}
 
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
+/* Buttons */
 button {
   min-height: 48px;
   min-width: 48px;
-  padding: 10px 18px;
-  margin: 12px 0 0;
+  padding: 11px 18px;
+  margin: 14px 0 0;
   font: inherit;
   font-weight: 600;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--card);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
   color: var(--text);
 }
+button:active { background: var(--pressed); }
+button.primary { background: var(--accent-fill); color: var(--on-accent); border-color: var(--accent-fill); }
+button.primary:active { background: var(--accent-fill-pressed); border-color: var(--accent-fill-pressed); }
+button.secondary { color: var(--accent); }
+button:disabled { opacity: 0.5; }
+#pair button.primary, #photo-form button.primary { width: 100%; }
+#show-add { width: 100%; }
 
-button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-
-button:disabled { opacity: 0.55; }
+/* "Back to search": a link with a chevron, like a navigation bar's back button */
+#back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0 -6px;
+  padding: 10px 6px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+}
+#back::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-left: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+}
+#edit-heading { margin-top: 6px; font-size: 24px; }
 
 .row { display: flex; gap: 10px; align-items: flex-end; }
 .row input { flex: 1; }
 .row button { margin-top: 0; }
-form > .row { margin-top: 14px; }
+form > .row { margin-top: 16px; }
+#add-form > .row button { flex: 1; }
 
-fieldset { border: 1px solid var(--border); border-radius: 10px; margin: 12px 0 0; padding: 4px 12px 12px; }
-legend { font-weight: 600; padding: 0 4px; }
+fieldset { border: 0; margin: 12px 0 0; padding: 0; }
+legend { font-size: 15px; font-weight: 600; padding: 0; margin-bottom: 4px; }
 
+/* Radio buttons and tick boxes: the whole row is the target */
 label.choice, label.check {
   display: flex;
   align-items: center;
   gap: 12px;
   min-height: 48px;
   margin: 6px 0 0;
+  padding: 0 14px;
+  font-size: 17px;
   font-weight: 400;
+  background: var(--subtle);
+  border-radius: var(--radius-control);
 }
+label.choice input, label.check input { width: 24px; height: 24px; margin: 0; accent-color: var(--accent-fill); }
 
-label.choice input, label.check input { width: 26px; height: 26px; margin: 0; }
-
-.results { list-style: none; margin: 12px 0 0; padding: 0; }
-.results li { margin: 0 0 8px; }
+/* Lists of structures (search results and my assignments): one grouped card, a row per structure */
+.results {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.results:empty { display: none; }
+.results li { margin: 0; border-top: 1px solid var(--hairline); }
+.results li:first-child { border-top: 0; }
+.results li:not(:has(button)) { padding: 14px 16px; color: var(--text-2); font-size: 15px; }
 .results button {
+  position: relative;
   display: block;
   width: 100%;
+  min-height: 60px;
   margin: 0;
+  padding: 11px 44px 11px 16px;
   text-align: left;
   font-weight: 400;
-  background: var(--card);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
-.results .addr { display: block; font-weight: 600; }
-.results .meta { display: block; color: var(--muted); font-size: 15px; }
-
-details {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin: 12px 0;
-  padding: 0 14px 12px;
+.results button:active { background: var(--pressed); }
+.results button::after {
+  content: "";
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--text-3);
+  border-right: 2px solid var(--text-3);
+  transform: translateY(-50%) rotate(45deg);
 }
+.results .addr { display: block; font-weight: 600; color: var(--text); }
+.results .meta { display: block; margin-top: 1px; color: var(--text-2); font-size: 15px; }
 
+/* My assignments sits above the search: its list is inside its card, so it has no card of its own */
+#mine .results { margin-top: 14px; background: var(--bg); box-shadow: none; }
+
+/* The steps of an assessment: one card each, opened by tapping its name */
+details { margin: 12px 0 0; padding: 0 16px; }
+details[open] { padding-bottom: 16px; }
 summary {
-  min-height: 52px;
+  position: relative;
   display: flex;
   align-items: center;
+  min-height: 56px;
+  padding-right: 28px;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
+  list-style: none;
   cursor: pointer;
 }
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-3);
+  border-bottom: 2px solid var(--text-3);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+details[open] > summary { border-bottom: 1px solid var(--hairline); margin-bottom: 2px; }
+details[open] > summary::after { transform: translateY(-30%) rotate(-135deg); }
+.field label { margin-top: 14px; }
 
-.unit { color: var(--muted); font-weight: 400; }
+.field-error { color: var(--danger); margin: 6px 0 0; font-size: 15px; }
 
-.field-error { color: var(--error-text); margin: 4px 0 0; font-size: 15px; }
+.save-status { min-height: 1.4em; color: var(--success); margin: 8px 0 0; font-size: 15px; font-weight: 600; }
 
-.locked { padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--warn-text); }
-
-.save-status { min-height: 1.4em; color: var(--ok); margin: 6px 0; }
-
-.photos { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0 14px 14px; margin: 12px 0; }
+/* Photos */
+.photos { margin: 14px 0 0; padding: 2px 16px 16px; }
+.photos > h3 { margin-top: 14px; }

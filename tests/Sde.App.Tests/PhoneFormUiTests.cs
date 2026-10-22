@@ -19,6 +19,7 @@ public class PhoneFormUiTests
 		PhoneFormService phone = ui.Services.PhoneForm;
 		phone.Options = new FieldServerOptions { BindAddress = IPAddress.Loopback };
 		ui.Main.ShowCommand.Execute(ViewModels.Page.Settings);
+		ui.Main.Settings.Show(ViewModels.SettingsCategory.PhoneForm);
 		ui.Pump();
 		Assert.False(phone.IsRunning);
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));

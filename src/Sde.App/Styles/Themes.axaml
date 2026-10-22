@@ -279,6 +279,27 @@
     </Setter>
   </ControlTheme>
 
+  <!-- Card header: icon tile, title and sentence, actions on the right -->
+  <ControlTheme x:Key="{x:Type c:CardHeader}" TargetType="c:CardHeader">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Width="36" Height="36" CornerRadius="9" Background="{DynamicResource AccentSoft}" VerticalAlignment="Top" Margin="0,0,12,0"
+                  IsVisible="{TemplateBinding Icon, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <c:Icon Kind="{TemplateBinding Icon}" Size="18" Foreground="{DynamicResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Classes="title" Text="{TemplateBinding Title}" TextWrapping="Wrap" />
+            <TextBlock Classes="muted" Text="{TemplateBinding Text}" TextWrapping="Wrap"
+                       IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+          <ContentPresenter Grid.Column="2" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="Center" Margin="16,0,0,0"
+                            IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
   <!-- Page header -->
   <ControlTheme x:Key="{x:Type c:PageHeader}" TargetType="c:PageHeader">
     <Setter Property="Margin" Value="0,0,0,16" />

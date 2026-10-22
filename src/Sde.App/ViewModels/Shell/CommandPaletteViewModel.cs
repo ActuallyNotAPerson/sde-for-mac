@@ -144,6 +144,10 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 			list.AddRange(_structures.Where(s => s.Matches(words)).Take(MaxStructures));
 		}
 		list.AddRange(Pages().Where(p => p.Matches(words)));
+		if (words.Count > 0)
+		{
+			list.AddRange(SettingsPages().Where(p => p.Matches(words)));
+		}
 		list.AddRange(Commands().Where(c => c.Matches(words)));
 		string group = null;
 		foreach (PaletteItem item in list)
@@ -181,6 +185,14 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 
 	private IEnumerable<PaletteItem> Pages() =>
 		_main.SidebarGroups.SelectMany(g => g.Items).Select(n => new PaletteItem("Pages", n.Title, null, n.Icon, n.Shortcut, () => _main.ShowCommand.Execute(n.Page), "go page"));
+
+	/// <summary>Each Settings category, found by its name ("phone form") or by "settings"; only once something is typed.</summary>
+	private IEnumerable<PaletteItem> SettingsPages() =>
+		_main.Settings.Categories.Select(c => new PaletteItem("Pages", c.Title, "Settings", c.Icon, null, () =>
+		{
+			_main.ShowCommand.Execute(ViewModels.Page.Settings);
+			_main.Settings.Show(c.Category);
+		}, "settings preferences"));
 
 	private IEnumerable<PaletteItem> Commands()
 	{

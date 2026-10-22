@@ -5,20 +5,24 @@
              x:Class="Sde.App.Views.DepthTablesPanel"
              x:DataType="vm:DepthTablesViewModel">
   <Border Classes="card">
-    <StackPanel Spacing="10">
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h2" Text="Depth tables" />
-        <TextBlock Classes="muted" TextWrapping="Wrap"
-                   Text="Your community's own depth-damage tables: for each depth of water above the lowest floor, the percent damage you expect for each part of the building. On an assessment's Damage step, Suggest from depth table fills in values the inspector then accepts or changes. SDE comes with none. Saved as you type." />
-      </StackPanel>
+    <StackPanel Spacing="12">
+      <c:CardHeader Icon="Flood" Title="Your depth tables"
+                    Text="Your community's own depth-damage tables: for each depth of water above the lowest floor, the percent damage you expect for each part of the building. On an assessment's Damage step, Suggest from depth table fills in values the inspector then accepts or changes. SDE comes with none. Saved as you type." />
 
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <ComboBox ItemsSource="{Binding Names}" SelectedItem="{Binding SelectedName}" Width="300" IsVisible="{Binding HasTables}"
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasTables}">
+        <ComboBox ItemsSource="{Binding Names}" SelectedItem="{Binding SelectedName}" Width="300"
                   PlaceholderText="Choose a table" AutomationProperties.Name="Depth table to edit" />
-        <Button Content="New table" Command="{Binding NewTableCommand}" />
+        <Button Command="{Binding NewTableCommand}" AutomationProperties.Name="New table">
+          <StackPanel Orientation="Horizontal" Spacing="6"><c:Icon Kind="Plus" Size="12" /><TextBlock Text="New table" /></StackPanel>
+        </Button>
         <Button Classes="danger" Content="Delete table…" Command="{Binding DeleteTableCommand}" IsVisible="{Binding HasTable}" />
       </StackPanel>
-      <TextBlock Classes="muted" Text="No depth tables yet." IsVisible="{Binding !HasTables}" />
+      <c:EmptyState IsVisible="{Binding !HasTables}" Icon="Flood" Title="No depth tables yet" Padding="12"
+                    Text="Make one for each kind of flooding your community sees, such as riverine or coastal, and building type.">
+        <Button Classes="primary" Command="{Binding NewTableCommand}" AutomationProperties.Name="New table">
+          <StackPanel Orientation="Horizontal" Spacing="6"><c:Icon Kind="Plus" Size="12" /><TextBlock Text="New table" /></StackPanel>
+        </Button>
+      </c:EmptyState>
 
       <StackPanel Spacing="10" IsVisible="{Binding HasTable}">
         <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="16">

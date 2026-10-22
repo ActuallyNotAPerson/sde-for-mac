@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:f="using:Sde.App.ViewModels.Fields"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.App"
              Name="Substantial Damage Estimator"
              RequestedThemeVariant="Default">
@@ -29,16 +30,20 @@
     <!-- One editor per kind of field; used by every form in the app. -->
     <DataTemplate DataType="f:TextFieldViewModel">
       <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
-        <DockPanel>
+        <DockPanel Classes="fieldHead">
           <Button DockPanel.Dock="Right" Classes="link sm" Content="Insert snippet" IsVisible="{Binding HasSnippets}" IsEnabled="{Binding IsEnabled}" Padding="0"
                   AutomationProperties.Name="{Binding Label, StringFormat='Insert a snippet into {0}'}">
             <Button.Flyout>
               <MenuFlyout ItemsSource="{Binding SnippetItems}" />
             </Button.Flyout>
           </Button>
-          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
-                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
-          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+          <StackPanel Orientation="Horizontal" Spacing="3">
+            <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+            <Button Classes="help" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                    AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field">
+              <c:Icon Kind="Info" Size="14" />
+            </Button>
+          </StackPanel>
         </DockPanel>
         <TextBox Text="{Binding Text}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" PlaceholderText="{Binding Placeholder}" MaxLength="{Binding MaxLength}"
                  AcceptsReturn="{Binding IsMultiline}" TextWrapping="Wrap" IsEnabled="{Binding IsEnabled}"
@@ -51,10 +56,14 @@
 
     <DataTemplate DataType="f:NumberFieldViewModel">
       <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
-                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
-          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        <DockPanel Classes="fieldHead">
+          <StackPanel Orientation="Horizontal" Spacing="3">
+            <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+            <Button Classes="help" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                    AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field">
+              <c:Icon Kind="Info" Size="14" />
+            </Button>
+          </StackPanel>
         </DockPanel>
         <NumericUpDown Value="{Binding Value}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" FormatString="{Binding Format}" ShowButtonSpinner="False"
                        Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" PlaceholderText="{Binding Placeholder}"
@@ -74,10 +83,14 @@
 
     <DataTemplate DataType="f:DateFieldViewModel">
       <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
-                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
-          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        <DockPanel Classes="fieldHead">
+          <StackPanel Orientation="Horizontal" Spacing="3">
+            <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+            <Button Classes="help" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                    AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field">
+              <c:Icon Kind="Info" Size="14" />
+            </Button>
+          </StackPanel>
         </DockPanel>
         <CalendarDatePicker SelectedDate="{Binding Date}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" IsEnabled="{Binding IsEnabled}" HorizontalAlignment="Stretch"
                             SelectedDateFormat="Custom" CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" />
@@ -89,10 +102,14 @@
 
     <DataTemplate DataType="f:ChoiceFieldViewModel">
       <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
-                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
-          <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+        <DockPanel Classes="fieldHead">
+          <StackPanel Orientation="Horizontal" Spacing="3">
+            <TextBlock Classes="fieldLabel" Text="{Binding Label}" />
+            <Button Classes="help" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                    AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field">
+              <c:Icon Kind="Info" Size="14" />
+            </Button>
+          </StackPanel>
         </DockPanel>
         <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Help}" IsEnabled="{Binding IsEnabled}"
                   HorizontalAlignment="Stretch" MaxDropDownHeight="360" />
@@ -104,12 +121,14 @@
 
     <DataTemplate DataType="f:BoolFieldViewModel">
       <StackPanel Classes="field" Classes.wide="{Binding IsWide}" IsVisible="{Binding IsVisible}">
-        <TextBlock Classes="fieldLabel" Text=" " />
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Classes="help" Content="?" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
-                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field" />
+        <Panel Classes="fieldHead" />
+        <StackPanel Orientation="Horizontal" Spacing="3">
           <CheckBox IsChecked="{Binding Value}" Content="{Binding Label}" IsEnabled="{Binding IsEnabled}" />
-        </DockPanel>
+          <Button Classes="help" IsVisible="{Binding HasHelp}" Command="{Binding ShowHelpCommand}"
+                  AutomationProperties.Name="{Binding Label, StringFormat='Help for {0}'}" ToolTip.Tip="What goes in this field">
+            <c:Icon Kind="Info" Size="14" />
+          </Button>
+        </StackPanel>
         <TextBlock Classes="help" Text="{Binding Help}" IsVisible="{Binding Help, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       </StackPanel>
     </DataTemplate>
@@ -130,5 +149,6 @@
     <StyleInclude Source="avares://SDE/Styles/DataGrid.axaml" />
     <StyleInclude Source="avares://SDE/Styles/AppStyles.axaml" />
     <StyleInclude Source="avares://SDE/Styles/Shell.axaml" />
+    <StyleInclude Source="avares://SDE/Styles/Editor.axaml" />
   </Application.Styles>
 </Application>
