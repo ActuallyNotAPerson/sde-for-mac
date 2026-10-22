@@ -19,8 +19,10 @@ namespace Sde.App.Tests;
 /// </summary>
 public class AccessibilityTests
 {
+	// The controls are listed first: asking a control for its name can apply its template, which adds to the tree, and
+	// walking the tree while that happens fails ("Collection was modified").
 	internal static IEnumerable<string> Unnamed(Window window) =>
-		window.GetVisualDescendants().OfType<Control>()
+		window.GetVisualDescendants().OfType<Control>().ToList()
 			.Where(c => c.IsEffectivelyVisible && c is TextBox or NumericUpDown or ComboBox or CalendarDatePicker or Slider or ToggleButton or Button)
 			// Inner parts belong to their control, except the text box inside a NumericUpDown or CalendarDatePicker: that is
 			// the element macOS exposes (and VoiceOver reads), so it must carry the name.

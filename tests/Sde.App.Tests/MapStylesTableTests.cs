@@ -148,8 +148,10 @@ public class MapStylesTableTests
 				{
 					for (double x = p.X - 30; x < p.X + 30; x++)
 					{
+						// The label's letters and their edges: Linux (FreeType) draws text lighter than macOS does, so a
+						// near-black cut-off finds only about 20 pixels of a short label there.
 						AColor c = MapTestSupport.At(frame, x, y);
-						dark += c.R < 70 && c.G < 70 && c.B < 70 ? 1 : 0;
+						dark += c.R < 110 && c.G < 110 && c.B < 110 ? 1 : 0;
 					}
 				}
 				return dark;
