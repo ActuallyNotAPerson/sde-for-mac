@@ -164,7 +164,10 @@ public sealed partial class MapLayerViewModel : ObservableObject
 			}
 			if (IsStructures)
 			{
-				return "Coloured by result";
+				string by = Style.Kind == StyleKind.Single || Style.Field is null or MapViewModel.ResultField
+					? "result"
+					: (MapViewModel.StructureFieldChoices.FirstOrDefault(f => f.Key == Style.Field)?.Label ?? Style.Field).ToLowerInvariant();
+				return "Coloured by " + by;
 			}
 			if (Data == null)
 			{
@@ -202,6 +205,7 @@ public sealed partial class MapLayerViewModel : ObservableObject
 		Record.Labels = labels?.ToJson();
 		Revision++;
 		UpdateLegend();
+		OnPropertyChanged(nameof(Detail));
 	}
 
 	/// <summary>Replaces the selection (or adds to it); the map redraws the highlight.</summary>

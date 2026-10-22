@@ -231,12 +231,6 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	public bool HasStructures => TotalCount > 0;
 
-	/// <summary>Writes each structure's address beside its dot (when zoomed in to street level).</summary>
-	[ObservableProperty]
-	public partial bool ShowAddressLabels { get; set; }
-
-	partial void OnShowAddressLabelsChanged(bool value) => MarkersChanged?.Invoke();
-
 	public string CountText => $"{ShownCount} of {OnMapCount} on the map";
 
 	/// <summary>The map should redraw its dots.</summary>
@@ -290,7 +284,9 @@ public sealed partial class MapViewModel : ViewModelBase
 		}
 		ShownCount = Visible.Count;
 		OnPropertyChanged(nameof(CountText));
+		_structureFeatures = null;
 		MarkersChanged?.Invoke();
+		StructuresChanged();
 	}
 
 	partial void OnSelectedChanged(MapPointViewModel value)
@@ -406,16 +402,9 @@ public sealed partial class MapViewModel : ViewModelBase
 	/// </summary>
 	public void SelectArea(IReadOnlyCollection<Guid> propertyIds, bool add)
 	{
-		HashSet<Guid> ids = _all.Where(p => propertyIds.Contains(p.Id) && p.AssessmentID != null).Select(p => p.AssessmentID!.Value).ToHashSet();
-		if (add)
-		{
-			ids.UnionWith(_main.Structures.CheckedAssessmentIds());
-		}
-		_main.Structures.CheckOnly(ids);
+		SelectStructures(propertyIds, add);
 		int n = _main.Structures.CheckedCount;
 		Message = n == 0 ? "No assessed structures in that box." : $"{n} structure{(n == 1 ? " is" : "s are")} checked in the Structures list.";
-		OnPropertyChanged(nameof(CheckedCount));
-		OnPropertyChanged(nameof(HasChecked));
 	}
 
 	public int CheckedCount => _main.Structures.CheckedCount;
@@ -428,10 +417,8 @@ public sealed partial class MapViewModel : ViewModelBase
 	[RelayCommand]
 	private void ClearChecked()
 	{
-		_main.Structures.CheckOnly(Array.Empty<Guid>());
+		SelectStructures(Array.Empty<Guid>(), add: false);
 		Message = "Nothing is checked in the Structures list.";
-		OnPropertyChanged(nameof(CheckedCount));
-		OnPropertyChanged(nameof(HasChecked));
 	}
 
 	/// <summary>The link under "N structures have no coordinates": the page with the bulk coordinate tools.</summary>

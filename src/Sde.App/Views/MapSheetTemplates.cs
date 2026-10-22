@@ -13,6 +13,7 @@ public sealed class MapSheetTemplates : IDataTemplate
 	private static readonly Dictionary<Type, Func<Control>> Views = new Dictionary<Type, Func<Control>>
 	{
 		[typeof(OnlineLayerSheetViewModel)] = () => new OnlineLayerSheetView(),
+		[typeof(LayerStyleSheetViewModel)] = () => new LayerStyleSheetView(),
 	};
 
 	public bool Match(object data) => data != null && Views.ContainsKey(data.GetType());

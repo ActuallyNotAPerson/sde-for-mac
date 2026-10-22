@@ -40,31 +40,90 @@
     </Grid>
 
     <Grid ColumnDefinitions="*,320">
-      <!-- The map -->
-      <Border Classes="card flush" ClipToBounds="True">
-        <Grid>
-          <maps:MapCanvas Name="Surface" Background="{DynamicResource SubtleBg}"
-                          AutomationProperties.Name="Map of the structures. The list beside the map has the same structures." />
-          <Border Classes="card compact" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Padding="8,3" MaxWidth="620"
-                  IsVisible="{Binding HasAttribution}" ToolTip.Tip="{Binding Attribution}">
-            <TextBlock Classes="muted xs" Text="{Binding Attribution}" TextTrimming="CharacterEllipsis" />
-          </Border>
-          <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" Padding="12,6" IsVisible="{Binding HasBasemapProblem}">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Classes="secondary" Text="{Binding BasemapProblem}" TextWrapping="Wrap" MaxWidth="420" VerticalAlignment="Center" />
-              <Button Classes="link" Content="Try again" Command="{Binding RetryTilesCommand}" VerticalAlignment="Center"
-                      AutomationProperties.Name="Try downloading the map tiles again" />
-            </StackPanel>
-          </Border>
-          <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20,14" IsVisible="{Binding OnMapCount, Converter={x:Static app:Converters.IsZero}}">
-            <StackPanel Spacing="4" MaxWidth="360">
-              <TextBlock Classes="h3" Text="No structures on the map yet" HorizontalAlignment="Center" />
-              <TextBlock Classes="secondary" TextWrapping="Wrap" TextAlignment="Center"
-                         Text="A structure appears here once it has a latitude and longitude. Use Set location to click each one on the map, or add coordinates in bulk." />
-            </StackPanel>
-          </Border>
-        </Grid>
-      </Border>
+      <!-- The map, with the attribute table under it when open -->
+      <Grid RowDefinitions="*,Auto">
+        <Border Classes="card flush" ClipToBounds="True">
+          <Grid>
+            <maps:MapCanvas Name="Surface" Background="{DynamicResource SubtleBg}"
+                            AutomationProperties.Name="Map of the structures. The list beside the map has the same structures." />
+            <Border Classes="card compact" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Padding="8,3" MaxWidth="620"
+                    IsVisible="{Binding HasAttribution}" ToolTip.Tip="{Binding Attribution}">
+              <TextBlock Classes="muted xs" Text="{Binding Attribution}" TextTrimming="CharacterEllipsis" />
+            </Border>
+            <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" Padding="12,6" IsVisible="{Binding HasBasemapProblem}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Classes="secondary" Text="{Binding BasemapProblem}" TextWrapping="Wrap" MaxWidth="420" VerticalAlignment="Center" />
+                <Button Classes="link" Content="Try again" Command="{Binding RetryTilesCommand}" VerticalAlignment="Center"
+                        AutomationProperties.Name="Try downloading the map tiles again" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20,14" IsVisible="{Binding OnMapCount, Converter={x:Static app:Converters.IsZero}}">
+              <StackPanel Spacing="4" MaxWidth="360">
+                <TextBlock Classes="h3" Text="No structures on the map yet" HorizontalAlignment="Center" />
+                <TextBlock Classes="secondary" TextWrapping="Wrap" TextAlignment="Center"
+                           Text="A structure appears here once it has a latitude and longitude. Use Set location to click each one on the map, or add coordinates in bulk." />
+              </StackPanel>
+            </Border>
+
+            <!-- Identify: the clicked feature's values -->
+            <Border Classes="card" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Width="280" MaxHeight="380"
+                    DataContext="{Binding Identified}" x:DataType="vm:IdentifyViewModel" IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                  <StackPanel>
+                    <TextBlock Classes="eyebrow" Text="{Binding LayerName}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="medium" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <Button Grid.Column="1" Classes="icon sm" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).CloseIdentifyCommand}" VerticalAlignment="Top"
+                          AutomationProperties.Name="Close the feature's details">
+                    <c:Icon Kind="Close" />
+                  </Button>
+                </Grid>
+                <Button DockPanel.Dock="Bottom" Classes="link" Content="Show in the table" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).ShowIdentifiedInTableCommand}"
+                        Margin="0,6,0,0" AutomationProperties.Name="Select this feature and show it in the attribute table" />
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                  <ItemsControl ItemsSource="{Binding Lines}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:IdentifyLine">
+                        <Grid ColumnDefinitions="110,*" ColumnSpacing="8" Margin="0,1" AutomationProperties.Name="{Binding SpokenName}">
+                          <TextBlock Classes="muted" Text="{Binding Field}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
+          </Grid>
+        </Border>
+
+        <!-- The attribute table (read-only) -->
+        <Border Grid.Row="1" Classes="card flush" Height="250" Margin="0,10,0,0" IsVisible="{Binding IsTableOpen}">
+          <DockPanel>
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="10" Margin="12,8">
+              <TextBlock Classes="medium" Text="Table" VerticalAlignment="Center" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding SelectableLayers}" SelectedItem="{Binding TableLayer}" MinWidth="170" AutomationProperties.Name="Layer shown in the table">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:MapLayerViewModel">
+                    <TextBlock Text="{Binding Name}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBox Grid.Column="2" Text="{Binding TableFilter}" PlaceholderText="Filter rows" MaxWidth="260" HorizontalAlignment="Left"
+                       AutomationProperties.Name="Show only rows containing" />
+              <CheckBox Grid.Column="3" Content="Selected only" IsChecked="{Binding TableSelectedOnly}" AutomationProperties.Name="Show only the selected features" />
+              <TextBlock Grid.Column="4" Classes="muted" Text="{Binding TableCountText}" VerticalAlignment="Center" />
+              <Button Grid.Column="5" Classes="icon sm" Command="{Binding CloseTableCommand}" AutomationProperties.Name="Close the table">
+                <c:Icon Kind="Close" />
+              </Button>
+            </Grid>
+            <DataGrid Name="TableGrid" ItemsSource="{Binding TableRows}" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Extended"
+                      CanUserSortColumns="True" CanUserResizeColumns="True" CanUserReorderColumns="False" GridLinesVisibility="Horizontal"
+                      AutomationProperties.Name="Attribute table" />
+          </DockPanel>
+        </Border>
+      </Grid>
 
       <!-- Beside the map: the structures, or the layers -->
       <DockPanel Grid.Column="1" Margin="14,0,0,0">
@@ -112,6 +171,10 @@
                           <c:Icon Kind="More" />
                           <Button.Flyout>
                             <MenuFlyout Placement="BottomEdgeAlignedRight">
+                              <MenuItem Header="Style…" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).StyleLayerCommand}" CommandParameter="{Binding}"
+                                        IsVisible="{Binding !IsTiles}" />
+                              <MenuItem Header="Attribute table" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).ShowTableCommand}" CommandParameter="{Binding}"
+                                        IsVisible="{Binding !IsTiles}" />
                               <MenuItem Header="Zoom to layer" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).ZoomToLayerCommand}" CommandParameter="{Binding}"
                                         IsVisible="{Binding IsFeatures}" />
                               <MenuItem Header="Move up" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).MoveLayerUpCommand}" CommandParameter="{Binding}"
@@ -167,7 +230,26 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <StackPanel Spacing="4" IsVisible="{Binding HasStructureLegend}">
+              <TextBlock Classes="eyebrow" Text="{Binding StructureLegendTitle}" />
+              <ItemsControl ItemsSource="{Binding StructureLegend}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:LegendLineViewModel">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,1">
+                      <Ellipse Width="12" Height="12" Fill="{Binding Fill}" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
             <CheckBox IsChecked="{Binding ShowAddressLabels}" Content="Show addresses on the map" AutomationProperties.Name="Show addresses beside the dots when zoomed in" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Content="Style…" Command="{Binding StyleLayerCommand}" CommandParameter="{Binding StructuresLayer}"
+                      AutomationProperties.Name="Choose what the structure dots are coloured and labelled by" />
+              <Button Content="Table" Command="{Binding ShowTableCommand}" CommandParameter="{Binding StructuresLayer}"
+                      AutomationProperties.Name="Show the structures in the attribute table" />
+            </StackPanel>
 
             <StackPanel Spacing="2" IsVisible="{Binding HasUnplaced}">
               <TextBlock Classes="medium" Text="{Binding UnplacedText}" TextWrapping="Wrap" />

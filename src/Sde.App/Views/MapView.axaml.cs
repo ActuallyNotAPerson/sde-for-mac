@@ -32,6 +32,38 @@ public partial class MapView : UserControl
 		ZoomOutButton.Click += (_, _) => Surface.ZoomBy(-1);
 		ActualThemeVariantChanged += (_, _) => Rebuild();
 		PointList.DoubleTapped += (_, _) => _vm?.OpenSelectedCommand.Execute(null);
+		TableGrid.SelectionChanged += OnTableSelectionChanged;
+		TableGrid.DoubleTapped += (_, _) => _vm?.ZoomToRowCommand.Execute(TableGrid.SelectedItem as AttributeRowViewModel);
+	}
+
+	private bool _fillingTable;
+
+	/// <summary>Rows picked in the table are selected on the map (not while the table is being filled).</summary>
+	private void OnTableSelectionChanged(object sender, SelectionChangedEventArgs e)
+	{
+		if (_vm != null && !_fillingTable && TableGrid.SelectedItems.Count > 0)
+		{
+			_vm.SelectTableRows(TableGrid.SelectedItems.OfType<AttributeRowViewModel>().ToList());
+		}
+	}
+
+	/// <summary>Makes the table's columns for the layer it shows: one per field, sorting by the field's value.</summary>
+	private void BuildTableColumns()
+	{
+		_fillingTable = true;
+		TableGrid.Columns.Clear();
+		foreach (AttributeColumn column in _vm?.TableColumns ?? Array.Empty<AttributeColumn>())
+		{
+			TableGrid.Columns.Add(new DataGridTextColumn
+			{
+				Header = column.Header,
+				Binding = new Avalonia.Data.Binding($"[{column.Index}]"),
+				CustomSortComparer = new AttributeComparer(column.Index),
+				CanUserSort = true,
+				MaxWidth = 320,
+			});
+		}
+		_fillingTable = false;
 	}
 
 	/// <summary>The map control, for tests that need its screen positions.</summary>
@@ -70,12 +102,15 @@ public partial class MapView : UserControl
 		_vm.CenterRequested += Center;
 		_vm.ZoomToRequested += ZoomTo;
 		_vm.RetryRequested += Surface.RetryTiles;
+		_vm.SelectionChanged += ShowSelection;
+		_vm.TableColumnsChanged += BuildTableColumns;
 		_vm.PropertyChanged += VmChanged;
 		Surface.Tiles = _vm.Tiles;
 		Surface.Basemap = _vm.Basemap;
 		ApplyMode();
 		Rebuild();
 		ShowLayers();
+		BuildTableColumns();
 	}
 
 	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -98,6 +133,8 @@ public partial class MapView : UserControl
 		_vm.CenterRequested -= Center;
 		_vm.ZoomToRequested -= ZoomTo;
 		_vm.RetryRequested -= Surface.RetryTiles;
+		_vm.SelectionChanged -= ShowSelection;
+		_vm.TableColumnsChanged -= BuildTableColumns;
 		_vm.PropertyChanged -= VmChanged;
 		Surface.Tiles = null;
 		_vm = null;
@@ -138,28 +175,54 @@ public partial class MapView : UserControl
 		}
 	}
 
-	/// <summary>Hands the visible structures to the map, each in the colour of its result class.</summary>
+	/// <summary>Rings the selected structures.</summary>
+	private void ShowSelection()
+	{
+		if (_vm != null)
+		{
+			Surface.SelectedMarkers = _vm.SelectedStructures();
+		}
+	}
+
+	/// <summary>
+	/// Hands the visible structures to the map: each in the colour of its result class (the theme's), or in its
+	/// category's colour when the structures are coloured by something else, with its label when labels are on.
+	/// </summary>
 	private void Rebuild()
 	{
 		if (_vm == null)
 		{
 			return;
 		}
-		Dictionary<Sde.Core.Assessments.DeterminationClass, IBrush> brushes = new();
+		Dictionary<string, IBrush> brushes = new();
+		IReadOnlyDictionary<Guid, string> fills = _vm.ColoursByResult ? null : _vm.StructureFills();
+		IReadOnlyDictionary<Guid, string> labels = _vm.StructureLabels();
 		List<MapMarker> markers = new(_vm.Visible.Count);
 		bool shown = _vm.StructuresLayer?.IsVisible ?? true;
 		foreach (MapPointViewModel p in shown ? (IEnumerable<MapPointViewModel>)_vm.Visible : Array.Empty<MapPointViewModel>())
 		{
-			if (!brushes.TryGetValue(p.Class, out IBrush fill))
+			string key;
+			if (fills == null)
 			{
-				fill = this.TryFindResource("Status" + p.Class + "Fg", ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.Gray;
-				brushes[p.Class] = fill;
+				key = "Status" + p.Class + "Fg";
 			}
-			markers.Add(new MapMarker(p.Id, p.Latitude, p.Longitude, fill, _vm.ShowAddressLabels ? p.Address : null));
+			else if (!fills.TryGetValue(p.Id, out key))
+			{
+				// Its category is unticked in the style.
+				continue;
+			}
+			if (!brushes.TryGetValue(key, out IBrush fill))
+			{
+				fill = fills == null
+					? this.TryFindResource(key, ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.Gray
+					: LegendLineViewModel.Brush(key);
+				brushes[key] = fill;
+			}
+			markers.Add(new MapMarker(p.Id, p.Latitude, p.Longitude, fill, labels != null && labels.TryGetValue(p.Id, out string text) ? text : null));
 		}
-		// Addresses only once zoomed in to street level (1:8,000 or closer), where they have room.
-		Surface.MarkerLabels = _vm.ShowAddressLabels ? new Sde.Gis.Styles.LabelStyle { Field = "Address", MinScale = 8000 } : null;
+		Surface.MarkerLabels = labels == null ? null : _vm.StructuresLayer.Labels;
 		Surface.Markers = markers;
 		Surface.Highlighted = _vm.Selected?.Id;
+		ShowSelection();
 	}
 }
