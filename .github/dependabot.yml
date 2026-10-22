@@ -16,11 +16,15 @@ updates:
       # version only together with an Avalonia release that uses it.
       - dependency-name: "SkiaSharp*"
         update-types: ["version-update:semver-major"]
-      # Svg.Skia and the packages under it no longer ship: the map library (Mapsui) names them, but SDE.app leaves them
-      # out (Svg.Custom is MS-PL) and never draws SVG symbols. Their versions stay pinned in Directory.Packages.props only
-      # so that the exclusion resolves; a new major (built on SkiaSharp 4) would not resolve against SkiaSharp 3.
+      # Svg.Skia and the packages under it never ship: the map library (Mapsui) names them, but SDE.app leaves them out
+      # (Svg.Custom is MS-PL; src/Sde.App/LeaveOutSvg.props) and never draws SVG symbols. Their versions stay pinned in
+      # Directory.Packages.props only so that the exclusion resolves, at what Mapsui asks for (Svg.Skia 3.2.1), so an
+      # update gains nothing and can leave the set mismatched. They move only with a Mapsui update.
       - dependency-name: "Svg.Skia"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: "Svg.Custom"
+      - dependency-name: "Svg.Model"
+      - dependency-name: "ShimSkiaSharp"
+      - dependency-name: "ExCSS"
       # Mapsui must stay on a release built for Avalonia 12 and SkiaSharp 3; a new major is checked by hand.
       - dependency-name: "Mapsui*"
         update-types: ["version-update:semver-major"]
