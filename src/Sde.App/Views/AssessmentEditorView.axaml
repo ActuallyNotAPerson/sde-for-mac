@@ -476,13 +476,22 @@
             <TextBlock Classes="h2" Text="{Binding Title}" />
             <TextBlock Classes="secondary" Text="{Binding Subtitle}" />
           </StackPanel>
-          <Button Grid.Column="1" Command="{Binding OnlineLookupCommand}" IsVisible="{Binding HasOnlineLookup}" VerticalAlignment="Top" AutomationProperties.Name="Look up online"
-                  ToolTip.Tip="Coordinates from the Census geocoder and the flood zone from FEMA's flood map. You choose what to use.">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <c:Icon Kind="Globe" Size="14" />
-              <TextBlock Text="Look up online…" />
-            </StackPanel>
-          </Button>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+            <Button Command="{Binding ElevationCertificateCommand}" IsVisible="{Binding HasElevationCertificate}" AutomationProperties.Name="Elevation certificate"
+                    ToolTip.Tip="Read FEMA's elevation certificate (or type its values) and keep the PDF with the structure. You choose what to use.">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:Icon Kind="Pdf" Size="14" />
+                <TextBlock Text="Elevation certificate…" />
+              </StackPanel>
+            </Button>
+            <Button Command="{Binding OnlineLookupCommand}" IsVisible="{Binding HasOnlineLookup}" AutomationProperties.Name="Look up online"
+                    ToolTip.Tip="Coordinates from the Census geocoder and the flood zone from FEMA's flood map. You choose what to use.">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:Icon Kind="Globe" Size="14" />
+                <TextBlock Text="Look up online…" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
         </Grid>
         <ItemsControl ItemsSource="{Binding Groups}" />
       </StackPanel>
@@ -557,6 +566,7 @@
                 <MenuItem Header="History…" Command="{Binding ShowHistoryCommand}" />
                 <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" IsEnabled="{Binding IsEditable}" />
                 <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
+                <MenuItem Header="Elevation certificate…" Command="{Binding ImportElevationCertificateCommand}" IsEnabled="{Binding IsEditable}" />
                 <Separator />
                 <MenuItem Header="Improvements and SI…" Command="{Binding ShowImprovementsCommand}" />
                 <MenuItem Header="Appeal…" Command="{Binding ShowAppealCommand}" />

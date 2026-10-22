@@ -22,6 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Sde.App/Sde.App.csproj" />
     <ProjectReference Include="../Sde.TestSupport/Sde.TestSupport.csproj" />
+    <!-- Made-up elevation certificate PDFs, shared with the Interop tests -->
+    <Compile Include="../Sde.Interop.Tests/EcTestForms.cs" Link="Support/EcTestForms.cs" />
   </ItemGroup>
 
   <!-- The recorded Census geocoder and FEMA NFHL answers, shared with the Interop tests (the network is never used). -->

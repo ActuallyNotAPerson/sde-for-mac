@@ -68,6 +68,11 @@ public partial class SectionViewModel : ObservableObject
 
 	public bool HasOnlineLookup => OnlineLookupCommand != null;
 
+	/// <summary>"Elevation certificate…" in the Flood zone step's header, or null.</summary>
+	public System.Windows.Input.ICommand ElevationCertificateCommand { get; set; }
+
+	public bool HasElevationCertificate => ElevationCertificateCommand != null;
+
 	/// <summary>Every field shown in this step (used to place validation issues).</summary>
 	public virtual IEnumerable<FieldViewModel> AllFields => Groups.SelectMany(g => g.Fields);
 

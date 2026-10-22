@@ -110,10 +110,21 @@ public static class EcImport
 	/// </summary>
 	public static EcImportResult Apply(SdeStore store, EcImportPreview preview, IReadOnlyCollection<string> keys, SaveContext context = null)
 	{
-		ArgumentNullException.ThrowIfNull(store);
 		ArgumentNullException.ThrowIfNull(preview);
 		HashSet<string> chosen = new HashSet<string>(keys ?? Array.Empty<string>(), StringComparer.Ordinal);
-		List<FieldInputChange> changes = preview.Changes.Where(c => chosen.Contains(c.Key)).Select(c => new FieldInputChange(c.Key, c.Value)).ToList();
+		return Apply(store, preview, preview.Changes.Where(c => chosen.Contains(c.Key)).Select(c => new FieldInputChange(c.Key, c.Value)).ToList(), context);
+	}
+
+	/// <summary>
+	/// The same with the values given directly: the ticked proposals, or values typed from a certificate SDE couldn't
+	/// read (the entry sheet). They are checked as the editor checks them; a refused value changes nothing and keeps no
+	/// PDF (<see cref="FieldInputException"/>).
+	/// </summary>
+	public static EcImportResult Apply(SdeStore store, EcImportPreview preview, IReadOnlyList<FieldInputChange> changes, SaveContext context = null)
+	{
+		ArgumentNullException.ThrowIfNull(store);
+		ArgumentNullException.ThrowIfNull(preview);
+		changes ??= Array.Empty<FieldInputChange>();
 		SaveContext ctx = new SaveContext
 		{
 			User = context?.User,
@@ -133,6 +144,16 @@ public static class EcImport
 			"Elevation certificate", preview.AssessmentID, fields, ctx);
 		return new EcImportResult { Changed = changed, Document = document, BatchId = changed == 0 ? null : ctx.BatchId };
 	}
+
+	/// <summary>
+	/// The fields the entry sheet offers when a certificate can't be read (a scan or a flattened copy): the ones the
+	/// certificate's sections A5, B1, B4, B5, B9 and C2 hold that are typed rather than chosen.
+	/// </summary>
+	public static readonly IReadOnlyList<string> EntryKeys = new[]
+	{
+		"Property.Latitude", "Property.Longitude", "Property.NFIPCID", "Property.FIRMPanelNumber", "Property.PanelSuffix",
+		"Property.BFE", "Property.FirstFloorElevation", "Property.Datum",
+	};
 
 	private static string AddressWarning(AssessmentFile file, ElevationCertificateValues ec, ReferenceData reference)
 	{

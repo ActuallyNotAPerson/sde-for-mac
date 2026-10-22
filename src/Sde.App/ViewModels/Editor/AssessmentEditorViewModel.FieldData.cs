@@ -32,6 +32,10 @@ public sealed partial class AssessmentEditorViewModel
 			{
 				s.OnlineLookupCommand = LookUpOnlineCommand;
 			}
+			if (s.AllFields.Any(f => f.RecordType == typeof(PropertyRecord) && f.Member == nameof(PropertyRecord.BFE)))
+			{
+				s.ElevationCertificateCommand = ImportElevationCertificateCommand;
+			}
 		}
 		_depthTables = _app.DepthTables.All().ToList();
 		LoadSuggestions();
