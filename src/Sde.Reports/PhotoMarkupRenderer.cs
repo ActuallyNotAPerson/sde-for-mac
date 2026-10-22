@@ -106,6 +106,13 @@ public static class PhotoMarkupRenderer
 	}
 
 	/// <summary>
+	/// A photo with its markup drawn on, as JPEG bytes (upright, at most <paramref name="maxEdge"/> pixels on the long
+	/// side), for previews and thumbnails; null when the photo can't be read. The photo file itself never changes.
+	/// </summary>
+	public static (byte[] Jpeg, int Width, int Height)? Render(string photoPath, PhotoMarkup markup, int maxEdge) =>
+		Internal.PhotoPrep.Prepare(photoPath, markup, maxEdge);
+
+	/// <summary>
 	/// Writes a marked-up JPEG copy of a photo (upright, at most <paramref name="maxEdge"/> pixels on the long side).
 	/// Returns false when the photo can't be read.
 	/// </summary>
