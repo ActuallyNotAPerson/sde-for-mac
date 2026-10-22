@@ -159,6 +159,7 @@
                     <MenuFlyout>
                       <MenuItem Header="To FEMA SDE (export folder)…" Command="{Binding ExportCheckedCommand}" />
                       <MenuItem Header="To Excel…" Command="{Binding ExportCheckedToExcelCommand}" />
+                      <MenuItem Header="Web map…" Command="{Binding WebMapCommand}" ToolTip.Tip="A web page of these structures on a map, for the office or the public" />
                       <Separator />
                       <MenuItem Header="Submission folder (reports + FEMA package)…" Command="{Binding OpenSubmissionCommand}" />
                       <Separator />

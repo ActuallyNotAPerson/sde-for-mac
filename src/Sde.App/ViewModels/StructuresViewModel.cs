@@ -794,6 +794,21 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	[RelayCommand]
 	private async Task ExportCheckedToExcel() => await _main.ImportExport.ExportExcelAsync(TargetIds());
 
+	/// <summary>Export ▾, then Web map: a web map folder of the checked structures (or the list), for the office or the public.</summary>
+	[RelayCommand]
+	private async Task WebMap()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new WebMapSheetViewModel(_app, ids)) is string done)
+		{
+			_app.Dialogs.Notify("Web map made", done);
+		}
+	}
+
 	// ───────────── Changing many at once ─────────────
 
 	/// <summary>Set a field on all the checked assessments (or all shown).</summary>

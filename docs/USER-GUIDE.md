@@ -572,6 +572,24 @@ Under **Share this event**:
 
 ![The event dashboard](screenshots/57-dashboard.png)
 
+### Sharing a web map
+A web map is a folder with a web page of structures on a map. Open it in any browser, send the folder, or put it on
+any web server. The page works offline; only the background map needs the internet.
+
+1. On Structures, check the structures (or filter the list), then choose **Export ▾ > Web map…**. On the map, select
+   structures and click **Add to web map…**. With an event chosen in the sidebar, the title is the event's name.
+2. Choose **Who it is for**:
+   - **The office and partners**: a dot for each structure with its address, result and percent damaged. Tick the
+     other fields to show in each structure's popup, such as the inspection date or the depth above the lowest floor.
+   - **The public**: structures are counted in **Grid squares** (100, 200 or 500 metres) instead of dots, owners are
+     never shown, and **Addresses** are hidden or cut to the block ("100 block of River St").
+3. Choose the **Background map** (USGS topographic, OpenStreetMap or None) and whether to show the event's summary
+   beside the map.
+4. Click **Make web map…** and choose where to put the folder. SDE opens the page when it is done. Structures without
+   coordinates are left out and counted.
+
+![Web map](screenshots/56e-web-map-sheet.png)
+
 ---
 
 ## 10. Reports and sending results to FEMA or your state
