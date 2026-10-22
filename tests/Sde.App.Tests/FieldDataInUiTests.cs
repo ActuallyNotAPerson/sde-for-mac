@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Sde.App.ViewModels.Editor;
 using Sde.App.ViewModels.Sheets;
+using Sde.Core.Assessments;
 using Sde.Core.Records;
 using Sde.Data;
 using Sde.Interop.ElevationCertificates;
@@ -92,5 +93,45 @@ public class FieldDataInUiTests
 		ui.Pump();
 		Assert.Equal(741.2m, ui.Store.LoadAssessment(id).Property.FirstFloorElevation);
 		Assert.Single(ui.Store.GetDocuments(ui.Main.Editor.Property.PropertyID));
+	}
+
+	[AvaloniaFact]
+	public async Task FloodDepth_FromAMarksFile_FillsTheTickedStructures_AsTheDepthTool()
+	{
+		using UiSession ui = WithSamples();
+		Guid id = Ranch(ui);
+		ui.Store.Apply(id, f =>
+		{
+			f.Property.Latitude = 39.7m;
+			f.Property.Longitude = -84.2m;
+			f.Property.Datum = "NAVD88";
+			f.Property.FirstFloorElevation = 740m;
+		});
+		string csv = Path.Combine(ui.Folder, "marks.csv");
+		File.WriteAllText(csv, "latitude,longitude,elev_ft,vertical_datum_name,hwm_quality_id\n39.7005,-84.2,742.5,NAVD88,2\n39.6995,-84.2,742.5,NAVD88,2\n");
+		ui.Services.RaiseDataChanged();
+		ui.Pump();
+
+		ui.Main.Structures.Rows.Single(r => r.AssessmentID == id).IsChecked = true;
+		Task depth = ui.Main.Structures.FloodDepthCommand.ExecuteAsync(null);
+		ui.Pump();
+		DepthSheetViewModel sheet = Assert.IsType<DepthSheetViewModel>(ui.Main.Sheets.Current);
+		ui.Dialogs.Answers.Enqueue(new[] { csv });
+		await sheet.ChooseMarksFileCommand.ExecuteAsync(null);
+		ui.Pump();
+		FloodDepthRowViewModel row = Assert.Single(sheet.Rows);
+		Assert.True(row.IsChecked);
+		Assert.Contains("742.5 ft", row.Proposed);
+		Assert.Contains("2.5 ft above the floor", row.Proposed);
+		Assert.Contains("2 marks", sheet.MarksSummary);
+		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
+		ui.Snapshot("65-flood-depth");
+		sheet.SaveCommand.Execute(null);
+		await depth;
+
+		AssessmentFile now = ui.Store.LoadAssessment(id);
+		Assert.Equal(742.5m, now.Assessment.DepthOfFlood);
+		Assert.Equal(2.5m, now.Assessment.DepthOfFloodAboveFFE);
+		Assert.Contains(ui.Store.GetHistory(id), h => h.Via == SaveVia.DepthTool);
 	}
 }

@@ -103,6 +103,7 @@
     <DataTemplate DataType="sh:ManageEventsSheetViewModel"><v:ManageEventsSheetView /></DataTemplate>
     <DataTemplate DataType="sh:SetEventSheetViewModel"><v:SetEventSheetView /></DataTemplate>
     <DataTemplate DataType="sh:EcImportSheetViewModel"><v:EcImportSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:DepthSheetViewModel"><v:DepthSheetView /></DataTemplate>
     <DataTemplate DataType="sh:OwnerLettersSheetViewModel"><v:OwnerLettersSheetView /></DataTemplate>
     <DataTemplate DataType="sh:FieldHelpSheetViewModel"><v:FieldHelpSheetView /></DataTemplate>
     <DataTemplate DataType="sh:HelpIndexSheetViewModel"><v:HelpIndexSheetView /></DataTemplate>

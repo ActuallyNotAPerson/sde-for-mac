@@ -826,6 +826,23 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		}
 	}
 
+	/// <summary>Change, then Flood depth from high-water marks: for the checked assessments (or all shown).</summary>
+	[RelayCommand]
+	private async Task FloodDepth()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to change", "Check some structures first, or clear the search.");
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new DepthSheetViewModel(_app, ids)) is DepthApplyResult result)
+		{
+			_app.Dialogs.Notify("Flood depths saved", $"{result.Changed:N0} assessment{(result.Changed == 1 ? "" : "s")} changed."
+				+ (result.Refused.Count > 0 ? $" {result.Refused.Count:N0} Final, Letter sent or checked out {(result.Refused.Count == 1 ? "was" : "were")} left alone." : ""));
+		}
+	}
+
 	/// <summary>Edit, then Search and Replace.</summary>
 	[RelayCommand]
 	private async Task SearchReplace() => await _app.Sheets.ShowAsync(new SearchReplaceSheetViewModel(_app));

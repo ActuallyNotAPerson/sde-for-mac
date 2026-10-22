@@ -1,10 +1,14 @@
 using CommunityToolkit.Mvvm.Input;
 using Sde.App.ViewModels.Sheets;
+using Sde.Data;
 using Sde.Interop.ElevationCertificates;
 
 namespace Sde.App.ViewModels.Editor;
 
-/// <summary>Elevation certificates (C11): read one into this assessment and keep the PDF with the structure.</summary>
+/// <summary>
+/// Field data in: elevation certificates (C11), read into this assessment with the PDF kept with the structure, and the
+/// flood depth from high-water marks or a water-surface grid (C4).
+/// </summary>
 public sealed partial class AssessmentEditorViewModel
 {
 	/// <summary>
@@ -34,6 +38,25 @@ public sealed partial class AssessmentEditorViewModel
 			_app.Dialogs.Notify("Elevation certificate kept", result.Changed == 0
 				? "The PDF is kept with the structure; no values changed."
 				: $"{result.Changed} value{(result.Changed == 1 ? "" : "s")} changed, and the PDF is kept with the structure. History lists them as an EC import.");
+		}
+	}
+
+	/// <summary>⋯, then Flood depth from high-water marks, for this assessment (a new one is saved first).</summary>
+	[RelayCommand]
+	private async Task FloodDepth()
+	{
+		if (IsDraft)
+		{
+			_dirty = true;
+		}
+		Save();
+		if (IsDraft || SaveState != "Saved")
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new DepthSheetViewModel(_app, new[] { Assessment.AssessmentID })) is DepthApplyResult result && result.Changed > 0)
+		{
+			_app.Dialogs.Notify("Flood depth saved", "History lists the change as the depth tool's.");
 		}
 	}
 }

@@ -171,6 +171,24 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		Snippets.Remove(snippet);
 	}
 
+	/// <summary>The address of USGS's high-water mark service; blank uses the built-in one.</summary>
+	public string UsgsStnUrl
+	{
+		get => _app.Settings.UsgsStnUrl ?? "";
+		set
+		{
+			string clean = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+			if (clean != _app.Settings.UsgsStnUrl)
+			{
+				_app.Settings.UsgsStnUrl = clean;
+				_app.Settings.Save();
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	public string UsgsStnDefault => Sde.Interop.Online.StnClient.DefaultBaseUrl;
+
 	/// <summary>The name written in edit history (Settings, Preferences).</summary>
 	public string YourName
 	{

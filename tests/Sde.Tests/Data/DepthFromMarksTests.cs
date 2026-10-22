@@ -89,4 +89,25 @@ public class DepthFromMarksTests
 		Assert.Equal(1, result.Changed);
 		Assert.Equal(742m, t.Store.LoadAssessment(open.Assessment.AssessmentID).Assessment.DepthOfFlood);
 	}
+
+	[Fact]
+	public void AWaterSurfaceGrid_ProposesTheSameWay_AndSaysWhenAStructureIsOutsideIt()
+	{
+		using TempDatabase t = new TempDatabase();
+		AssessmentFile inside = Placed(t, "NAVD88", 740m);
+		AssessmentFile outside = SampleCases.RanchFlood(t.Store);
+		t.Store.Apply(outside.Assessment.AssessmentID, x =>
+		{
+			x.Property.Latitude = 40.5m;
+			x.Property.Longitude = Lon;
+		});
+		decimal? Grid(double lat, double lon) => lat < 40 ? 743.04m : null;
+
+		List<DepthRow> rows = DepthFromMarks.ProposeFromGrid(t.Store, new[] { inside.Assessment.AssessmentID, outside.Assessment.AssessmentID }, Grid, "NAVD88", "wse.tif");
+		DepthRow row = Assert.Single(rows, r => r.AssessmentID == inside.Assessment.AssessmentID);
+		Assert.Equal(743.0m, row.Proposal.FloodElevationFt);
+		Assert.Equal(3.0m, row.Proposal.DepthAboveLowestFloorFt);
+		Assert.Contains("wse.tif", row.Estimate.Note);
+		Assert.Contains("outside the grid", Assert.Single(rows, r => r.AssessmentID == outside.Assessment.AssessmentID).Skipped);
+	}
 }

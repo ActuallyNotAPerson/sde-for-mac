@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+    <ProjectReference Include="../Sde.Gis/Sde.Gis.csproj" />
     <ProjectReference Include="../Sde.Reports/Sde.Reports.csproj" />
     <ProjectReference Include="../Sde.Interop/Sde.Interop.csproj" />
     <ProjectReference Include="../Sde.Field/Sde.Field.csproj" />

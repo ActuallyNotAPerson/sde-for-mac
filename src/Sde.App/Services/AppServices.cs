@@ -60,6 +60,9 @@ public sealed class AppSettings
 	/// <summary>The first-run walkthrough has been shown (Help, then Show the Walkthrough, shows it again).</summary>
 	public bool SeenWalkthrough { get; set; }
 
+	/// <summary>USGS's high-water mark service (STN), when it moves; null uses <see cref="Sde.Interop.Online.StnClient.DefaultBaseUrl"/>.</summary>
+	public string UsgsStnUrl { get; set; }
+
 	public const int MaxRecent = 8;
 
 	/// <summary>

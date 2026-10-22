@@ -185,8 +185,23 @@
               </Border>
             </StackPanel>
           </Border>
+          <Border Classes="card flush">
+            <StackPanel Classes="settingsGroup">
+              <Border Classes="settingsRow">
+                <Grid ColumnDefinitions="Auto,*,280">
+                  <Border Classes="rowIcon"><c:Icon Kind="Flood" Size="16" /></Border>
+                  <StackPanel Grid.Column="1" Margin="12,0,12,0" Spacing="1">
+                    <TextBlock Classes="medium" Text="USGS high-water marks (STN)" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="The marks USGS surveyed after a flood, for Flood depth from high-water marks. Its data is provisional. Change the address only if USGS moves the service." />
+                  </StackPanel>
+                  <TextBox Grid.Column="2" Text="{Binding UsgsStnUrl}" PlaceholderText="{Binding UsgsStnDefault}" VerticalAlignment="Center"
+                           AutomationProperties.Name="USGS high-water mark service address" />
+                </Grid>
+              </Border>
+            </StackPanel>
+          </Border>
           <c:Banner Tone="Info" Title="Only when you ask"
-                    Text="SDE contacts these services only when you choose Look up online in an assessment, or Look up flood data online on the Structures page. It sends the structure's address or coordinates, nothing else. You review every value before it is saved." />
+                    Text="SDE contacts these services only when you choose Look up online in an assessment, Look up flood data online on the Structures page, or USGS high-water marks in Flood depth. It sends the structure's address or coordinates, or the event and states, nothing else. You review every value before it is saved." />
         </StackPanel>
 
         <!-- Phone form -->

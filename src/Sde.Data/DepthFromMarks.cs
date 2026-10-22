@@ -51,8 +51,27 @@ public static class DepthFromMarks
 	public static List<DepthRow> Propose(SdeStore store, IReadOnlyCollection<Guid> assessmentIds, IReadOnlyList<HighWaterMark> marks,
 		HighWaterMarkOptions options = null, decimal? datumOffsetFt = null)
 	{
-		ArgumentNullException.ThrowIfNull(store);
 		ArgumentNullException.ThrowIfNull(marks);
+		return Build(store, assessmentIds, (lat, lon) => HighWaterMarks.Estimate(marks, lat, lon, options), datumOffsetFt);
+	}
+
+	/// <summary>
+	/// The same from a water-surface elevation grid (a GeoTIFF): <paramref name="waterSurfaceFt"/> samples it at a
+	/// latitude and longitude, in feet in <paramref name="datumName"/> (null outside the grid or where it has no value).
+	/// </summary>
+	public static List<DepthRow> ProposeFromGrid(SdeStore store, IReadOnlyCollection<Guid> assessmentIds, Func<double, double, decimal?> waterSurfaceFt,
+		string datumName, string gridName, decimal? datumOffsetFt = null)
+	{
+		ArgumentNullException.ThrowIfNull(waterSurfaceFt);
+		return Build(store, assessmentIds, (lat, lon) => waterSurfaceFt(lat, lon) is decimal wse
+			? new WaterSurfaceEstimate { ElevationFt = Math.Round(wse, 2), DatumName = datumName, Confidence = EstimateConfidence.High, Note = "From the grid " + gridName + "." }
+			: new WaterSurfaceEstimate { DatumName = datumName, Confidence = EstimateConfidence.None, Note = "The structure is outside the grid, or the grid has no water there." },
+			datumOffsetFt);
+	}
+
+	private static List<DepthRow> Build(SdeStore store, IReadOnlyCollection<Guid> assessmentIds, Func<double, double, WaterSurfaceEstimate> estimateAt, decimal? datumOffsetFt)
+	{
+		ArgumentNullException.ThrowIfNull(store);
 		ReferenceData r = store.Reference;
 		FieldInfo floodField = FieldCatalog.Get(DepthProposal.DepthOfFloodKey);
 		FieldInfo aboveField = FieldCatalog.Get(DepthProposal.DepthAboveFloorKey);
@@ -74,7 +93,7 @@ public static class DepthFromMarks
 			}
 			else
 			{
-				estimate = HighWaterMarks.Estimate(marks, (double)lat, (double)lon, options);
+				estimate = estimateAt((double)lat, (double)lon);
 				proposal = HighWaterMarks.Propose(estimate, f.Property, datumOffsetFt ?? EventOffset(store, f.Assessment.AssessmentID, offsets));
 				if (!proposal.CanApply)
 				{

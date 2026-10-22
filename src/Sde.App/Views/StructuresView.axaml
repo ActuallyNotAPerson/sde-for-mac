@@ -137,6 +137,7 @@
                       <MenuItem Header="Search and replace…" Command="{Binding SearchReplaceCommand}" />
                       <Separator />
                       <MenuItem Header="Look up flood data online…" Command="{Binding LookUpFloodDataCommand}" ToolTip.Tip="Coordinates (Census geocoder) and flood zone (FEMA NFHL) for the checked structures, for you to review" />
+                      <MenuItem Header="Flood depth from high-water marks…" Command="{Binding FloodDepthCommand}" ToolTip.Tip="From a file of marks, USGS's marks for an event, or a water-surface grid, for you to review" />
                     </MenuFlyout>
                   </DropDownButton.Flyout>
                 </DropDownButton>

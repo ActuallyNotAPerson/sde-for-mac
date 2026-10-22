@@ -567,6 +567,7 @@
                 <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" IsEnabled="{Binding IsEditable}" />
                 <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
                 <MenuItem Header="Elevation certificate…" Command="{Binding ImportElevationCertificateCommand}" IsEnabled="{Binding IsEditable}" />
+                <MenuItem Header="Flood depth from high-water marks…" Command="{Binding FloodDepthCommand}" IsEnabled="{Binding IsEditable}" />
                 <Separator />
                 <MenuItem Header="Improvements and SI…" Command="{Binding ShowImprovementsCommand}" />
                 <MenuItem Header="Appeal…" Command="{Binding ShowAppealCommand}" />
