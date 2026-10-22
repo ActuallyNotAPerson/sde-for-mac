@@ -134,6 +134,7 @@
                     <MenuFlyout>
                       <MenuItem Header="Set a field on these…" Command="{Binding BulkEditCommand}" />
                       <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
+                      <MenuItem Header="Assign to team…" Command="{Binding AssignToTeamCommand}" ToolTip.Tip="Give these structures to a field team, in a route order with worksheets" />
                       <MenuItem Header="Search and replace…" Command="{Binding SearchReplaceCommand}" />
                       <Separator />
                       <MenuItem Header="Look up flood data online…" Command="{Binding LookUpFloodDataCommand}" ToolTip.Tip="Coordinates (Census geocoder) and flood zone (FEMA NFHL) for the checked structures, for you to review" />

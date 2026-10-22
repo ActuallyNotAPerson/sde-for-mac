@@ -96,6 +96,7 @@
     <DataTemplate DataType="vm:TrashViewModel"><v:TrashView /></DataTemplate>
     <DataTemplate DataType="vm:MapViewModel"><v:MapView /></DataTemplate>
     <DataTemplate DataType="vm:DashboardViewModel"><v:DashboardView /></DataTemplate>
+    <DataTemplate DataType="vm:AssignmentsViewModel"><v:AssignmentsView /></DataTemplate>
     <v:MapSheetTemplates />
     <DataTemplate DataType="shell:PlaceholderPageViewModel"><v:PlaceholderPageView /></DataTemplate>
     <DataTemplate DataType="sh:ImprovementsSheetViewModel"><v:ImprovementsSheetView /></DataTemplate>
@@ -105,6 +106,7 @@
     <DataTemplate DataType="sh:SetEventSheetViewModel"><v:SetEventSheetView /></DataTemplate>
     <DataTemplate DataType="sh:EcImportSheetViewModel"><v:EcImportSheetView /></DataTemplate>
     <DataTemplate DataType="sh:PhotoMarkupSheetViewModel"><v:PhotoMarkupSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:TeamSheetViewModel"><v:TeamSheetView /></DataTemplate>
     <DataTemplate DataType="sh:DepthSheetViewModel"><v:DepthSheetView /></DataTemplate>
     <DataTemplate DataType="sh:OwnerLettersSheetViewModel"><v:OwnerLettersSheetView /></DataTemplate>
     <DataTemplate DataType="sh:FieldHelpSheetViewModel"><v:FieldHelpSheetView /></DataTemplate>

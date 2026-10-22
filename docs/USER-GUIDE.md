@@ -447,6 +447,23 @@ allows, with a preview before anything changes.
 **Open**, **Copy from another structure…**, **Set a field on the checked structures…** and **Move to Recently
 Deleted**.
 
+### Field teams and routes
+The **Assignments** page sends structures out to field teams, each with its structures in a driving order, a route
+sheet and worksheets. With an event chosen in the sidebar, it shows that event's assignments.
+
+1. Click **New team…** and give the team a name, its members and a colour.
+2. On Structures, check the structures (or filter the list) and choose **Change ▾ > Assign to team…**, or select
+   structures on the map and click **Assign to team…**. Pick the team and, if you like, the event.
+3. On **Assignments**, choose the team. **Order the route** puts its structures in a short driving order
+   (straight-line distance); structures without coordinates go at the end.
+4. **Route sheet…** saves a one-page list of the stops, and **Worksheets…** a page per structure with a short code the
+   phone form's search accepts. The pin beside a structure opens directions in Maps.
+5. As the team works, set each structure's **Status**: Assigned, Visited, Done or Skipped. The team's line shows how
+   many are assigned, assessed and done.
+6. To take structures off a team, tick them and click **Take the ticked structures off the team…**.
+
+![Assignments](screenshots/113-assignments.png)
+
 ---
 
 ## 8. Looking up locations and flood data online

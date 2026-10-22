@@ -57,8 +57,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			"No assessments to review", "Assessments waiting for review, and the checks that flag possible problems, appear here.");
 		Compliance = new PlaceholderPageViewModel("Compliance", "Follow up on substantially damaged structures.", "Compliance",
 			"No compliance cases", "Substantially damaged structures appear here with their permits, deadlines, ICC claims and final inspections.");
-		Assignments = new PlaceholderPageViewModel("Assignments", "Who inspects what, and in what order.", "Assignments",
-			"No assignments", "Teams and the structures assigned to them appear here, with route sheets for the field.");
+		Assignments = new AssignmentsViewModel(app, this);
 		SidebarGroups = BuildSidebar();
 		Events = new EventSwitcherViewModel { NewEventCommand = NewEventCommand, ManageEventsCommand = ManageEventsCommand };
 		Events.SelectionChanged += choice => _app.Scope.Set(_app.Store, choice.Id);
@@ -71,6 +70,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			app.Scope.Refresh(app.Store);
 			RefreshEvents();
 			Structures.Reload();
+			if (Assignments.IsActive)
+			{
+				Assignments.Reload();
+			}
 			RefreshStatus();
 		};
 		app.Changes.Changed += OnExternalChanges;
@@ -160,7 +163,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 
 	public PlaceholderPageViewModel Compliance { get; }
 
-	public PlaceholderPageViewModel Assignments { get; }
+	/// <summary>Teams, their structures in route order, and the field kit.</summary>
+	public AssignmentsViewModel Assignments { get; }
 
 	private IReadOnlyList<NavGroupViewModel> BuildSidebar()
 	{
@@ -408,6 +412,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		};
 		Map.IsActive = page == Page.Map;
 		Dashboard.IsActive = page == Page.Dashboard;
+		Assignments.IsActive = page == Page.Assignments;
 		RefreshStatus();
 		if (page == Page.Map)
 		{
@@ -421,6 +426,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (page == Page.Trash)
 		{
 			Trash.Reload();
+		}
+		if (page == Page.Assignments)
+		{
+			Assignments.Reload();
 		}
 		if (page == Page.Structures)
 		{
@@ -443,6 +452,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (Dashboard.IsActive)
 		{
 			Dashboard.Reload();
+		}
+		if (Assignments.IsActive)
+		{
+			Assignments.Reload();
 		}
 		if (ActivePage == Page.Trash)
 		{

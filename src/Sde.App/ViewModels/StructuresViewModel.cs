@@ -794,6 +794,22 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	[RelayCommand]
 	private async Task ExportCheckedToExcel() => await _main.ImportExport.ExportExcelAsync(TargetIds());
 
+	/// <summary>Change ▾, then Assign to team: the checked structures (or every one shown) go to a team for the field.</summary>
+	[RelayCommand]
+	private async Task AssignToTeam()
+	{
+		IEnumerable<StructureRowViewModel> rows = CheckedCount > 0 ? _all.Where(r => r.IsChecked) : Rows;
+		List<Guid> structures = rows.Select(r => r.Summary.PropertyID).Distinct().ToList();
+		if (structures.Count == 0)
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new AssignTeamSheetViewModel(_app, structures)) is string done)
+		{
+			_app.Dialogs.Notify("Assigned", done);
+		}
+	}
+
 	/// <summary>Export ▾, then Web map: a web map folder of the checked structures (or the list), for the office or the public.</summary>
 	[RelayCommand]
 	private async Task WebMap()
