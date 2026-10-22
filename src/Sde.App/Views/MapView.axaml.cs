@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using Sde.App.Maps;
 using Sde.App.ViewModels;
@@ -9,8 +8,9 @@ using Sde.App.ViewModels;
 namespace Sde.App.Views;
 
 /// <summary>
-/// The Map page. The <see cref="MapCanvas"/> draws and reports clicks; this class hands the dots to it, turns its
-/// events into view-model calls, and keeps the two in step (basemap, mode, the structure picked in the list).
+/// The Map page. The <see cref="MapCanvas"/> draws and reports clicks; this class hands it the dots and layers, turns
+/// its events into view-model calls, and keeps the two in step (basemap, mode, the structure picked in the list, the
+/// area in view). When the page closes, the map engine is stopped.
 /// </summary>
 public partial class MapView : UserControl
 {
@@ -20,9 +20,13 @@ public partial class MapView : UserControl
 	public MapView()
 	{
 		InitializeComponent();
-		Surface.MarkerClicked += (id, add) => _vm?.ClickStructure(id);
+		Surface.MarkerClicked += (id, add) => _vm?.ClickStructure(id, add);
+		Surface.FeatureClicked += (layer, feature, add) => _vm?.ClickFeature(layer, feature, add);
 		Surface.MapClicked += (lat, lon) => _vm?.ClickMap(lat, lon);
 		Surface.AreaSelected += (ids, add) => _vm?.SelectArea(ids.ToList(), add);
+		Surface.FeaturesSelected += (layer, features, add) => _vm?.SelectFeatures(layer, features, add);
+		Surface.SketchChanged += (points, finished) => _vm?.SketchChanged(points, finished);
+		Surface.ViewChanged += OnViewChanged;
 		Surface.SizeChanged += OnCanvasSizeChanged;
 		ZoomInButton.Click += (_, _) => Surface.ZoomBy(1);
 		ZoomOutButton.Click += (_, _) => Surface.ZoomBy(-1);
@@ -40,6 +44,15 @@ public partial class MapView : UserControl
 			_fitted = true;
 			Surface.FitToMarkers();
 		}
+		OnViewChanged();
+	}
+
+	private void OnViewChanged()
+	{
+		if (_vm != null && Surface.Bounds.Width > 0)
+		{
+			_vm.ViewExtent = Surface.Extent;
+		}
 	}
 
 	protected override void OnDataContextChanged(EventArgs e)
@@ -52,14 +65,17 @@ public partial class MapView : UserControl
 			return;
 		}
 		_vm.MarkersChanged += Rebuild;
+		_vm.LayersChanged += ShowLayers;
 		_vm.FitRequested += Surface.FitToMarkers;
 		_vm.CenterRequested += Center;
+		_vm.ZoomToRequested += ZoomTo;
+		_vm.RetryRequested += Surface.RetryTiles;
 		_vm.PropertyChanged += VmChanged;
 		Surface.Tiles = _vm.Tiles;
 		Surface.Basemap = _vm.Basemap;
-		Surface.Drag = _vm.IsSelect ? MapDrag.Box : MapDrag.Pan;
-		Surface.Cursor = new Avalonia.Input.Cursor(_vm.IsSetLocation ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
+		ApplyMode();
 		Rebuild();
+		ShowLayers();
 	}
 
 	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -77,8 +93,11 @@ public partial class MapView : UserControl
 			return;
 		}
 		_vm.MarkersChanged -= Rebuild;
+		_vm.LayersChanged -= ShowLayers;
 		_vm.FitRequested -= Surface.FitToMarkers;
 		_vm.CenterRequested -= Center;
+		_vm.ZoomToRequested -= ZoomTo;
+		_vm.RetryRequested -= Surface.RetryTiles;
 		_vm.PropertyChanged -= VmChanged;
 		Surface.Tiles = null;
 		_vm = null;
@@ -92,8 +111,7 @@ public partial class MapView : UserControl
 				Surface.Basemap = _vm.Basemap;
 				break;
 			case nameof(MapViewModel.Mode):
-				Surface.Drag = _vm.IsSelect ? MapDrag.Box : MapDrag.Pan;
-				Surface.Cursor = new Avalonia.Input.Cursor(_vm.IsSetLocation ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
+				ApplyMode();
 				break;
 			case nameof(MapViewModel.Selected):
 				Surface.Highlighted = _vm.Selected?.Id;
@@ -101,7 +119,24 @@ public partial class MapView : UserControl
 		}
 	}
 
+	/// <summary>What a click and a drag do on the map in the page's mode.</summary>
+	private void ApplyMode()
+	{
+		Surface.Drag = _vm.IsSelect ? MapDrag.Box : MapDrag.Pan;
+		Surface.Cursor = new Avalonia.Input.Cursor(_vm.IsSetLocation ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
+	}
+
 	private void Center(MapPointViewModel p) => Surface.CenterOn(p.Latitude, p.Longitude);
+
+	private void ZoomTo(MapExtent extent) => Surface.FitTo(extent);
+
+	private void ShowLayers()
+	{
+		if (_vm != null)
+		{
+			Surface.ShowLayers(_vm.MapLayers());
+		}
+	}
 
 	/// <summary>Hands the visible structures to the map, each in the colour of its result class.</summary>
 	private void Rebuild()
@@ -112,7 +147,8 @@ public partial class MapView : UserControl
 		}
 		Dictionary<Sde.Core.Assessments.DeterminationClass, IBrush> brushes = new();
 		List<MapMarker> markers = new(_vm.Visible.Count);
-		foreach (MapPointViewModel p in _vm.Visible)
+		bool shown = _vm.StructuresLayer?.IsVisible ?? true;
+		foreach (MapPointViewModel p in shown ? (IEnumerable<MapPointViewModel>)_vm.Visible : Array.Empty<MapPointViewModel>())
 		{
 			if (!brushes.TryGetValue(p.Class, out IBrush fill))
 			{
@@ -124,5 +160,6 @@ public partial class MapView : UserControl
 		// Addresses only once zoomed in to street level (1:8,000 or closer), where they have room.
 		Surface.MarkerLabels = _vm.ShowAddressLabels ? new Sde.Gis.Styles.LabelStyle { Field = "Address", MinScale = 8000 } : null;
 		Surface.Markers = markers;
+		Surface.Highlighted = _vm.Selected?.Id;
 	}
 }

@@ -96,6 +96,7 @@
     <DataTemplate DataType="vm:TrashViewModel"><v:TrashView /></DataTemplate>
     <DataTemplate DataType="vm:MapViewModel"><v:MapView /></DataTemplate>
     <DataTemplate DataType="vm:DashboardViewModel"><v:DashboardView /></DataTemplate>
+    <v:MapSheetTemplates />
     <DataTemplate DataType="shell:PlaceholderPageViewModel"><v:PlaceholderPageView /></DataTemplate>
     <DataTemplate DataType="sh:ImprovementsSheetViewModel"><v:ImprovementsSheetView /></DataTemplate>
     <DataTemplate DataType="sh:AppealSheetViewModel"><v:AppealSheetView /></DataTemplate>

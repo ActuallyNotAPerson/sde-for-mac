@@ -434,11 +434,7 @@ public sealed class MapCanvas : Panel, IDisposable
 						built = BuiltFeatureLayer.Build(spec, _theme, (float)PixelDensity);
 						_built[spec.Key] = built;
 					}
-					else if (built.Spec.SelectionRevision != spec.SelectionRevision)
-					{
-						built.ShowSelection(spec, _theme);
-					}
-					else
+					else if (built.Spec.SelectionRevision != spec.SelectionRevision || built.Spec.Visible != spec.Visible || !ReferenceEquals(built.Spec.Display, spec.Display))
 					{
 						built.ShowSelection(spec, _theme);
 					}

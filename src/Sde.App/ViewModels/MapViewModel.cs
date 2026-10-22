@@ -115,6 +115,7 @@ public sealed partial class MapViewModel : ViewModelBase
 				Reload();
 			}
 		};
+		app.DatabaseChanged += ResetLayers;
 		_basemap = Maps.Basemaps.UsgsTopo;
 	}
 
@@ -143,6 +144,7 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	private Basemap _basemap;
 
+	/// <summary>The basemap, kept for each database (in its MapLayer table).</summary>
 	public Basemap Basemap
 	{
 		get => _basemap;
@@ -151,17 +153,18 @@ public sealed partial class MapViewModel : ViewModelBase
 			if (SetProperty(ref _basemap, value ?? Maps.Basemaps.None))
 			{
 				BasemapProblem = null;
-				OnPropertyChanged(nameof(Attribution));
-				OnPropertyChanged(nameof(HasAttribution));
-				OnPropertyChanged(nameof(UsesInternet));
+				OnBasemapChanged();
+				SaveBasemap();
 			}
 		}
 	}
 
-	/// <summary>The credit the basemap's terms ask to be shown on the map.</summary>
-	public string Attribution => Basemap.Attribution;
-
-	public bool HasAttribution => !string.IsNullOrEmpty(Basemap.Attribution);
+	private void OnBasemapChanged()
+	{
+		OnPropertyChanged(nameof(Attribution));
+		OnPropertyChanged(nameof(HasAttribution));
+		OnPropertyChanged(nameof(UsesInternet));
+	}
 
 	/// <summary>True while a basemap that is downloaded is chosen (a note says so, and that "No basemap" works offline).</summary>
 	public bool UsesInternet => Basemap.HasTiles;
@@ -248,6 +251,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	/// <summary>Reads the structures again. Keeps the legend ticks and the mode.</summary>
 	public void Reload()
 	{
+		ReadLayers();
 		Guid? selected = Selected?.Id;
 		Guid? target = PlaceTarget?.Id;
 		_all = _app.Store.ListMapPoints()
@@ -344,7 +348,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	}
 
 	/// <summary>A dot was clicked: opens it, or in "Set location" picks it as the structure to move.</summary>
-	public void ClickStructure(Guid propertyId)
+	public void ClickStructure(Guid propertyId, bool add = false)
 	{
 		if (Mode != MapMode.SetLocation)
 		{

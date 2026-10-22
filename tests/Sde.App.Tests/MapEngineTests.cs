@@ -139,7 +139,8 @@ public class MapEngineTests
 		List<string> asked;
 		lock (FakeTiles.Requested)
 		{
-			asked = FakeTiles.Requested.ToList();
+			// Only this view's (another test's map may still be finishing its downloads elsewhere).
+			asked = FakeTiles.Requested.Where(u => NearView(u, 39.30, -84.20)).ToList();
 		}
 		// Exactly the tiles that cover the view at its zoom level, plus those covering it one level up (shown while the
 		// sharp ones load), and no more. The engine's default asked for 35 tiles for one 800 x 600 view.
@@ -156,6 +157,7 @@ public class MapEngineTests
 		Assert.Equal(Covering(14), asked.Count(u => u.Contains("/tile/14/")));
 		Assert.Equal(Covering(15) + Covering(14), asked.Count);
 		Assert.Equal(asked.Count, ui.Main.Map.Tiles.Downloads - downloadsBefore);
+		Assert.All(asked, u => Assert.Contains("/USGSTopo/", u));
 		Assert.Equal(asked.Count, asked.Distinct().Count());
 
 		// The paper colour of the fake tiles is drawn where there are no dots.
@@ -175,6 +177,20 @@ public class MapEngineTests
 		MapTestSupport.Settle(ui, view);
 		Assert.Equal(downloads, ui.Main.Map.Tiles.Downloads);
 		Assert.True(ui.Main.Map.Tiles.DiskReads >= disk + asked.Count);
+	}
+
+	/// <summary>True when a {z}/{y}/{x} tile address is within about 15 km of a place.</summary>
+	private static bool NearView(string url, double latitude, double longitude)
+	{
+		string[] parts = url.Split('/');
+		if (parts.Length < 3 || !int.TryParse(parts[^3], out int z) || !int.TryParse(parts[^2], out int y) || !int.TryParse(parts[^1], out int x))
+		{
+			return false;
+		}
+		double n = 1 << z;
+		double lat = WebMercator.Latitude((y + 0.5) / n);
+		double lon = WebMercator.Longitude((x + 0.5) / n);
+		return Math.Abs(lat - latitude) < 0.15 && Math.Abs(lon - longitude) < 0.15;
 	}
 
 	[Fact]
