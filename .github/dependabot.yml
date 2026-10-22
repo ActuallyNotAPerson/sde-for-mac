@@ -24,6 +24,11 @@ updates:
       # Mapsui must stay on a release built for Avalonia 12 and SkiaSharp 3; a new major is checked by hand.
       - dependency-name: "Mapsui*"
         update-types: ["version-update:semver-major"]
+      # The UI tests run on Avalonia's xunit runner (Avalonia.Headless.XUnit), which is built on xunit v3 3.x, and xunit 4
+      # runs only on Microsoft Testing Platform, which needs a different `dotnet test` setup. Move the xunit packages to a
+      # new major together, with an Avalonia release that supports it.
+      - dependency-name: "xunit*"
+        update-types: ["version-update:semver-major"]
     groups:
       # Minor and patch updates in one pull request a month; major versions each get their own.
       nuget-minor-and-patch:
