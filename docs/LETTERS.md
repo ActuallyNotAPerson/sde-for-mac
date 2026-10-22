@@ -23,6 +23,17 @@ advice. **Review and adapt them with your community's counsel before you use the
 | Not substantially damaged notice.docx | Not substantially damaged | FEMA's result is "Not Substantially Damaged" |
 | Substantial improvement determination.docx | Substantial improvement | After an SI determination for a project |
 
+The Compliance page has three more starter letters for a substantially damaged building's compliance case:
+
+| File | Kind (used in file names) | When |
+|---|---|---|
+| Substantial damage options and deadline.docx | Compliance options | The ways to comply (elevate, relocate, demolish, floodproof for non-residential buildings) and the deadline |
+| ICC support letter.docx | ICC support | For the owner's flood insurance adjuster, confirming the determination for an ICC claim |
+| Compliance deadline reminder.docx | Deadline reminder | When the deadline is near or has passed and the case is still open |
+
+A compliance letter is recorded on the case's timeline and, for a substantial damage case, in the assessment's
+letter log.
+
 SDE writes the starter templates only when they are missing, so your edits are never overwritten. Each starter
 letter has the community and office in the page header, contact details in the footer, and a table of the facts.
 
@@ -111,6 +122,18 @@ never change an assessment's percent damaged or its determination.
 | LookbackPeriod | "this project only", or "5 years" |
 | SIDetermination | Substantial Improvement, Not Substantial Improvement, or Cannot be determined |
 | SIDeterminationWording | "is a substantial improvement", "is not a substantial improvement", or "cannot be determined until the market value of the structure is known" |
+
+**Compliance case** (compliance letters, from the case on the Compliance page)
+
+| Field | Example |
+|---|---|
+| CompliancePath | Elevate, Relocate, Demolish, "Floodproof (non-residential)", or blank until chosen |
+| ComplianceDeadline | March 1, 2027 |
+| CompliancePermitNumber | P-0001 |
+| IccClaimNumber | The owner's Increased Cost of Compliance claim number |
+| IccStatus | Not filed, Filed, Approved, Paid or Denied |
+| IccAmount | $30,000.00 |
+| EcReceivedDate, FinalInspectionDate | February 20, 2027 |
 
 Your own templates can use extra fields that the app is given (for example «AppealDeadline»).
 

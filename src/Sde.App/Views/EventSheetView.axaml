@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.EventSheetView"
+             x:DataType="sh:EventSheetViewModel">
+  <StackPanel Spacing="12">
+    <Grid ColumnDefinitions="2*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+      <TextBlock Classes="fieldLabel" Text="Name" />
+      <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Kind" />
+      <TextBox Grid.Row="1" Text="{Binding Name}" PlaceholderText="For example: September flood" AutomationProperties.Name="Event name" />
+      <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" HorizontalAlignment="Stretch"
+                AutomationProperties.Name="Kind of event" />
+    </Grid>
+    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="4">
+      <TextBlock Classes="fieldLabel" Text="FEMA disaster number" />
+      <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Started" />
+      <TextBlock Grid.Column="2" Classes="fieldLabel" Text="Ended" />
+      <TextBox Grid.Row="1" Text="{Binding DRNumber}" PlaceholderText="DR-0000" AutomationProperties.Name="FEMA disaster number" />
+      <CalendarDatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding StartDate}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                          CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Date the event started" />
+      <CalendarDatePicker Grid.Row="1" Grid.Column="2" SelectedDate="{Binding EndDate}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                          CustomDateFormatString="MMM d, yyyy" PlaceholderText="Still going" AutomationProperties.Name="Date the event ended" />
+    </Grid>
+    <TextBlock Classes="muted" TextWrapping="Wrap"
+               Text="A new assessment whose damage date falls between these dates is offered this event." />
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Datum offset (ft, optional)" />
+      <TextBox Text="{Binding DatumOffset}" Width="140" HorizontalAlignment="Left" PlaceholderText="0.0" AutomationProperties.Name="Datum offset in feet" />
+      <TextBlock Classes="muted" TextWrapping="Wrap"
+                 Text="Added to high-water marks that use a different vertical datum from the structures, for example to go from NAVD 88 marks to NGVD 29 elevations." />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Notes" />
+      <TextBox Text="{Binding Notes}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48" AutomationProperties.Name="Notes about the event" />
+    </StackPanel>
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Classes="link danger" Content="Delete event…" Command="{Binding DeleteCommand}" IsVisible="{Binding IsExisting}" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Save" IsDefault="True" Command="{Binding SaveCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,32 @@
+{
+  "displayFieldName": "FLD_ZONE",
+  "geometryType": "esriGeometryPolygon",
+  "spatialReference": { "wkid": 4326, "latestWkid": 4326 },
+  "features": [
+    {
+      "attributes": {
+        "OBJECTID": 1011, "FLD_ZONE": "X", "ZONE_SUBTY": "AREA OF MINIMAL FLOOD HAZARD", "SFHA_TF": "F", "STATIC_BFE": -9999, "V_DATUM": null
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 1012, "FLD_ZONE": "D", "ZONE_SUBTY": null, "SFHA_TF": "F", "STATIC_BFE": -9999, "V_DATUM": null
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 1013, "FLD_ZONE": "X", "ZONE_SUBTY": "0.2 PCT ANNUAL CHANCE FLOOD HAZARD", "SFHA_TF": "F", "STATIC_BFE": -9999, "V_DATUM": null
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 1014, "FLD_ZONE": "AE", "ZONE_SUBTY": null, "SFHA_TF": "T", "STATIC_BFE": 14.2, "V_DATUM": "NAVD88"
+      }
+    },
+    {
+      "attributes": {
+        "OBJECTID": 1015, "FLD_ZONE": "VE", "ZONE_SUBTY": null, "SFHA_TF": "T", "STATIC_BFE": 16, "V_DATUM": "NAVD88"
+      }
+    }
+  ]
+}

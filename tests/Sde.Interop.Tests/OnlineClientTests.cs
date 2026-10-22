@@ -145,11 +145,82 @@ public class OnlineClientTests
 	}
 
 	[Fact]
+	public async Task Nfhl_SeveralZones_PicksTheStrictest_NotTheFirst()
+	{
+		FloodInfo info = await Nfhl(FakeHandler.Nfhl("nfhl-zone-several.json")).LookupAsync(38.9, -77.0, CancellationToken.None);
+		Assert.Equal("VE", info.Zone);
+		Assert.Null(info.ZoneSubtype);
+		Assert.False(info.InFloodway);
+		Assert.Equal(16m, info.Bfe);
+		Assert.Equal("NAVD88", info.BfeDatum);
+	}
+
+	[Theory]
+	[InlineData("X", "0.2 PCT ANNUAL CHANCE FLOOD HAZARD", "X|AREA OF MINIMAL FLOOD HAZARD", "X|0.2 PCT ANNUAL CHANCE FLOOD HAZARD")]
+	[InlineData("AO", null, "X", "AO")]
+	[InlineData("A99", null, "AREA NOT INCLUDED", "A99")]
+	[InlineData("A12", null, "X|0.2 PCT ANNUAL CHANCE FLOOD HAZARD", "A12")]
+	[InlineData("V", null, "A", "V")]
+	[InlineData("AE", null, "OPEN WATER", "AE")]
+	[InlineData("X", "AREA OF MINIMAL FLOOD HAZARD", "D", "X|AREA OF MINIMAL FLOOD HAZARD")]
+	[InlineData("AE", "FLOODWAY", "VE", "AE|FLOODWAY")]
+	[InlineData("AE", null, "AE", "AH")]
+	public async Task Nfhl_SeveralZones_FloodwayThenVThenAThenShadedXThenX(string zone, string subtype, params string[] zones)
+	{
+		FloodInfo info = await Nfhl(FakeHandler.NfhlZones(FakeHandler.ZonesJson(zones))).LookupAsync(38.9, -77.0, CancellationToken.None);
+		Assert.Equal(zone, info.Zone);
+		Assert.Equal(subtype, info.ZoneSubtype);
+	}
+
+	[Fact]
+	public async Task Nfhl_AsksTheThreeLayersAtOnce()
+	{
+		// Each answer waits until all three questions have arrived, which only happens when they are sent together.
+		int arrived = 0;
+		TaskCompletionSource allThree = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		FakeHandler handler = new FakeHandler(async (request, ct) =>
+		{
+			if (Interlocked.Increment(ref arrived) == 3)
+			{
+				allThree.SetResult();
+			}
+			await allThree.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
+			string path = request.RequestUri.AbsolutePath;
+			return FakeHandler.Json(FakeHandler.Fixture(path.Contains("/28/query") ? "nfhl-zone-ae.json" : path.Contains("/3/query") ? "nfhl-panel.json" : "nfhl-community.json"));
+		});
+
+		FloodInfo info = await Nfhl(handler).LookupAsync(38.9, -77.0, CancellationToken.None);
+		Assert.Equal("AE", info.Zone);
+		Assert.Equal("11001C0359E", info.PanelNumber);
+		Assert.Equal("110001", info.CommunityId);
+		Assert.Equal(3, handler.Urls.Count);
+	}
+
+	[Fact]
 	public async Task Nfhl_NoZoneFeature_ReturnsNull()
 	{
 		FakeHandler handler = FakeHandler.Nfhl("nfhl-empty.json");
 		Assert.Null(await Nfhl(handler).LookupAsync(0, 0, CancellationToken.None));
-		Assert.Single(handler.Urls);
+	}
+
+	[Fact]
+	public async Task Nfhl_NoZoneFeature_IgnoresAFailedPanelOrCommunityQuery()
+	{
+		// Without a flood zone the answer is "no flood information", whatever the other two layers said.
+		FakeHandler handler = new FakeHandler((r, ct) => Task.FromResult(r.RequestUri.AbsolutePath.Contains("/28/query")
+			? FakeHandler.Json(FakeHandler.Fixture("nfhl-empty.json"))
+			: FakeHandler.Json("down", HttpStatusCode.ServiceUnavailable)));
+		Assert.Null(await Nfhl(handler).LookupAsync(0, 0, CancellationToken.None));
+	}
+
+	[Fact]
+	public async Task Nfhl_ZoneQueryFailure_IsTheOneReported()
+	{
+		FakeHandler handler = new FakeHandler((r, ct) => Task.FromResult(r.RequestUri.AbsolutePath.Contains("/28/query")
+			? FakeHandler.Json(FakeHandler.Fixture("nfhl-error.json"))
+			: FakeHandler.Json("down", HttpStatusCode.ServiceUnavailable)));
+		OnlineServiceException ex = await Assert.ThrowsAsync<OnlineServiceException>(() => Nfhl(handler).LookupAsync(1, 2, CancellationToken.None));
+		Assert.Contains("Unable to complete operation", ex.Detail);
 	}
 
 	[Fact]
@@ -168,7 +239,7 @@ public class OnlineClientTests
 		FakeHandler handler = new FakeHandler((r, ct) => Task.FromResult(FakeHandler.Json("{\"features\":[]}")));
 		NfhlClient client = new NfhlClient(new HttpClient(handler), "https://example.test/maps/MapServer/") { FloodZoneLayer = 7 };
 		await client.LookupAsync(1, 2, CancellationToken.None);
-		Assert.StartsWith("https://example.test/maps/MapServer/7/query?", handler.Urls.Single());
+		Assert.Single(handler.Urls, u => u.StartsWith("https://example.test/maps/MapServer/7/query?", StringComparison.Ordinal));
 	}
 
 	[Fact]

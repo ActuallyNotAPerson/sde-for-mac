@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.EcImportSheetView"
+             x:DataType="sh:EcImportSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" Text="{Binding Message}" TextWrapping="Wrap" />
+    <c:Banner Tone="Warning" Icon="Warning" Text="{Binding AddressWarning}" IsVisible="{Binding HasAddressWarning}" AutomationProperties.Name="Address check" />
+
+    <Border Classes="card flush" IsVisible="{Binding HasRows}">
+      <StackPanel>
+        <Grid ColumnDefinitions="36,2*,2*,3*" Margin="14,8">
+          <TextBlock Grid.Column="1" Classes="eyebrow" Text="FIELD" />
+          <TextBlock Grid.Column="2" Classes="eyebrow" Text="NOW" />
+          <TextBlock Grid.Column="3" Classes="eyebrow" Text="CERTIFICATE" />
+        </Grid>
+        <ScrollViewer MaxHeight="380" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="sh:EcRowViewModel">
+                <Border Classes="rule" Padding="14,6">
+                  <Grid ColumnDefinitions="36,2*,2*,3*">
+                    <CheckBox IsChecked="{Binding IsChecked}" IsVisible="{Binding IsReadOnly}" AutomationProperties.Name="{Binding CheckName}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Classes="medium" Text="{Binding Label}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding Current}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="3" Text="{Binding Proposed}" IsVisible="{Binding IsReadOnly}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <TextBox Grid.Column="3" Text="{Binding Value}" IsVisible="{Binding IsEditable}" AutomationProperties.Name="{Binding Label}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+    </Border>
+
+    <StackPanel Spacing="2" IsVisible="{Binding HasNotes}">
+      <TextBlock Classes="h3" Text="Left out" />
+      <ItemsControl ItemsSource="{Binding Notes}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Classes="muted" Text="{Binding}" TextWrapping="Wrap" Margin="0,2" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Content="Keep the PDF only" Command="{Binding AttachOnlyCommand}" IsVisible="{Binding CanAttach}"
+              ToolTip.Tip="Keep the certificate with the structure without changing any value" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Save" IsDefault="True" Command="{Binding SaveCommand}" IsVisible="{Binding CanAttach}" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

@@ -12,6 +12,7 @@ public partial class App : Application
 {
 	private MainViewModel _main;
 
+	/// <summary>The application menu's About and Settings…: the Settings page (it shows the version).</summary>
 	private void OnAboutClicked(object sender, EventArgs e) => _main?.ShowCommand.Execute(Page.Settings);
 
 	public override void Initialize() => AvaloniaXamlLoader.Load(this);
@@ -26,8 +27,23 @@ public partial class App : Application
 			window.DataContext = main;
 			_main = main;
 			window.Restore(services.Settings.Window);
-			window.Closing += (_, _) =>
+			bool mapEditsSettled = false;
+			window.Closing += (_, e) =>
 			{
+				if (main.Map.HasUnsavedEdits && !mapEditsSettled)
+				{
+					// Unsaved map edits: ask first (save, throw away, or keep the window open), then close again.
+					e.Cancel = true;
+					Dispatcher.UIThread.Post(async () =>
+					{
+						if (await main.Map.ConfirmLeaveEditsAsync())
+						{
+							mapEditsSettled = true;
+							window.Close();
+						}
+					});
+					return;
+				}
 				main.Editor?.Save();
 				services.Settings.Window = window.Placement();
 				services.Settings.Save();

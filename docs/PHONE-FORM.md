@@ -4,8 +4,9 @@ The phone form lets inspectors work from a phone in the field while SDE runs on 
 office, a shelter). The Mac serves a small web page over its Wi-Fi network; a phone on the same network opens it in its
 browser (Safari on iPhone, Chrome on Android), with nothing to install. From the phone an inspector can:
 
-- search for a structure by address, owner, parcel number or record ID, or add a new one (residential or
-  non-residential);
+- see the structures assigned to their team, in route order (**My assignments**);
+- search for a structure by address, owner, parcel number, record ID or the code on a field worksheet, or add a new
+  one (residential or non-residential);
 - fill in the fields of its assessment, step by step, as in the Mac's editor (only the fields that apply are shown, and
   the same rules run: a new structure type clears the stories, a cause other than flood clears the flood details, and so
   on);
@@ -22,7 +23,7 @@ deleting, and import and export stay on the Mac.
 
 ### On the Mac
 
-1. Open **Settings** and find **Phone form**.
+1. Open **Settings** and choose **Phone form**.
 2. Press **Start phone form**. SDE shows a QR code, the address phones use (for example `http://192.168.1.20:52814/`) and
    a 6-digit PIN.
 3. The first time, macOS may ask whether SDE may accept incoming network connections, or find devices on your local
@@ -36,8 +37,15 @@ quit SDE, and by itself after 12 hours (the card shows how long is left).
 1. Join the same Wi-Fi network as the Mac.
 2. Scan the QR code with the camera and open the link, or type the address into the browser and use the PIN.
 3. Type your name and tap **Pair**. The name goes into the Mac's edit history next to each change you make.
-4. Search for the structure, or tap **Add a structure**. Open a step and fill in the fields; each one is saved when you
-   leave it ("Saved on the Mac"). Use **Add photo** to take or choose a photo.
+4. If the office has made teams, choose yours under **My assignments**; the phone remembers it. Tap a structure on the
+   list, search for one (the code printed on a field worksheet works too), or tap **Add a structure**. Open a step and
+   fill in the fields; each one is saved when you leave it ("Saved on the Mac"). Use **Add photo** to take or choose a
+   photo.
+
+<p>
+  <img src="screenshots/90-phone-find.png" alt="My assignments on the phone" width="260">
+  <img src="screenshots/91-phone-edit.png" alt="An assessment open on the phone" width="260">
+</p>
 
 Several phones can be paired at once. The QR code and PIN work for one phone, for 10 minutes; a new code appears as soon
 as one is used. **New code** on the Mac makes a fresh one at any time. Each paired phone is listed on the Mac with

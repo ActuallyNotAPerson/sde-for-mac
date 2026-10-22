@@ -41,6 +41,9 @@ public sealed partial class MainViewModel
 					Assessments = files,
 					IncludePhotos = !noPhotos,
 					PhotosFolder = _app.Store.AttachmentsFolder,
+					// Photos print with their markup (water lines, arrows, labels); the photo files never change.
+					PhotoMarkups = noPhotos ? null : files.SelectMany(f => _app.Store.GetPhotoMarkups(f.Assessment.AssessmentID))
+						.GroupBy(kv => kv.Key).ToDictionary(g => g.Key, g => g.First().Value),
 				};
 				ReportGenerator.RenderToFile(request, _app.Store.Reference, path);
 			});

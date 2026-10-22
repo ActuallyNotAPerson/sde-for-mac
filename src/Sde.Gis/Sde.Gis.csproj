@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The GIS core for the map workspace, free of UI code (no Avalonia): the feature model, file readers and writers
+    (Shapefile, GeoJSON, GeoPackage, CSV), the layers GeoPackage beside each database, our own projections (ProjNET is
+    LGPL), the ArcGIS REST client, spatial operations with NetTopologySuite, the style model and GeoTIFF sampling.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Gis</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite" />
+    <PackageReference Include="NetTopologySuite.IO.Esri.Shapefile" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" />
+    <PackageReference Include="BitMiracle.LibTiff.NET" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <!-- The EPSG projected systems SDE knows by code (tools/gis/make_epsg_table.py writes it from the EPSG Dataset). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Projections/EpsgUs.csv" LogicalName="Sde.Gis.Projections.EpsgUs.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Core/Sde.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Gis.Tests" />
+  </ItemGroup>
+
+</Project>

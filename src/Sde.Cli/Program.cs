@@ -35,6 +35,7 @@ public static class Program
 		  lookups [TYPE-ID]           List lookup values (building types, causes, …)
 
 		Default database: ~/Library/Application Support/SDE/sde.sqlite
+		Only init makes a new database. The other commands open one that already exists.
 		""";
 
 	public static int Main(string[] args)
@@ -73,7 +74,18 @@ public static class Program
 		}
 	}
 
-	private static SdeStore Store(string dbPath) => new SdeStore(SdeDatabase.OpenOrCreate(dbPath));
+	/// <summary>
+	/// Opens the database for a command. Only "init" makes a new one, so a mistyped --db path is an error rather than a
+	/// new, empty database.
+	/// </summary>
+	private static SdeStore Store(string dbPath)
+	{
+		if (!File.Exists(dbPath))
+		{
+			throw new FileNotFoundException($"There is no SDE database at {dbPath}. Check the path, or run 'sde --db \"{dbPath}\" init' to make a new one.", dbPath);
+		}
+		return new SdeStore(SdeDatabase.Open(dbPath));
+	}
 
 	private static int Init(string dbPath)
 	{

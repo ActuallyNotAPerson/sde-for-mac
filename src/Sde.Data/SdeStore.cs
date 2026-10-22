@@ -29,7 +29,8 @@ public sealed record StructureSummary(
 	string ZipCode = null,
 	string ParcelNumber = null,
 	int? FIRMZone = null,
-	string Status = null);
+	string Status = null,
+	bool CheckedOut = false);
 
 /// <summary>
 /// Everything the app reads and writes. Replaces FEMA's 25 DAL services and the parts of the BLL that called them.
@@ -121,7 +122,9 @@ public sealed partial class SdeStore
 			foreach (Guid aid in c.Query<Guid>("SELECT AssessmentID FROM Assessment WHERE PropertyID = @propertyId", new { propertyId }, tx).ToList())
 			{
 				files.AddRange(DeleteAssessmentRows(c, tx, aid));
+				BumpVersion(c, tx, aid, VersionKind.Assessment);
 			}
+			BumpVersion(c, tx, propertyId, VersionKind.Property);
 			TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
 			TableMap<CustomFieldResultRecord>.Delete(c, "ObjectIdentifier = @propertyId", new { propertyId }, tx);
 			TableMap<RecentAssessmentRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
@@ -169,6 +172,14 @@ public sealed partial class SdeStore
 
 	public AssessmentFile LoadAssessment(Guid assessmentId) => Database.Read(c => LoadAssessment(c, null, assessmentId));
 
+	/// <summary>An assessment with the versions it was loaded at (in one read, so they belong together), or null.</summary>
+	public (AssessmentFile File, VersionStamp Stamp) LoadAssessmentWithStamp(Guid assessmentId) => Database.Read(c =>
+	{
+		using IDbTransaction tx = c.BeginTransaction(deferred: true);
+		AssessmentFile file = LoadAssessment(c, tx, assessmentId);
+		return file == null ? (null, null) : (file, GetStamp(c, tx, assessmentId, file.Property.PropertyID));
+	});
+
 	internal static AssessmentFile LoadAssessment(IDbConnection c, IDbTransaction tx, Guid assessmentId)
 	{
 		AssessmentRecord a = TableMap<AssessmentRecord>.Get(c, new { AssessmentID = assessmentId }, tx);
@@ -189,14 +200,14 @@ public sealed partial class SdeStore
 		};
 	}
 
-	/// <summary>Loads several assessments (skipping IDs that don't exist), in the order given.</summary>
+	/// <summary>Loads several assessments (skipping IDs that don't exist), in the order given, over one connection.</summary>
 	public List<AssessmentFile> LoadAssessments(IEnumerable<Guid> assessmentIds) =>
-		assessmentIds.Select(LoadAssessment).Where(f => f != null).ToList();
+		Database.Read(c => assessmentIds.Select(id => LoadAssessment(c, null, id)).Where(f => f != null).ToList());
 
 	/// <summary>All active assessments of active structures.</summary>
-	public List<AssessmentFile> LoadAllAssessments() =>
-		LoadAssessments(Database.Read(c => c.Query<Guid>(
-			"SELECT a.AssessmentID FROM Assessment a JOIN Property p ON p.PropertyID = a.PropertyID WHERE a.Active = 1 AND p.Active = 1 ORDER BY a.DateofInspection DESC").ToList()));
+	public List<AssessmentFile> LoadAllAssessments() => Database.Read(c => c.Query<Guid>(
+			"SELECT a.AssessmentID FROM Assessment a JOIN Property p ON p.PropertyID = a.PropertyID WHERE a.Active = 1 AND p.Active = 1 ORDER BY a.DateofInspection DESC")
+		.ToList().Select(id => LoadAssessment(c, null, id)).Where(f => f != null).ToList());
 
 	public List<AssessmentRecord> GetAssessmentsForProperty(Guid propertyId) =>
 		Database.Read(c => TableMap<AssessmentRecord>.Select(c, "PropertyID = @propertyId AND Active = 1", new { propertyId }, orderBy: "DateofInspection DESC").ToList());
@@ -204,18 +215,42 @@ public sealed partial class SdeStore
 	/// <summary>
 	/// Recalculates and saves an assessment and its property in one transaction. Child rows are replaced
 	/// (the original deleted and re-inserted them per tab). Also updates the recent-assessments list, writes edit
-	/// history and refuses to change a locked assessment (see <see cref="SaveTracked"/>).
+	/// history and refuses to change a locked assessment (see <see cref="SaveTracked"/>). Nothing is written when
+	/// nothing changed. With <paramref name="shapes"/>, the structure's square-footage shapes are replaced in the same
+	/// transaction. Returns the versions after the save, which a writer that keeps the assessment open expects next time.
 	/// </summary>
-	public void SaveAssessment(AssessmentFile file, SaveContext context = null)
+	public VersionStamp SaveAssessment(AssessmentFile file, SaveContext context = null, IReadOnlyList<ShapeRecord> shapes = null)
 	{
 		Calculator.Recalculate(file);
-		Database.InTransaction((c, tx) => SaveTracked(c, tx, file, context ?? SaveContext.App));
+		return Database.InTransaction((c, tx) => SaveTracked(c, tx, file, context ?? SaveContext.App, shapes));
 	}
 
-	internal static void SaveAssessment(IDbConnection c, IDbTransaction tx, AssessmentFile file)
+	/// <summary>
+	/// Loads one assessment, changes it and saves it, all in one transaction, so nothing another program saves can
+	/// slip in between (the phone form, the AI assistant server, the map's spatial join). The change runs before the
+	/// assessment is recalculated; locks, history and versions are as for any save. Returns the saved assessment.
+	/// </summary>
+	public AssessmentFile Apply(Guid assessmentId, Action<AssessmentFile> change, SaveContext context = null)
+	{
+		AssessmentCalculator calc = Calculator;
+		return Database.InTransaction((c, tx) =>
+		{
+			AssessmentFile file = LoadAssessment(c, tx, assessmentId) ?? throw new ArgumentException("That assessment no longer exists.");
+			change(file);
+			calc.Recalculate(file);
+			SaveTracked(c, tx, file, context ?? SaveContext.App);
+			return file;
+		});
+	}
+
+	/// <summary>Writes an assessment's rows: the structure row only when it changed, then the assessment and its child rows.</summary>
+	internal static void SaveAssessment(IDbConnection c, IDbTransaction tx, AssessmentFile file, bool writeProperty)
 	{
 		AssessmentRecord a = file.Assessment;
-		SaveProperty(c, tx, file.Property);
+		if (writeProperty || file.Property.PropertyID == Guid.Empty)
+		{
+			SaveProperty(c, tx, file.Property);
+		}
 		a.PropertyID = file.Property.PropertyID;
 		a.LastUpdate = Now();
 		TableMap<AssessmentRecord>.Upsert(c, a, tx);
@@ -261,7 +296,12 @@ public sealed partial class SdeStore
 	/// <summary>Permanently deletes one assessment, its rows and its photo files.</summary>
 	public void DeleteAssessment(Guid assessmentId)
 	{
-		List<string> files = Database.InTransaction((c, tx) => DeleteAssessmentRows(c, tx, assessmentId));
+		List<string> files = Database.InTransaction((c, tx) =>
+		{
+			List<string> removed = DeleteAssessmentRows(c, tx, assessmentId);
+			BumpVersion(c, tx, assessmentId, VersionKind.Assessment);
+			return removed;
+		});
 		DeleteFiles(files);
 	}
 
@@ -309,7 +349,8 @@ public sealed partial class SdeStore
 			       a.PercentDamage, a.DamageMessage, COALESCE(a.LastUpdate, p.LastUpdate) AS LastUpdate,
 			       COALESCE(x.Source, (SELECT l.Source FROM StructureLink l WHERE l.PropertyID = p.PropertyID ORDER BY l.ImportedOn DESC LIMIT 1)) AS ExternalSource,
 			       COALESCE(x.RecordId, (SELECT l.RecordId FROM StructureLink l WHERE l.PropertyID = p.PropertyID ORDER BY l.ImportedOn DESC LIMIT 1)) AS ExternalId,
-			       p.StreetName, p.ZipCode, p.ParcelNumber, p.FIRMZone, st.Status
+			       p.StreetName, p.ZipCode, p.ParcelNumber, p.FIRMZone, st.Status,
+			       EXISTS (SELECT 1 FROM CheckOut co WHERE co.AssessmentID = a.AssessmentID) AS CheckedOut
 			FROM Property p
 			LEFT JOIN Assessment a ON a.PropertyID = p.PropertyID AND a.Active = 1
 			LEFT JOIN Lookup s ON s.LookupID = p.StreetSuffixID
@@ -321,7 +362,7 @@ public sealed partial class SdeStore
 		return Database.Read(c => c.Query<SummaryRow>(sql).Select(r => new StructureSummary(
 			r.PropertyID, r.AssessmentID, r.StructureTypeID, r.Owner, r.Address, r.City, r.NFIPCID, r.NFIPCommunityName,
 			r.DateofInspection, r.InspectorName, r.PercentDamage is decimal pd ? JetScaling.WithScale(pd, 1) : null,
-			r.DamageMessage, r.LastUpdate, r.ExternalSource, r.ExternalId, r.StreetName, r.ZipCode, r.ParcelNumber, r.FIRMZone, r.Status)).ToList());
+			r.DamageMessage, r.LastUpdate, r.ExternalSource, r.ExternalId, r.StreetName, r.ZipCode, r.ParcelNumber, r.FIRMZone, r.Status, r.CheckedOut)).ToList());
 	}
 
 	private sealed class SummaryRow
@@ -346,6 +387,7 @@ public sealed partial class SdeStore
 		public string ParcelNumber { get; set; }
 		public int? FIRMZone { get; set; }
 		public string Status { get; set; }
+		public bool CheckedOut { get; set; }
 	}
 
 	public List<RecentAssessmentRecord> RecentAssessments(int count = 5) =>
@@ -370,23 +412,44 @@ public sealed partial class SdeStore
 	public List<ShapeRecord> GetShapes(Guid propertyId) =>
 		Database.Read(c => TableMap<ShapeRecord>.Select(c, "PropertyID = @propertyId", new { propertyId }, orderBy: "ShapeID").ToList());
 
-	/// <summary>Replaces a property's shapes and sets its SquareFootage to their total (ShapeViewService.UpdateTotalSquareFootage).</summary>
+	/// <summary>
+	/// Replaces a property's shapes and sets its SquareFootage to their total (ShapeViewService.UpdateTotalSquareFootage).
+	/// Nothing is written when the shapes and total are already the same.
+	/// </summary>
 	public decimal SaveShapes(Guid propertyId, IEnumerable<ShapeRecord> shapes)
 	{
 		List<ShapeRecord> list = shapes.ToList();
 		decimal total = list.Sum(s => s.TotalSqFt ?? 0m);
 		Database.InTransaction((c, tx) =>
 		{
-			TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
-			foreach (ShapeRecord s in list)
+			decimal? stored = c.ExecuteScalar<decimal?>("SELECT SquareFootage FROM Property WHERE PropertyID = @propertyId", new { propertyId }, tx);
+			if (SameShapes(c, tx, propertyId, list) && stored == total)
 			{
-				s.ShapeID = null;
-				s.PropertyID = propertyId;
-				TableMap<ShapeRecord>.Insert(c, s, tx);
+				return;
 			}
+			ReplaceShapes(c, tx, propertyId, list);
 			c.Execute("UPDATE Property SET SquareFootage = @total, LastUpdate = @now WHERE PropertyID = @propertyId", new { total, now = Now(), propertyId }, tx);
+			BumpVersion(c, tx, propertyId, VersionKind.Property);
 		});
 		return total;
+	}
+
+	/// <summary>True when a structure's stored shapes are these (their IDs aside).</summary>
+	private static bool SameShapes(IDbConnection c, IDbTransaction tx, Guid propertyId, IReadOnlyList<ShapeRecord> shapes)
+	{
+		List<ShapeRecord> stored = TableMap<ShapeRecord>.Select(c, "PropertyID = @propertyId", new { propertyId }, tx, orderBy: "ShapeID").ToList();
+		return SameRows(stored, shapes, nameof(ShapeRecord.ShapeID), nameof(ShapeRecord.PropertyID));
+	}
+
+	private static void ReplaceShapes(IDbConnection c, IDbTransaction tx, Guid propertyId, IEnumerable<ShapeRecord> shapes)
+	{
+		TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
+		foreach (ShapeRecord s in shapes)
+		{
+			s.ShapeID = null;
+			s.PropertyID = propertyId;
+			TableMap<ShapeRecord>.Insert(c, s, tx);
+		}
 	}
 
 	// ───────────────────────── Photos ─────────────────────────
@@ -445,6 +508,7 @@ public sealed partial class SdeStore
 				r.ResultType = resultType;
 				TableMap<CustomFieldResultRecord>.Insert(c, r, tx);
 			}
+			BumpVersion(c, tx, objectId, string.Equals(resultType, "property", StringComparison.OrdinalIgnoreCase) ? VersionKind.Property : VersionKind.Assessment);
 		});
 
 	public List<NoteRecord> GetNotes() => Database.Read(c => TableMap<NoteRecord>.Select(c, "Active = 1", orderBy: "NoteName").ToList());

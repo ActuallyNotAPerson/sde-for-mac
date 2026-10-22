@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.ManageEventsSheetView"
+             x:DataType="sh:ManageEventsSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="An event groups the assessments of one disaster. Choose it in the sidebar to see only its structures, its dashboard and its exports." />
+    <c:EmptyState IsVisible="{Binding IsEmpty}" Icon="Event" Title="No events yet" Text="Add one for each disaster you assess." />
+    <Border Classes="card flush" IsVisible="{Binding !IsEmpty}">
+      <ScrollViewer MaxHeight="360" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding Rows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="sh:EventRowViewModel">
+              <Border Classes="rule" Padding="14,10">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <c:Icon Kind="Event" Size="16" Classes="secondary" VerticalAlignment="Center" Margin="0,0,10,0" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Classes="medium" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Content="Edit…" Command="{Binding EditCommand}" AutomationProperties.Name="{Binding EditName}" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+    <DockPanel>
+      <Button DockPanel.Dock="Left" Command="{Binding NewCommand}" AutomationProperties.Name="New event">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Icon Kind="Plus" Size="14" />
+          <TextBlock Text="New event" />
+        </StackPanel>
+      </Button>
+      <Button Classes="primary" Content="Done" IsDefault="True" HorizontalAlignment="Right" MinWidth="90" HorizontalContentAlignment="Center" Command="{Binding DoneCommand}" />
+    </DockPanel>
+  </StackPanel>
+</UserControl>

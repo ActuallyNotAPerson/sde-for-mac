@@ -293,6 +293,8 @@ public sealed class FieldServer : IAsyncDisposable
 		app.MapGet("/api/lookups", () => Results.Json(FieldApi.Lookups(_store().Reference)));
 		app.MapGet("/api/structures", (HttpContext ctx) => Results.Json(FieldApi.Search(_store(), ctx.Request.Query["q"].ToString())));
 		app.MapPost("/api/structures", AddStructure);
+		app.MapGet("/api/teams", () => Results.Json(FieldApi.Teams(_store())));
+		app.MapGet("/api/teams/{id:guid}/assignments", (Guid id) => Results.Json(FieldApi.Assignments(_store(), id)));
 		app.MapPost("/api/properties/{id:guid}/assessments", AddAssessment);
 		app.MapGet("/api/assessments/{id:guid}", (Guid id) =>
 		{
@@ -455,14 +457,12 @@ public sealed class FieldServer : IAsyncDisposable
 				return Results.Json(new { error = "The Mac couldn't convert that photo. Try taking it again, or set the camera to save JPEG (Most Compatible)." },
 					statusCode: StatusCodes.Status422UnprocessableEntity);
 			}
-			Sde.Core.Records.AttachmentRecord added = null;
+			// Copied into the attachments folder here, on the web server's thread: the save itself runs on the Mac
+			// app's UI thread, which a 25 MB copy would freeze.
+			Sde.Core.Records.AttachmentRecord added = store.ImportPhoto(id, converted, description);
 			try
 			{
-				AssessmentFile saved = await _writer.ApplyAsync(id, f =>
-				{
-					added = store.ImportPhoto(id, converted, description);
-					f.Attachments.Add(added);
-				}, ContextFor(ctx));
+				AssessmentFile saved = await _writer.ApplyAsync(id, f => f.Attachments.Add(added), ContextFor(ctx));
 				return Results.Json(new { photoCount = saved.Attachments.Count });
 			}
 			catch

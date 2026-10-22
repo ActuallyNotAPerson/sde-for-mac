@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The AI assistant server (Sde.Mcp): every tool called through the MCP SDK's own client over in-memory pipes, and the
+    real "SDE mcp" process spawned to check that stdout carries nothing but JSON-RPC.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- xUnit v3: a test project is an executable. -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- make_report draws with SkiaSharp, whose own package carries only the macOS and Windows natives. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sde.Mcp/Sde.Mcp.csproj" />
+    <ProjectReference Include="../Sde.TestSupport/Sde.TestSupport.csproj" />
+    <!-- Built first, not referenced: the process tests run the app's own "SDE mcp". -->
+    <ProjectReference Include="../../src/Sde.App/Sde.App.csproj" ReferenceOutputAssembly="false" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Sde.TestSupport" />
+  </ItemGroup>
+
+  <!-- The same files as SDE.app: no Svg packages (see the props file). -->
+  <Import Project="../../src/Sde.App/LeaveOutSvg.props" />
+
+</Project>

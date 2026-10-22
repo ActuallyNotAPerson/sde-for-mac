@@ -8,6 +8,7 @@ using Sde.App.ViewModels;
 using Sde.App.ViewModels.Editor;
 using Sde.App.ViewModels.Fields;
 using Sde.App.ViewModels.Sheets;
+using Sde.App.ViewModels.Shell;
 using Sde.App.Views;
 using Sde.Core.Assessments;
 using Sde.Core.Records;
@@ -61,16 +62,33 @@ public class KeyboardTests
 		Assert.Equal("SearchBox", focused.Name);
 	}
 
+	/// <summary>⌘1 to ⌘9 open the sidebar's pages in its order, and View lists them in that order with those keys.</summary>
 	[AvaloniaFact]
-	public void CmdNumbers_SwitchPages()
+	public void CmdNumbers_FollowTheSidebarOrder()
 	{
 		using UiSession ui = new UiSession();
-		ui.Window.KeyPressQwerty(PhysicalKey.Digit3, RawInputModifiers.Meta);
-		ui.Pump();
-		Assert.Equal(ViewModels.Page.Settings, ui.Main.ActivePage);
-		ui.Window.KeyPressQwerty(PhysicalKey.Digit2, RawInputModifiers.Meta);
-		ui.Pump();
-		Assert.Equal(ViewModels.Page.ImportExport, ui.Main.ActivePage);
+		List<NavItemViewModel> sidebar = ui.Main.SidebarItems.ToList();
+		Assert.Equal(new[] { "Structures", "Map", "Dashboard", "Review", "Compliance", "Assignments", "Import & export", "Settings", "Recently deleted" },
+			sidebar.Select(i => i.Title));
+		PhysicalKey[] digits = { PhysicalKey.Digit1, PhysicalKey.Digit2, PhysicalKey.Digit3, PhysicalKey.Digit4, PhysicalKey.Digit5, PhysicalKey.Digit6, PhysicalKey.Digit7, PhysicalKey.Digit8, PhysicalKey.Digit9 };
+		for (int i = digits.Length - 1; i >= 0; i--)
+		{
+			ui.Window.KeyPressQwerty(digits[i], RawInputModifiers.Meta);
+			ui.Pump();
+			Assert.Equal(sidebar[i].Page, ui.Main.ActivePage);
+			Assert.True(sidebar[i].IsActive);
+			Assert.Single(sidebar, n => n.IsActive);
+			Assert.Equal("⌘" + (i + 1), sidebar[i].Shortcut);
+		}
+
+		NativeMenu view = NativeMenu.GetMenu(ui.Window).Items.OfType<NativeMenuItem>().Single(m => m.Header == "View").Menu;
+		List<NativeMenuItem> pages = view.Items.OfType<NativeMenuItem>().Take(sidebar.Count).ToList();
+		Assert.Equal(sidebar.Select(i => i.Title), pages.Select(m => m.Header));
+		for (int i = 0; i < pages.Count; i++)
+		{
+			Assert.Equal(new KeyGesture(Key.D1 + i, KeyModifiers.Meta), pages[i].Gesture);
+			Assert.Equal(sidebar[i].Page, pages[i].CommandParameter);
+		}
 	}
 
 	[AvaloniaFact]
@@ -117,7 +135,7 @@ public class KeyboardTests
 	{
 		using UiSession ui = new UiSession();
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		StructuresViewModel s = ui.Main.Structures;
 		Assert.False(s.AllChecked);
 		s.Rows[0].IsChecked = true;

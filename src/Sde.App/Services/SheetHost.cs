@@ -44,6 +44,19 @@ public abstract partial class SheetViewModel : ObservableObject
 	}
 
 	public virtual bool CanCancel => true;
+
+	/// <summary>The sheet's width: small (440), medium (600) or large (800); Auto lets the content decide.</summary>
+	public virtual SheetSize Size => SheetSize.Auto;
+}
+
+/// <summary>Sheet widths (the SheetWidth tokens).</summary>
+public enum SheetSize
+{
+	/// <summary>As wide as its content, between 440 and 760.</summary>
+	Auto,
+	Small,
+	Medium,
+	Large,
 }
 
 /// <summary>Shows sheets one on top of another; the window shows <see cref="Current"/> with the rest of the window dimmed.</summary>
@@ -52,13 +65,16 @@ public sealed partial class SheetHost : ObservableObject
 	public ObservableCollection<SheetViewModel> Open { get; } = new();
 
 	[ObservableProperty]
-	[NotifyPropertyChangedFor(nameof(HasSheet), nameof(CurrentTitle))]
+	[NotifyPropertyChangedFor(nameof(HasSheet), nameof(CurrentTitle), nameof(CurrentSize))]
 	public partial SheetViewModel Current { get; private set; }
 
 	public bool HasSheet => Current != null;
 
 	/// <summary>The current sheet's title ("" when none; the window binds to this rather than through a null sheet).</summary>
 	public string CurrentTitle => Current?.Title ?? "";
+
+	/// <summary>The current sheet's width, for the window's sheet chrome.</summary>
+	public SheetSize CurrentSize => Current?.Size ?? SheetSize.Auto;
 
 	/// <summary>Esc: cancels the current sheet, if any.</summary>
 	[RelayCommand]

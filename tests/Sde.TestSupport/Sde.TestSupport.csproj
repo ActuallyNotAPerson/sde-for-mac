@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <!-- For Assert.Skip when FEMA's installer files (the answer key) aren't set up. -->
-    <PackageReference Include="xunit.v3.assert" Version="3.2.2" />
+    <PackageReference Include="xunit.v3.assert" />
   </ItemGroup>
 
   <ItemGroup>

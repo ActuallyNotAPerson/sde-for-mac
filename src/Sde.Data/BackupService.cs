@@ -5,15 +5,19 @@ using Microsoft.Data.Sqlite;
 
 namespace Sde.Data;
 
-/// <summary>One automatic or manual backup: a folder with a copy of the database and its photos.</summary>
-public sealed record BackupInfo(string Folder, DateTime TakenOn, string Reason, long DatabaseBytes, int Structures, int Assessments);
+/// <summary>
+/// One automatic or manual backup: a folder with a copy of the database, its photos and documents, and its map layers.
+/// The counts are only filled in by <see cref="BackupService.List(bool)"/> when asked for (they mean opening the copy).
+/// </summary>
+public sealed record BackupInfo(string Folder, DateTime TakenOn, string Reason, long DatabaseBytes, int? Structures = null, int? Assessments = null);
 
 /// <summary>
 /// Automatic backups, kept in a Backups folder beside the database: one when a database is first opened each day and
 /// one on quitting when something changed, keeping the newest <see cref="Keep"/>. Each backup is a consistent copy of
-/// the database (SQLite VACUUM INTO) plus the photos, which are hard links to the originals (photos never change once
-/// added, so a link costs no space and survives the original being deleted). Restoring a backup backs up the current
-/// state first.
+/// the database (SQLite VACUUM INTO) plus the photos and documents, which are hard links to the originals (they never
+/// change once added, so a link costs no space and survives the original being deleted). The map layers GeoPackage is
+/// copied the same way when it changed since the previous backup, and otherwise linked to that backup's copy (backup
+/// copies never change either). Restoring a backup backs up the current state first.
 /// </summary>
 public sealed class BackupService
 {
@@ -35,8 +39,11 @@ public sealed class BackupService
 
 	public string BackupsFolder => Path.Combine(Path.GetDirectoryName(_database.FilePath)!, FolderName);
 
-	/// <summary>Backups of this database, newest first.</summary>
-	public List<BackupInfo> List()
+	/// <summary>
+	/// Backups of this database, newest first. Cheap: only the folder names and sizes are read, unless
+	/// <paramref name="withCounts"/> asks for the number of structures and assessments in each (the Restore sheet).
+	/// </summary>
+	public List<BackupInfo> List(bool withCounts = false)
 	{
 		if (!Directory.Exists(BackupsFolder))
 		{
@@ -58,8 +65,15 @@ public sealed class BackupService
 				continue;
 			}
 			string reason = rest.Length > Stamp.Length ? rest[Stamp.Length..].Trim(' ', '(', ')') : "";
-			(int structures, int assessments) = Counts(db);
-			found.Add(new BackupInfo(dir, taken, reason, new FileInfo(db).Length, structures, assessments));
+			if (withCounts)
+			{
+				(int structures, int assessments) = Counts(db);
+				found.Add(new BackupInfo(dir, taken, reason, new FileInfo(db).Length, structures, assessments));
+			}
+			else
+			{
+				found.Add(new BackupInfo(dir, taken, reason, new FileInfo(db).Length));
+			}
 		}
 		return found.OrderByDescending(b => b.TakenOn).ToList();
 	}
@@ -81,17 +95,12 @@ public sealed class BackupService
 		Directory.CreateDirectory(partial);
 		try
 		{
+			BackupInfo previous = List().FirstOrDefault();
 			string dbCopy = Path.Combine(partial, "sde.sqlite");
 			_database.Read(c => c.Execute("VACUUM INTO @dbCopy", new { dbCopy }));
-			string photos = Path.Combine(partial, "attachments");
-			Directory.CreateDirectory(photos);
-			if (Directory.Exists(_database.AttachmentsFolder))
-			{
-				foreach (string f in Directory.GetFiles(_database.AttachmentsFolder))
-				{
-					LinkOrCopy(f, Path.Combine(photos, Path.GetFileName(f)));
-				}
-			}
+			LinkFolder(_database.AttachmentsFolder, Path.Combine(partial, "attachments"));
+			LinkFolder(_database.DocumentsFolder, Path.Combine(partial, "documents"));
+			BackUpLayers(previous, Path.Combine(partial, LayersFileName));
 			Directory.Move(partial, folder);
 		}
 		catch
@@ -100,7 +109,47 @@ public sealed class BackupService
 			throw;
 		}
 		Prune();
-		return List().First(b => b.Folder == folder);
+		BackupInfo made = List().First(b => b.Folder == folder);
+		(int structures, int assessments) = Counts(Path.Combine(folder, "sde.sqlite"));
+		return made with { Structures = structures, Assessments = assessments };
+	}
+
+	/// <summary>The map layers GeoPackage's name inside a backup folder.</summary>
+	public const string LayersFileName = "layers.gpkg";
+
+	/// <summary>Hard-links (or copies) every file of a folder into a backup.</summary>
+	private static void LinkFolder(string source, string target)
+	{
+		Directory.CreateDirectory(target);
+		if (Directory.Exists(source))
+		{
+			foreach (string f in Directory.GetFiles(source))
+			{
+				LinkOrCopy(f, Path.Combine(target, Path.GetFileName(f)));
+			}
+		}
+	}
+
+	/// <summary>
+	/// Copies the layers GeoPackage into a backup: a consistent copy (VACUUM INTO) when it changed since the previous
+	/// backup, otherwise a link to the previous backup's copy.
+	/// </summary>
+	private void BackUpLayers(BackupInfo previous, string target)
+	{
+		string live = _database.LayersPath;
+		if (!File.Exists(live))
+		{
+			return;
+		}
+		string earlier = previous == null ? null : Path.Combine(previous.Folder, LayersFileName);
+		if (earlier != null && File.Exists(earlier) && LastWrite(live) < File.GetLastWriteTime(earlier))
+		{
+			LinkOrCopy(earlier, target);
+			return;
+		}
+		using SqliteConnection c = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = live, Pooling = false }.ToString());
+		c.Open();
+		c.Execute("VACUUM INTO @target", new { target });
 	}
 
 	/// <summary>The automatic backup when a database is opened: once a day.</summary>
@@ -118,11 +167,26 @@ public sealed class BackupService
 		return newest != null && changed <= newest.TakenOn ? null : BackUp("quit");
 	}
 
-	/// <summary>When the database file (or its write-ahead log) was last written.</summary>
+	/// <summary>When the database (or its layers GeoPackage) was last written.</summary>
 	private DateTime LastWrite()
 	{
-		DateTime t = File.GetLastWriteTime(_database.FilePath);
-		string wal = _database.FilePath + "-wal";
+		DateTime t = LastWrite(_database.FilePath);
+		if (File.Exists(_database.LayersPath))
+		{
+			DateTime layers = LastWrite(_database.LayersPath);
+			if (layers > t)
+			{
+				t = layers;
+			}
+		}
+		return t;
+	}
+
+	/// <summary>When a SQLite file (or its write-ahead log) was last written.</summary>
+	private static DateTime LastWrite(string path)
+	{
+		DateTime t = File.GetLastWriteTime(path);
+		string wal = path + "-wal";
 		if (File.Exists(wal) && new FileInfo(wal).Length > 0 && File.GetLastWriteTime(wal) > t)
 		{
 			t = File.GetLastWriteTime(wal);
@@ -147,37 +211,99 @@ public sealed class BackupService
 	}
 
 	/// <summary>
-	/// Replaces the database and photos with a backup. The current state is backed up first ("before restore"), so a
-	/// restore can itself be undone. The caller must reopen the database afterwards; every connection is closed here.
-	/// Photos added since the backup are kept in the attachments folder (unused).
+	/// Replaces the database, its layers and its photos and documents with a backup. Refused while another copy of SDE
+	/// (the AI assistant server, another window) has the database open: <paramref name="lease"/> is the caller's own
+	/// lease, which must be the only one; without one, a lease is taken here. The current state is backed up first
+	/// ("before restore"), so a restore can itself be undone. The write-ahead log is checkpointed, then each file is
+	/// copied beside its target and renamed over it (the layers first, then the database), so a failure part-way never
+	/// leaves a half-written database. The caller must reopen the database afterwards; every connection is closed here.
+	/// Photos and documents added since the backup are kept (unused).
 	/// </summary>
-	public BackupInfo Restore(BackupInfo backup)
+	public BackupInfo Restore(BackupInfo backup, DatabaseLease lease = null)
 	{
-		BackupInfo before = BackUp("before restore");
-		SqliteConnection.ClearAllPools();
-		string db = _database.FilePath;
-		File.Copy(Path.Combine(backup.Folder, "sde.sqlite"), db, overwrite: true);
-		foreach (string side in new[] { db + "-wal", db + "-shm" })
+		DatabaseLease own = lease == null ? DatabaseLease.TryExclusive(_database.LockPath) : null;
+		bool exclusive = own != null || lease?.TryUpgrade() == true || OperatingSystem.IsWindows();
+		try
 		{
-			if (File.Exists(side))
+			if (!exclusive)
 			{
-				File.Delete(side);
+				throw new InvalidOperationException("This database is also open in another copy of SDE (another window, or an AI assistant connected to it). Close that first, then restore.");
 			}
-		}
-		string photos = Path.Combine(backup.Folder, "attachments");
-		if (Directory.Exists(photos))
-		{
-			Directory.CreateDirectory(_database.AttachmentsFolder);
-			foreach (string f in Directory.GetFiles(photos))
+			BackupInfo before = BackUp("before restore");
+			_database.Read(c => c.Execute("PRAGMA wal_checkpoint(TRUNCATE)"));
+			SqliteConnection.ClearAllPools();
+
+			string layers = Path.Combine(backup.Folder, LayersFileName);
+			if (File.Exists(layers))
 			{
-				string target = Path.Combine(_database.AttachmentsFolder, Path.GetFileName(f));
-				if (!File.Exists(target))
+				ReplaceSqliteFile(layers, _database.LayersPath);
+			}
+			else
+			{
+				DeleteSqliteFile(_database.LayersPath);
+			}
+			ReplaceSqliteFile(Path.Combine(backup.Folder, "sde.sqlite"), _database.FilePath);
+			RestoreFolder(Path.Combine(backup.Folder, "attachments"), _database.AttachmentsFolder);
+			RestoreFolder(Path.Combine(backup.Folder, "documents"), _database.DocumentsFolder);
+			return before;
+		}
+		finally
+		{
+			own?.Dispose();
+			lease?.Downgrade();
+		}
+	}
+
+	/// <summary>Copies a SQLite file beside its target, removes the target's write-ahead log, and renames the copy over it.</summary>
+	private static void ReplaceSqliteFile(string source, string target)
+	{
+		string temp = target + ".restoring";
+		File.Copy(source, temp, overwrite: true);
+		try
+		{
+			foreach (string side in new[] { target + "-wal", target + "-shm" })
+			{
+				if (File.Exists(side))
 				{
-					LinkOrCopy(f, target);
+					File.Delete(side);
 				}
 			}
+			File.Move(temp, target, overwrite: true);
 		}
-		return before;
+		catch
+		{
+			File.Delete(temp);
+			throw;
+		}
+	}
+
+	private static void DeleteSqliteFile(string path)
+	{
+		foreach (string f in new[] { path, path + "-wal", path + "-shm" })
+		{
+			if (File.Exists(f))
+			{
+				File.Delete(f);
+			}
+		}
+	}
+
+	/// <summary>Puts back files from a backup folder that are missing from the live one (they never change, so existing ones are the same).</summary>
+	private static void RestoreFolder(string source, string target)
+	{
+		if (!Directory.Exists(source))
+		{
+			return;
+		}
+		Directory.CreateDirectory(target);
+		foreach (string f in Directory.GetFiles(source))
+		{
+			string to = Path.Combine(target, Path.GetFileName(f));
+			if (!File.Exists(to))
+			{
+				LinkOrCopy(f, to);
+			}
+		}
 	}
 
 	private static (int Structures, int Assessments) Counts(string db)

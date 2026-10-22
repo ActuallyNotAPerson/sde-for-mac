@@ -3,7 +3,7 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.WalkthroughSheetView"
              x:DataType="sh:WalkthroughSheetViewModel">
-  <StackPanel Spacing="14" Width="560">
+  <StackPanel Spacing="14">
     <StackPanel Spacing="8" MinHeight="150" DataContext="{Binding Current}" x:DataType="sh:WalkthroughPage">
       <TextBlock Classes="h2" Text="{Binding Heading}" TextWrapping="Wrap" />
       <TextBlock Text="{Binding Body}" TextWrapping="Wrap" />

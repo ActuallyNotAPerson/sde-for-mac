@@ -11,17 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
-    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.3" />
-    <PackageReference Include="Avalonia.Skia" Version="12.1.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Avalonia.Headless.XUnit" />
+    <PackageReference Include="Avalonia.Skia" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../src/Sde.App/Sde.App.csproj" />
     <ProjectReference Include="../Sde.TestSupport/Sde.TestSupport.csproj" />
+    <!-- Made-up elevation certificate PDFs, shared with the Interop tests -->
+    <Compile Include="../Sde.Interop.Tests/EcTestForms.cs" Link="Support/EcTestForms.cs" />
   </ItemGroup>
 
   <!-- The recorded Census geocoder and FEMA NFHL answers, shared with the Interop tests (the network is never used). -->
@@ -29,9 +31,18 @@
     <None Include="../Sde.Interop.Tests/Fixtures/online/*.json" Link="Fixtures/online/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- The made-up town's GIS files and recorded ArcGIS answers, shared with the GIS tests (the network is never used). -->
+  <ItemGroup>
+    <None Include="../Sde.Gis.Tests/Fixtures/town/*" Link="Fixtures/town/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../Sde.Gis.Tests/Fixtures/arcgis/*.json;../Sde.Gis.Tests/Fixtures/arcgis/*.geojson" Link="Fixtures/arcgis/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Sde.TestSupport" />
   </ItemGroup>
+
+  <!-- The same files as SDE.app: no Svg packages (see the props file). -->
+  <Import Project="../../src/Sde.App/LeaveOutSvg.props" />
 
 </Project>

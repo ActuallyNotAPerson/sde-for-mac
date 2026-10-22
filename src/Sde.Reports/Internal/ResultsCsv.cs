@@ -59,14 +59,14 @@ internal static class ResultsCsv
 	internal static string Amount(string printed) =>
 		decimal.TryParse(printed, NumberStyles.Currency, Fmt.Us, out decimal d) ? d.ToString("0.00", CultureInfo.InvariantCulture) : "";
 
-	private static void Line(StringBuilder sb, IEnumerable<string> values)
+	internal static void Line(StringBuilder sb, IEnumerable<string> values)
 	{
 		sb.Append(string.Join(",", values.Select(Quote)));
 		sb.Append("\r\n");
 	}
 
 	/// <summary>RFC 4180 quoting; a leading = + - @ is prefixed with ' so a spreadsheet doesn't run it as a formula.</summary>
-	private static string Quote(string value)
+	internal static string Quote(string value)
 	{
 		string s = value ?? "";
 		if (s.Length > 0 && "=+-@".Contains(s[0]) && !decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out _))

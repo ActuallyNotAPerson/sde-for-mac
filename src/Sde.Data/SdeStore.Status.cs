@@ -57,6 +57,10 @@ public sealed partial class SdeStore
 		{
 			return current;
 		}
+		if (ctx.Via != SaveVia.WorkPackage)
+		{
+			EnsureNotCheckedOut(c, tx, assessmentId);
+		}
 		bool reopening = current.IsLocked && !AssessmentStatuses.IsLocked(status);
 		if (reopening && string.IsNullOrWhiteSpace(reason))
 		{
@@ -80,6 +84,7 @@ public sealed partial class SdeStore
 				: null,
 		};
 		TableMap<AssessmentStatusRecord>.Upsert(c, next, tx);
+		BumpVersion(c, tx, assessmentId, VersionKind.Assessment);
 		string label = reopening ? "Reopened: " + next.Reason : "Status: " + AssessmentStatuses.Label(status);
 		WriteEvent(c, tx, propertyId.Value, assessmentId, label, ctx, "Status", AssessmentStatuses.Label(current.Value), AssessmentStatuses.Label(status));
 		return next;

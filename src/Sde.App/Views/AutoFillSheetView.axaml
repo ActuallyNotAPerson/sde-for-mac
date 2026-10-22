@@ -3,9 +3,9 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.AutoFillSheetView"
              x:DataType="sh:AutoFillSheetViewModel">
-  <StackPanel Spacing="12" Width="660">
+  <StackPanel Spacing="12">
     <TextBlock Classes="secondary" TextWrapping="Wrap">
-      <Run Text="Coordinates from the U.S. Census Bureau geocoder and flood data from FEMA's National Flood Hazard Layer, for " /><Run Text="{Binding Address}" FontWeight="Medium" /><Run Text="." />
+      <Run Text="Coordinates from the U.S. Census Bureau geocoder and flood data from FEMA's National Flood Hazard Layer, for " /><Run Text="{Binding Address}" FontWeight="{StaticResource FontWeightMedium}" /><Run Text="." />
     </TextBlock>
     <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsBusy}">
       <ProgressBar IsIndeterminate="True" Width="120" AutomationProperties.Name="Looking up" />
@@ -29,11 +29,11 @@
             <DataTemplate x:DataType="sh:ProposalRowViewModel">
               <Grid ColumnDefinitions="30,1.3*,1.3*,1.6*,1.1*" Margin="0,3">
                 <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding CanCheck}" AutomationProperties.Name="{Binding CheckLabel}" VerticalAlignment="Top" />
-                <TextBlock Grid.Column="1" Text="{Binding Label}" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
+                <TextBlock Classes="medium" Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
                 <TextBlock Grid.Column="2" Text="{Binding CurrentText}" Classes="secondary" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
                 <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="0,0,8,0">
                   <TextBlock Text="{Binding ProposedText}" TextWrapping="Wrap" />
-                  <TextBlock Classes="issue recommended" FontSize="11" Text="{Binding Note}" IsVisible="{Binding HasNote}" />
+                  <TextBlock Classes="issue recommended" Text="{Binding Note}" IsVisible="{Binding HasNote}" />
                 </StackPanel>
                 <TextBlock Grid.Column="4" Text="{Binding SourceText}" Classes="muted" VerticalAlignment="Center" TextWrapping="Wrap" />
               </Grid>

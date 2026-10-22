@@ -22,6 +22,12 @@ public sealed record LookupsDto(IReadOnlyList<string> Steps, IReadOnlyList<Field
 public sealed record StructureDto(Guid PropertyId, Guid? AssessmentId, string Address, string City, string Owner, string Parcel,
 	string RecordId, string StructureType, string Result);
 
+/// <summary>A field team the phone can choose (no member names or phone numbers).</summary>
+public sealed record TeamDto(Guid TeamId, string Name, string Color);
+
+/// <summary>A structure on a team's list, in route order.</summary>
+public sealed record AssignmentDto(Guid AssignmentId, string ShortCode, int? RouteOrder, string Status, string DueDate, StructureDto Structure);
+
 /// <summary>An assessment as the phone edits it: only the fields that apply to it now.</summary>
 public sealed record AssessmentDto(Guid AssessmentId, Guid PropertyId, string Address, string StructureType, string Status, bool Locked,
 	string Result, int PhotoCount, IReadOnlyList<StepDto> Steps);
@@ -36,14 +42,11 @@ public sealed record AddStructureRequest(int StructureType, IReadOnlyList<Change
 
 public sealed record PairRequest(string Token, string Pin, string Name);
 
-/// <summary>A value the phone sent that can't be used, with a message for the inspector.</summary>
-public sealed class FieldInputException(string message) : Exception(message);
-
 /// <summary>What the phone form reads and how it checks and applies changes. No web code here, so it is easy to test.</summary>
 public static class FieldApi
 {
 	public const int MaxResults = 50;
-	public const int MaxTextLength = 2000;
+	public const int MaxTextLength = FieldInput.MaxTextLength;
 
 	public static string KindName(FieldKind kind) => kind switch
 	{
@@ -68,27 +71,59 @@ public static class FieldApi
 	/// <summary>
 	/// Structures whose address, city, ZIP, owner, parcel number or record ID contain every word of
 	/// <paramref name="query"/> (any case). An empty query lists the most recently changed.
+	/// A field worksheet's short code finds its structure, listed first.
 	/// </summary>
 	public static IReadOnlyList<StructureDto> Search(SdeStore store, string query)
 	{
 		string[] words = (query ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-		Dictionary<Guid, PropertyRecord> properties = store.GetProperties().ToDictionary(p => p.PropertyID);
+		List<StructureSummary> structures = store.ListStructures();
 		List<StructureDto> results = new();
-		foreach (StructureSummary s in store.ListStructures())
+		// A field worksheet's code (typed, or read from its QR code) finds its structure first.
+		AssignmentRecord coded = words.Length == 0 ? null : store.FindAssignmentByCode(query);
+		if (coded != null && structures.FirstOrDefault(x => x.PropertyID == coded.PropertyID) is StructureSummary codedStructure)
 		{
-			properties.TryGetValue(s.PropertyID, out PropertyRecord p);
-			string haystack = string.Join(" ", s.Address, s.City, p?.ZipCode, s.Owner, p?.ParcelNumber, s.ExternalId);
-			if (words.All(w => haystack.Contains(w, StringComparison.OrdinalIgnoreCase)))
+			results.Add(Dto(codedStructure));
+		}
+		foreach (StructureSummary s in structures)
+		{
+			string haystack = string.Join(" ", s.Address, s.City, s.ZipCode, s.Owner, s.ParcelNumber, s.ExternalId);
+			if (words.All(w => haystack.Contains(w, StringComparison.OrdinalIgnoreCase)) && s.PropertyID != coded?.PropertyID)
 			{
-				results.Add(new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner, p?.ParcelNumber,
-					s.ExternalId, TypeName(s.StructureTypeID), ResultText(s.PercentDamage, s.DamageMessage)));
-				if (results.Count >= MaxResults)
-				{
-					break;
-				}
+				results.Add(Dto(s));
+			}
+			if (results.Count >= MaxResults)
+			{
+				break;
 			}
 		}
 		return results;
+	}
+
+	private static StructureDto Dto(StructureSummary s) => new StructureDto(s.PropertyID, s.AssessmentID, Blank(s.Address, "(no address)"), s.City, s.Owner,
+		s.ParcelNumber, s.ExternalId, TypeName(s.StructureTypeID), ResultText(s.PercentDamage, s.DamageMessage));
+
+	/// <summary>The active field teams, by name.</summary>
+	public static IReadOnlyList<TeamDto> Teams(SdeStore store) =>
+		store.GetTeams().OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase).Select(t => new TeamDto(t.TeamID, t.Name, t.Color)).ToList();
+
+	/// <summary>A team's structures in route order ("My assignments"); structures removed since are left out.</summary>
+	public static IReadOnlyList<AssignmentDto> Assignments(SdeStore store, Guid teamId)
+	{
+		Dictionary<Guid, StructureSummary> structures = new();
+		foreach (StructureSummary s in store.ListStructures())
+		{
+			structures.TryAdd(s.PropertyID, s);
+		}
+		List<AssignmentDto> list = new();
+		foreach (AssignmentRecord a in store.GetAssignments(teamId))
+		{
+			if (structures.TryGetValue(a.PropertyID, out StructureSummary s))
+			{
+				list.Add(new AssignmentDto(a.AssignmentID, a.ShortCode, a.RouteOrder, a.Status,
+					a.DueDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), Dto(s)));
+			}
+		}
+		return list;
 	}
 
 	public static AssessmentDto Describe(SdeStore store, AssessmentFile file)
@@ -110,84 +145,13 @@ public static class FieldApi
 	}
 
 	/// <summary>
-	/// Applies the phone's changes in order: each key must be a known field that applies to the assessment at that
-	/// point (after the changes before it), and each value must suit the field. Every change then goes through
-	/// <see cref="FieldRules.Apply"/>, so dependent fields reset as they do in the editor. Throws
-	/// <see cref="FieldInputException"/> with a plain-English message for the first problem.
+	/// Applies the phone's changes in order through <see cref="FieldInput.Apply"/>: each key must be a known field that
+	/// applies to the assessment at that point, each value must suit the field, and dependent fields reset as they do in
+	/// the editor. Throws <see cref="FieldInputException"/> with a plain-English message for the first problem.
 	/// </summary>
-	public static void Apply(AssessmentFile file, IEnumerable<ChangeDto> changes, ReferenceData reference, AssessmentCalculator calculator)
-	{
-		foreach (ChangeDto change in changes ?? Array.Empty<ChangeDto>())
-		{
-			FieldInfo f = FieldCatalog.Get(change?.Key) ?? throw new FieldInputException("The phone sent a field SDE doesn't know. Reload the page and try again.");
-			if (!f.AppliesTo(file))
-			{
-				throw new FieldInputException($"{f.Label} doesn't apply to this assessment.");
-			}
-			object value = Convert(f, change.Value, file, reference);
-			FieldRules.Apply(file, new[] { new FieldChange(f.Key, value) }, calculator);
-		}
-	}
-
-	/// <summary>Checks and converts one value to the field's column type (null clears it).</summary>
-	public static object Convert(FieldInfo f, string text, AssessmentFile file, ReferenceData reference)
-	{
-		text = text?.Trim();
-		Type type = f.RecordProperty.PropertyType;
-		if (string.IsNullOrEmpty(text))
-		{
-			if (f.Kind == FieldKind.StructureType)
-			{
-				throw new FieldInputException("Choose residential or non-residential.");
-			}
-			return FieldCatalog.Convert(null, type);
-		}
-		switch (f.Kind)
-		{
-			case FieldKind.Text:
-			case FieldKind.MultilineText:
-				if (text.Length > MaxTextLength)
-				{
-					throw new FieldInputException($"{f.Label} is too long (at most {MaxTextLength} characters).");
-				}
-				return FieldCatalog.Convert(text, type);
-			case FieldKind.Number:
-				if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal n))
-				{
-					throw new FieldInputException($"{f.Label}: type a number.");
-				}
-				try
-				{
-					return FieldCatalog.Convert(n.ToString(CultureInfo.InvariantCulture), type);
-				}
-				catch (Exception ex) when (ex is FormatException or OverflowException)
-				{
-					throw new FieldInputException($"{f.Label}: type a whole number in range.");
-				}
-			case FieldKind.Date:
-				if (!DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime d) || d.Year < 1800 || d.Year > 2200)
-				{
-					throw new FieldInputException($"{f.Label}: choose a date.");
-				}
-				return FieldCatalog.Convert(d.Date, type);
-			case FieldKind.YesNo:
-				bool yes = text.ToLowerInvariant() switch
-				{
-					"true" or "1" or "yes" => true,
-					"false" or "0" or "no" => false,
-					_ => throw new FieldInputException($"{f.Label}: choose yes or no."),
-				};
-				return FieldCatalog.Convert(yes, type);
-			default:
-				// A choice: it must be one of the choices offered for this assessment right now.
-				if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id)
-					|| !FieldCatalog.Options(f, file, reference).Any(o => o.Id == id))
-				{
-					throw new FieldInputException($"{f.Label}: choose one of the choices in the list.");
-				}
-				return FieldCatalog.Convert(id, type);
-		}
-	}
+	public static void Apply(AssessmentFile file, IEnumerable<ChangeDto> changes, ReferenceData reference, AssessmentCalculator calculator) =>
+		FieldInput.Apply(file, (changes ?? Array.Empty<ChangeDto>()).Select(c => new FieldInputChange(c?.Key, c?.Value)), reference, calculator,
+			"The phone sent a field SDE doesn't know. Reload the page and try again.");
 
 	/// <summary>A new structure and assessment (not saved), set up as the Mac's "New structure" does, with the phone's first values.</summary>
 	public static AssessmentFile NewStructure(SdeStore store, AddStructureRequest request)

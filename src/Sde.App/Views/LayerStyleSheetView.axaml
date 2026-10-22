@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:vm="using:Sde.App.ViewModels"
+             x:Class="Sde.App.Views.LayerStyleSheetView"
+             x:DataType="sh:LayerStyleSheetViewModel">
+  <StackPanel Spacing="14">
+    <!-- Colours -->
+    <StackPanel Spacing="8">
+      <TextBlock Classes="fieldLabel" Text="Colour" />
+      <ListBox Classes="segmented" ItemsSource="{Binding Kinds}" SelectedIndex="{Binding KindIndex}" AutomationProperties.Name="How the features are coloured" />
+
+      <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding IsByResult}"
+                 Text="Each structure in the colour of its result: substantially damaged, close to the threshold, not substantially damaged, undetermined or incomplete." />
+
+      <StackPanel Spacing="8" IsVisible="{Binding IsSingle}">
+        <ItemsControl ItemsSource="{Binding Swatches}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="sh:SwatchViewModel">
+              <Button Classes="icon" Margin="0,0,6,6" Command="{Binding $parent[UserControl].((sh:LayerStyleSheetViewModel)DataContext).PickColourCommand}" CommandParameter="{Binding}"
+                      ToolTip.Tip="{Binding Name}" AutomationProperties.Name="{Binding Name}">
+                <Border Width="18" Height="18" CornerRadius="9" Background="{Binding Brush}" />
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Border Width="18" Height="18" CornerRadius="4" Background="{Binding FillBrush}" VerticalAlignment="Center" />
+          <TextBlock Classes="secondary" Text="{Binding FillName}" VerticalAlignment="Center" />
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="8" IsVisible="{Binding IsCategories}">
+        <ComboBox ItemsSource="{Binding Fields}" SelectedItem="{Binding CategoryField}" PlaceholderText="Choose a field" MinWidth="260" MaxDropDownHeight="400"
+                  AutomationProperties.Name="Field the colours are taken from" />
+        <ScrollViewer MaxHeight="200">
+          <ItemsControl ItemsSource="{Binding Categories}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="sh:StyleCategoryViewModel">
+                <CheckBox IsChecked="{Binding IsShown}" AutomationProperties.Name="{Binding SpokenName}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Border Width="14" Height="14" CornerRadius="3" Background="{Binding Fill}" BorderBrush="{Binding Stroke}" BorderThickness="1" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Label}" />
+                  </StackPanel>
+                </CheckBox>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+
+      <StackPanel Spacing="8" IsVisible="{Binding IsRanges}">
+        <TextBlock Classes="secondary" Text="This layer has no fields that hold numbers." IsVisible="{Binding !HasNumberFields}" />
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" IsVisible="{Binding HasNumberFields}">
+          <ComboBox ItemsSource="{Binding NumberFields}" SelectedItem="{Binding RangeField}" PlaceholderText="Choose a number field" HorizontalAlignment="Stretch"
+                    AutomationProperties.Name="Number field the ranges are taken from" />
+          <NumericUpDown Grid.Column="1" Value="{Binding ClassCount}" Minimum="2" Maximum="9" Increment="1" FormatString="0" Width="110"
+                         AutomationProperties.Name="Number of ranges" />
+          <ComboBox Grid.Column="2" ItemsSource="{Binding Ramps}" SelectedItem="{Binding Ramp}" MinWidth="140" AutomationProperties.Name="Colours of the ranges" />
+        </Grid>
+        <ItemsControl ItemsSource="{Binding RangeLegend}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:LegendLineViewModel">
+              <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,1">
+                <Border Width="14" Height="14" CornerRadius="3" Background="{Binding Fill}" BorderBrush="{Binding Stroke}" BorderThickness="1" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Label}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsPoints}">
+        <TextBlock Classes="secondary" Text="Point size" VerticalAlignment="Center" />
+        <NumericUpDown Value="{Binding PointSize}" Minimum="3" Maximum="40" Increment="1" FormatString="0" Width="110" AutomationProperties.Name="Point size in points" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- Labels -->
+    <StackPanel Spacing="8">
+      <CheckBox IsChecked="{Binding ShowLabels}" Content="Label the features" AutomationProperties.Name="Label the features" />
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" IsVisible="{Binding ShowLabels}">
+        <ComboBox ItemsSource="{Binding Fields}" SelectedItem="{Binding LabelField}" HorizontalAlignment="Stretch" MaxDropDownHeight="400"
+                  AutomationProperties.Name="Field the labels show" />
+        <NumericUpDown Grid.Column="1" Value="{Binding LabelSize}" Minimum="7" Maximum="30" Increment="1" FormatString="0" Width="110"
+                       AutomationProperties.Name="Label size in points" />
+        <CheckBox Grid.Column="2" IsChecked="{Binding LabelHalo}" Content="Halo" AutomationProperties.Name="Outline the label text so it reads over anything" />
+      </Grid>
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding ShowLabels}">
+        <TextBlock Classes="secondary" Text="Show labels only zoomed in past 1:" VerticalAlignment="Center" />
+        <NumericUpDown Value="{Binding LabelMinScale}" Minimum="0" Maximum="10000000" Increment="1000" FormatString="N0" Width="150"
+                       PlaceholderText="Always" AutomationProperties.Name="Show labels only when zoomed in past this scale" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- Scale range -->
+    <StackPanel Spacing="6">
+      <TextBlock Classes="fieldLabel" Text="When to show the layer" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Classes="secondary" Text="Only zoomed in past 1:" VerticalAlignment="Center" Width="190" />
+        <NumericUpDown Value="{Binding MinScale}" Minimum="0" Maximum="100000000" Increment="5000" FormatString="N0" Width="150"
+                       PlaceholderText="Always" AutomationProperties.Name="Show the layer only when zoomed in past this scale" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Classes="secondary" Text="Not zoomed in past 1:" VerticalAlignment="Center" Width="190" />
+        <NumericUpDown Value="{Binding MaxScale}" Minimum="0" Maximum="100000000" Increment="500" FormatString="N0" Width="150"
+                       PlaceholderText="Never" AutomationProperties.Name="Hide the layer when zoomed in past this scale" />
+      </StackPanel>
+    </StackPanel>
+
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Apply" Command="{Binding ApplyCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

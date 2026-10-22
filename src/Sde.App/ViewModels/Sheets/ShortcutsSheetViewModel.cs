@@ -8,6 +8,9 @@ public sealed record Shortcut(string Keys, string Action);
 /// <summary>Help, then Keyboard Shortcuts.</summary>
 public sealed class ShortcutsSheetViewModel() : SheetViewModel("Keyboard shortcuts")
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	public IReadOnlyList<Shortcut> Shortcuts { get; } = new[]
 	{
 		new Shortcut("⌘N", "New residential structure"),

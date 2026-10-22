@@ -1,47 +1,58 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.TrashView"
              x:DataType="vm:TrashViewModel">
-  <DockPanel Margin="28,22,28,18">
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h1" Text="Recently deleted" />
-        <TextBlock Classes="secondary" Text="{Binding Intro}" TextWrapping="Wrap" MaxWidth="760" HorizontalAlignment="Left" />
-      </StackPanel>
-      <Button Grid.Column="1" Content="Empty Recently deleted…" Command="{Binding EmptyAllCommand}" IsEnabled="{Binding !IsEmpty}" VerticalAlignment="Center" />
-    </Grid>
-    <Border Classes="card" Padding="0">
+  <DockPanel Margin="{StaticResource PagePadding}">
+    <!-- The title band says "Recently deleted"; the header says how long things stay -->
+    <c:PageHeader DockPanel.Dock="Top" Subtitle="{Binding Intro}">
+      <Button Classes="danger" Command="{Binding EmptyAllCommand}" IsEnabled="{Binding !IsEmpty}" AutomationProperties.Name="Empty Recently deleted">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Icon Kind="Trash" Size="14" />
+          <TextBlock Text="Empty Recently deleted…" />
+        </StackPanel>
+      </Button>
+    </c:PageHeader>
+    <Border Classes="card flush">
       <Grid>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding !IsEmpty}">
-          <ItemsControl ItemsSource="{Binding Items}" Margin="0,4">
+          <ItemsControl ItemsSource="{Binding Items}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:DeletedItemViewModel">
-                <Grid ColumnDefinitions="110,*,Auto" Margin="16,10">
-                  <Border Classes="pill" Background="{DynamicResource SubtleBg}" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <TextBlock Text="{Binding Kind}" FontSize="12" />
-                  </Border>
-                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
-                    <TextBlock Text="{Binding Label}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
-                      <Run Text="{Binding When}" /><Run Text=" · " /><Run Text="{Binding DaysLeft}" />
-                    </TextBlock>
-                  </StackPanel>
-                  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Button Classes="primary" Content="Restore" Command="{Binding $parent[UserControl].((vm:TrashViewModel)DataContext).RestoreCommand}" CommandParameter="{Binding}"
-                            AutomationProperties.Name="{Binding Label, StringFormat='Restore {0}'}" />
-                    <Button Content="Delete now…" Command="{Binding $parent[UserControl].((vm:TrashViewModel)DataContext).DeleteNowCommand}" CommandParameter="{Binding}"
-                            AutomationProperties.Name="{Binding Label, StringFormat='Delete {0} for good'}" />
-                  </StackPanel>
-                </Grid>
+                <Border Classes="listRow">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Classes="rowIcon">
+                      <c:Icon Kind="{Binding Icon}" Size="16" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0" Spacing="1">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="medium" Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <c:Badge Text="{Binding Kind}" Tone="Neutral" VerticalAlignment="Center" />
+                      </StackPanel>
+                      <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
+                        <Run Text="{Binding When}" /><Run Text=" · " /><Run Text="{Binding DaysLeft}" />
+                      </TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                      <Button Command="{Binding $parent[UserControl].((vm:TrashViewModel)DataContext).RestoreCommand}" CommandParameter="{Binding}"
+                              AutomationProperties.Name="{Binding Label, StringFormat='Restore {0}'}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <c:Icon Kind="Restore" Size="14" />
+                          <TextBlock Text="Restore" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="danger" Content="Delete now…" Command="{Binding $parent[UserControl].((vm:TrashViewModel)DataContext).DeleteNowCommand}" CommandParameter="{Binding}"
+                              AutomationProperties.Name="{Binding Label, StringFormat='Delete {0} for good'}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </ScrollViewer>
-        <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6" Margin="0,60">
-          <TextBlock Classes="h3" Text="Nothing here" HorizontalAlignment="Center" />
-          <TextBlock Classes="secondary" Text="What you delete appears here for 30 days." HorizontalAlignment="Center" />
-        </StackPanel>
+        <c:EmptyState IsVisible="{Binding IsEmpty}" Icon="Trash" Title="Nothing here"
+                      Text="What you delete appears here for 30 days, so you can bring it back." />
       </Grid>
     </Border>
   </DockPanel>

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Sde.App.ViewModels.Editor;
@@ -9,12 +8,11 @@ namespace Sde.App;
 /// <summary>Value converters used by the views.</summary>
 public static class Converters
 {
-	private static IBrush Brush(string key) =>
-		Application.Current!.TryGetResource(key, Application.Current.ActualThemeVariant, out object value) && value is IBrush b ? b : Brushes.Gray;
+	/// <summary>The name of the result's text colour, e.g. "StatusSubstantialFg", for <see cref="ThemeBrush"/>.</summary>
+	public static readonly IValueConverter StatusForegroundKey = new FuncValueConverter<ResultState, string>(s => $"Status{s}Fg");
 
-	public static readonly IValueConverter StatusForeground = new FuncValueConverter<ResultState, IBrush>(s => Brush($"Status{s}Fg"));
-
-	public static readonly IValueConverter StatusBackground = new FuncValueConverter<ResultState, IBrush>(s => Brush($"Status{s}Bg"));
+	/// <summary>The name of the result's background colour, e.g. "StatusSubstantialBg", for <see cref="ThemeBrush"/>.</summary>
+	public static readonly IValueConverter StatusBackgroundKey = new FuncValueConverter<ResultState, string>(s => $"Status{s}Bg");
 
 	/// <summary>"$1,234.56" or "—" for null.</summary>
 	public static readonly IValueConverter Money = new FuncValueConverter<decimal?, string>(v => v is decimal d ? d.ToString("C2", CultureInfo.GetCultureInfo("en-US")) : "–");
@@ -37,11 +35,11 @@ public static class Converters
 
 	public static readonly IValueConverter IsZero = new FuncValueConverter<int, bool>(v => v == 0);
 
-	/// <summary>Required (red) / recommended (amber) / suggested (green) issue colour.</summary>
-	public static readonly IValueConverter IssueBrush = new FuncValueConverter<Sde.Core.Assessments.IssueSeverity, IBrush>(s => Brush(s switch
+	/// <summary>The name of the issue's colour, required (red) / recommended (amber) / suggested (green), for <see cref="ThemeBrush"/>.</summary>
+	public static readonly IValueConverter IssueBrushKey = new FuncValueConverter<Sde.Core.Assessments.IssueSeverity, string>(s => s switch
 	{
 		Sde.Core.Assessments.IssueSeverity.Required => "RequiredFg",
 		Sde.Core.Assessments.IssueSeverity.Recommended => "RecommendedFg",
 		_ => "SuggestedFg",
-	}));
+	});
 }

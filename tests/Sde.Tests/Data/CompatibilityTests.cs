@@ -6,8 +6,8 @@ using Sde.Data;
 namespace Sde.Tests.Data;
 
 /// <summary>
-/// v2.0 adds Mac-only tables but must stay compatible both ways: nothing in them reaches FEMA's export, and an older
-/// version of this app (which doesn't know them) can still open, change and delete structures in a v2.0 database.
+/// v2.0 and v2.5 add Mac-only tables but must stay compatible both ways: nothing in them reaches FEMA's export, and an
+/// older version of this app (which doesn't know them) can still open, change and delete structures in a newer database.
 /// </summary>
 public class CompatibilityTests
 {
@@ -32,6 +32,20 @@ public class CompatibilityTests
 			INSERT INTO StructureLink (Source, RecordId, PropertyID) VALUES ('Test', 'R-1', @pid);
 			INSERT INTO ExternalLink (AssessmentID, Source, RecordId) VALUES (@aid, 'Test', 'R-1');
 			INSERT INTO DeletedItem (ItemKey, Kind, DeletedOn, PurgeAfter) VALUES ('P:gone.jpg', 'Photo', '2026-10-01', '2026-10-31');
+			UPDATE RowVersion SET Version = Version + 1 WHERE ObjectID = @aid;
+			INSERT INTO Event (EventID, Name) VALUES ('e1', 'September flood');
+			INSERT INTO EventAssessment (AssessmentID, EventID) VALUES (@aid, 'e1');
+			INSERT INTO Team (TeamID, Name) VALUES ('t1', 'Team 1');
+			INSERT INTO Assignment (AssignmentID, PropertyID, TeamID, EventID) VALUES ('as1', @pid, 't1', 'e1');
+			INSERT INTO ReviewComment (CommentID, AssessmentID, Body, CreatedOn) VALUES ('c1', @aid, 'Check the depth', '2026-10-01');
+			INSERT INTO QaDismissal (RuleId, ObjectID, Reason) VALUES ('DuplicateParcel', @aid, 'Two buildings');
+			INSERT INTO ComplianceCase (CaseID, PropertyID, AssessmentID, Kind) VALUES ('cc1', @pid, @aid, 'SD');
+			INSERT INTO ComplianceEntry (EntryID, CaseID, EntryOn, Text) VALUES ('ce1', 'cc1', '2026-10-01', 'Called the owner');
+			INSERT INTO CheckOut (AssessmentID, PackageID, CheckedOutOn) VALUES (@aid, 'pk1', '2026-10-01');
+			INSERT INTO PhotoMarkup (FileName, Markup) VALUES ('x.jpg', '[]');
+			INSERT INTO Document (DocumentID, PropertyID, AssessmentID, Kind, FileName) VALUES ('d1', @pid, @aid, 'ElevationCertificate', 'ec.pdf');
+			INSERT INTO MapLayer (LayerID, Name, SourceKind) VALUES ('l1', 'Parcels', 'File');
+			INSERT INTO MapBookmark (BookmarkID, Name, MinX, MinY, MaxX, MaxY) VALUES ('b1', 'Downtown', -84.2, 39.6, -84.1, 39.7);
 			""", new { aid, pid });
 	}
 
@@ -67,7 +81,8 @@ public class CompatibilityTests
 			DELETE FROM Shapes WHERE PropertyID = @pid;
 			DELETE FROM Property WHERE PropertyID = @pid;
 			""", args);
-		foreach (string table in new[] { "AssessmentStatus", "EditHistory", "PhotoInfo", "DamageSuggestion", "ContractorBid", "Appeal", "LetterLog", "ImprovementProject", "SIDetermination", "StructureLink", "ExternalLink" })
+		foreach (string table in new[] { "AssessmentStatus", "EditHistory", "PhotoInfo", "DamageSuggestion", "ContractorBid", "Appeal", "LetterLog", "ImprovementProject", "SIDetermination", "StructureLink", "ExternalLink",
+			"EventAssessment", "Assignment", "ReviewComment", "ComplianceCase", "ComplianceEntry", "CheckOut", "Document" })
 		{
 			Assert.Equal(0, c.ExecuteScalar<int>($"SELECT COUNT(*) FROM {table}"));
 		}
@@ -91,5 +106,44 @@ public class CompatibilityTests
 		using SqliteConnection again = reopened.Connect();
 		Assert.Equal(before, Dump(again));
 		Assert.Equal(1, again.ExecuteScalar<int>("SELECT COUNT(*) FROM AssessmentStatus"));
+	}
+
+	/// <summary>What v2.0 (MacSchemaVersion 2) checks when it opens a database: the schema version, then its own Mac tables.</summary>
+	[Fact]
+	public void AV20App_OpensAV25Database_WithoutChangingIt()
+	{
+		using TempDatabase t = new TempDatabase();
+		AssessmentFile f = SampleCases.RanchFlood(t.Store);
+		FillMacTables(t, f);
+		using SqliteConnection c = t.Database.Connect();
+		Assert.Equal(1, c.ExecuteScalar<int>("SELECT CAST(Value AS INTEGER) FROM SchemaInfo WHERE Key = 'SchemaVersion'"));
+		// v2.0 runs its Schema.sql only when this is below 2.
+		Assert.True(c.ExecuteScalar<int>("SELECT CAST(Value AS INTEGER) FROM SchemaInfo WHERE Key = 'MacSchemaVersion'") >= 2);
+	}
+
+	/// <summary>What v2.0's store does when it saves and edits: FEMA's rows only, no versions. v2.5 notices and isn't blocked.</summary>
+	[Fact]
+	public void AV20AppsWrites_WorkInAV25Database_AndAreNoticed()
+	{
+		using TempDatabase t = new TempDatabase();
+		AssessmentFile f = SampleCases.RanchFlood(t.Store);
+		FillMacTables(t, f);
+		VersionStamp loaded = t.Store.GetStamp(f.Assessment.AssessmentID);
+		using ChangeWatcher watcher = new ChangeWatcher(t.Database);
+		using (SqliteConnection c = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = t.Database.FilePath, Pooling = false, ForeignKeys = true }.ToString()))
+		{
+			c.Open();
+			object args = new { aid = f.Assessment.AssessmentID.ToString("D"), pid = f.Property.PropertyID.ToString("D") };
+			c.Execute("""
+				UPDATE Property SET OwnerLastName = 'Changed in v2.0', LastUpdate = '2030-01-01 00:00:00' WHERE PropertyID = @pid;
+				UPDATE Assessment SET InspectorName = 'v2.0', LastUpdate = '2030-01-01 00:00:00' WHERE AssessmentID = @aid;
+				DELETE FROM ElementPercentage WHERE AssessmentID = @aid;
+				INSERT INTO EditHistory (PropertyID, AssessmentID, ChangedOn, ChangedBy, Via, Field, Label, OldValue, NewValue)
+				VALUES (@pid, @aid, '2030-01-01 00:00:00', 'v2.0', 'App', 'Assessment.InspectorName', 'Inspector', 'Inspector A', 'v2.0');
+				""", args);
+		}
+		Assert.True(watcher.Poll().Unversioned);
+		f.Assessment.CostData = "v2.5";
+		Assert.Throws<ConcurrencyException>(() => t.Store.SaveAssessment(f, SaveContext.App.Expecting(loaded)));
 	}
 }

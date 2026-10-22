@@ -1,0 +1,84 @@
+<Project>
+
+  <!--
+    Every package version in one place (central package management): projects list packages without versions. Versions
+    listed here also pin the same packages where they come in indirectly (transitive pinning), so a new dependency can't
+    pull in SkiaSharp 4 or a PDFsharp release under another license. The answer key (reference/OriginalCalc, made by
+    tools/answer-key/setup.sh) keeps the Newtonsoft.Json version FEMA shipped and manages its own version.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally Condition="'$(MSBuildProjectName)' != 'OriginalCalc'">true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Application framework -->
+    <PackageVersion Include="Avalonia" Version="12.1.3" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.3" />
+    <PackageVersion Include="Avalonia.Skia" Version="12.1.3" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+    <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.3" />
+    <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <!-- Graphics: SkiaSharp must match the native library Avalonia ships (3.119 for Avalonia 12.1) -->
+    <PackageVersion Include="SkiaSharp" Version="3.119.4" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
+    <!-- Data, documents and reports (PDFsharp and MigraDoc stay on 6.2.x, the last MIT release) -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageVersion Include="Dapper" Version="2.1.89" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="ClosedXML" Version="0.105.1" />
+    <PackageVersion Include="DocumentFormat.OpenXml" Version="3.3.0" />
+    <PackageVersion Include="ExcelDataReader" Version="3.9.0" />
+    <PackageVersion Include="PDFsharp-MigraDoc" Version="6.2.4" />
+    <PackageVersion Include="MetadataExtractor" Version="2.9.3" />
+    <PackageVersion Include="QRCoder" Version="1.6.0" />
+    <!-- Pinned where it comes in indirectly (through PDFsharp): 8.0.1 has known vulnerabilities (fixed in 8.0.2). -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
+    <!--
+      Track B, the AI assistant server (SDE mcp): the MCP SDK and the .NET generic host it runs in. The
+      Microsoft.Extensions.* versions match the ASP.NET Core shared framework the phone form runs on (10.0.13), so the
+      app ships one copy of each.
+    -->
+    <PackageVersion Include="ModelContextProtocol" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
+    <!-- v2.5 Track B helpers: the elevation certificate reader (Sde.Interop) uses PDFsharp directly, the same MIT 6.2.x
+         release Sde.Reports already ships through PDFsharp-MigraDoc -->
+    <PackageVersion Include="PDFsharp" Version="6.2.4" />
+    <!-- GIS (Sde.Gis): geometry, Shapefile, GeoJSON and GeoTIFF. All BSD-3-Clause. Not NetTopologySuite.IO.ShapeFile (LGPL). -->
+    <PackageVersion Include="NetTopologySuite" Version="2.6.0" />
+    <PackageVersion Include="NetTopologySuite.Features" Version="2.2.0" />
+    <PackageVersion Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" />
+    <PackageVersion Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
+    <PackageVersion Include="BitMiracle.LibTiff.NET" Version="2.4.660" />
+    <!--
+      M4, the map engine behind the Map page (Sde.App/Maps): Mapsui 5.1 for Avalonia 12 (MIT) and everything it brings
+      in, each pinned so nothing drifts to SkiaSharp 4. Mapsui names Svg.Skia, but SDE.app leaves the Svg packages out
+      (Svg.Custom is MS-PL): Sde.App.csproj excludes their assets, and their versions are listed here only so that the
+      exclusion resolves. SDE never draws SVG map symbols, and NoSvgTests checks that none of them ships or loads.
+    -->
+    <PackageVersion Include="Mapsui" Version="5.1.0" />
+    <PackageVersion Include="Mapsui.Avalonia12" Version="5.1.0" />
+    <PackageVersion Include="Mapsui.Nts" Version="5.1.0" />
+    <PackageVersion Include="Mapsui.Rendering.Skia" Version="5.1.0" />
+    <PackageVersion Include="Mapsui.Tiling" Version="5.1.0" />
+    <PackageVersion Include="BruTile" Version="6.0.0" />
+    <PackageVersion Include="Topten.RichTextKit" Version="0.4.167" />
+    <!-- 3.119.2 (what Mapsui asks for), because 3.119.4 would lift HarfBuzzSharp above the 8.3.1.3 Avalonia ships. -->
+    <PackageVersion Include="SkiaSharp.HarfBuzz" Version="3.119.2" />
+    <PackageVersion Include="Svg.Skia" Version="3.2.1" />
+    <PackageVersion Include="Svg.Custom" Version="3.2.1" />
+    <PackageVersion Include="Svg.Model" Version="3.2.1" />
+    <PackageVersion Include="ShimSkiaSharp" Version="3.2.1" />
+    <PackageVersion Include="ExCSS" Version="4.3.1" />
+    <!-- Tests -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.v3.assert" Version="3.2.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
+  </ItemGroup>
+
+</Project>

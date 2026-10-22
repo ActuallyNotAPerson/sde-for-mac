@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.TeamSheetView"
+             x:DataType="sh:TeamSheetViewModel">
+  <StackPanel Spacing="12">
+    <StackPanel Classes="field">
+      <TextBlock Classes="fieldLabel" Text="Name" />
+      <TextBox Text="{Binding Name}" PlaceholderText="Team 1" AutomationProperties.Name="Team name" />
+    </StackPanel>
+    <StackPanel Classes="field">
+      <TextBlock Classes="fieldLabel" Text="Members" />
+      <TextBox Text="{Binding Members}" PlaceholderText="Inspector A, Inspector B" AutomationProperties.Name="Team members" />
+    </StackPanel>
+    <StackPanel Spacing="6">
+      <TextBlock Classes="fieldLabel" Text="Colour" />
+      <ListBox Classes="segmented" ItemsSource="{x:Static sh:TeamSheetViewModel.Colours}" SelectedItem="{Binding Colour}" AutomationProperties.Name="Team colour">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="sh:TeamColour">
+            <Border Width="14" Height="14" CornerRadius="7" Background="{Binding Brush}" ToolTip.Tip="{Binding Name}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </StackPanel>
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Save" IsDefault="True" Command="{Binding SaveCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

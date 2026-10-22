@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Sde.App.Services;
 using Sde.Core.Assessments;
 using Sde.Core.Events;
+using Sde.Data;
 using Sde.Interop;
 using Sde.Reports;
 
@@ -53,8 +54,24 @@ public sealed partial class DashboardViewModel : ViewModelBase
 		};
 	}
 
-	/// <summary>Set by the window while this is the page showing.</summary>
-	public bool IsActive { get; set; }
+	private bool _isActive;
+
+	/// <summary>
+	/// Set by the window while this is the page showing. Each time the page opens, Include owner names starts as
+	/// Settings, then Map and GIS, says (off unless the person chose otherwise there).
+	/// </summary>
+	public bool IsActive
+	{
+		get => _isActive;
+		set
+		{
+			if (value && !_isActive)
+			{
+				IncludeOwnerNames = !_app.Store.GetGisLeaveOutOwnerNames();
+			}
+			_isActive = value;
+		}
+	}
 
 	/// <summary>The numbers behind everything on the page; null until the first <see cref="Reload"/>.</summary>
 	public EventSummary Summary { get; private set; }
@@ -117,13 +134,64 @@ public sealed partial class DashboardViewModel : ViewModelBase
 
 	public string OwnerWarning => "The file will contain owners' names, which are personal information. Share it only with people who are allowed to see them.";
 
+	/// <summary>True when no event is chosen in the sidebar: the page covers the whole database and takes a typed name.</summary>
+	public bool IsAllEvents => _app.Scope.IsAll;
+
+	public string Subtitle => _app.Scope.IsAll
+		? "The numbers for every structure in this database, in one place."
+		: $"The numbers for {_app.Scope.Event.Label}, in one place.";
+
+	/// <summary>The second chart: assessed and not yet assessed for the whole database; review status for one event.</summary>
+	public string ProgressTitle => _app.Scope.IsAll ? "Assessed and not yet assessed" : "Review status";
+
+	/// <summary>The name printed on the summary and used for file names: the chosen event, else the typed name.</summary>
+	private string Title => _app.Scope.Event?.Label ?? (string.IsNullOrWhiteSpace(EventName) ? null : EventName.Trim());
+
 	/// <summary>Reads the database again and rebuilds every number and bar.</summary>
 	public void Reload()
 	{
-		List<Guid> ids = _app.Store.ListMapPoints().Where(r => r.AssessmentID != null).Select(r => r.AssessmentID!.Value).ToList();
+		List<Guid> ids;
+		List<StructureSummary> inEvent = null;
+		if (_app.Scope.IsAll)
+		{
+			ids = _app.Store.ListMapPoints().Where(r => r.AssessmentID != null).Select(r => r.AssessmentID!.Value).ToList();
+		}
+		else
+		{
+			// Each structure's latest assessment in the event.
+			inEvent = _app.Store.ListStructures().Where(r => r.AssessmentID != null && _app.Scope.Includes(r.AssessmentID))
+				.GroupBy(r => r.PropertyID)
+				.Select(g => g.OrderByDescending(r => r.DateofInspection).ThenByDescending(r => r.LastUpdate).First())
+				.ToList();
+			ids = inEvent.Select(r => r.AssessmentID!.Value).ToList();
+		}
 		_files = _app.Store.LoadAssessments(ids);
-		Summary = EventSummary.Build(_files, _app.Store.GetProperties(), string.IsNullOrWhiteSpace(EventName) ? null : EventName.Trim(), _app.Store.Reference);
+		Summary = EventSummary.Build(_files, _app.Scope.IsAll ? _app.Store.GetProperties() : null, Title, _app.Store.Reference,
+			details: _app.Scope.Event?.ToDetails());
 		Show(Summary);
+		if (inEvent != null)
+		{
+			// "Not yet assessed" means nothing inside one event: every structure in it has an assessment there.
+			StructuresNote = "With an assessment in this event";
+			ShowStatuses(inEvent);
+		}
+		LoadCompliance();
+		LoadTeams();
+		OnPropertyChanged(nameof(IsAllEvents));
+		OnPropertyChanged(nameof(Subtitle));
+		OnPropertyChanged(nameof(ProgressTitle));
+	}
+
+	/// <summary>How far the event's assessments have got through review.</summary>
+	private void ShowStatuses(List<StructureSummary> rows)
+	{
+		Dictionary<AssessmentStatus, int> counts = Enum.GetValues<AssessmentStatus>().ToDictionary(v => v, v => 0);
+		foreach (StructureSummary r in rows)
+		{
+			counts[Enum.TryParse(r.Status, out AssessmentStatus st) ? st : AssessmentStatus.Draft]++;
+		}
+		Fill(Progress, new[] { AssessmentStatus.Draft, AssessmentStatus.Reviewed, AssessmentStatus.Final, AssessmentStatus.LetterSent, AssessmentStatus.Appeal }
+			.Select(v => (AssessmentStatuses.Label(v), counts[v], $"{counts[v]:N0}", new[] { (counts[v], v is AssessmentStatus.Final or AssessmentStatus.LetterSent ? "Accent" : "StatusIncompleteFg") })));
 	}
 
 	private void Show(EventSummary s)
@@ -223,14 +291,14 @@ public sealed partial class DashboardViewModel : ViewModelBase
 	private async Task SummaryPdf()
 	{
 		Reload();
-		string name = string.IsNullOrWhiteSpace(EventName) ? "Event summary" : EventName.Trim();
+		string name = Title ?? "Event summary";
 		string path = await _app.Dialogs.SaveFileAsync("Save the event summary", name + ".pdf", "PDF document", "pdf");
 		if (string.IsNullOrEmpty(path))
 		{
 			return;
 		}
 		EventSummary summary = Summary;
-		EventSummaryOptions options = new EventSummaryOptions { Title = string.IsNullOrWhiteSpace(EventName) ? null : EventName.Trim() };
+		EventSummaryOptions options = new EventSummaryOptions { Title = Title };
 		JobOutcome<bool> result = await _app.Jobs.RunAsync("Writing the event summary", (progress, ct) =>
 		{
 			EventSummaryReport.RenderToFile(summary, options, path);
@@ -252,7 +320,7 @@ public sealed partial class DashboardViewModel : ViewModelBase
 	private async Task ExportGis(string title, string extension, string filterName, Func<string, List<GisRow>, GisExportOptions, GisExportResult> write)
 	{
 		Reload();
-		string baseName = string.IsNullOrWhiteSpace(EventName) ? "SDE structures" : EventName.Trim();
+		string baseName = Title ?? "SDE structures";
 		string path = await _app.Dialogs.SaveFileAsync("Save " + title, baseName + extension, filterName, extension.TrimStart('.'));
 		if (string.IsNullOrEmpty(path))
 		{
@@ -262,7 +330,7 @@ public sealed partial class DashboardViewModel : ViewModelBase
 		GisExportOptions options = new GisExportOptions
 		{
 			IncludeOwnerNames = IncludeOwnerNames,
-			LayerTitle = string.IsNullOrWhiteSpace(EventName) ? "SDE structures" : EventName.Trim(),
+			LayerTitle = Title ?? "SDE structures",
 		};
 		string stylePath = Path.ChangeExtension(path, ".qml");
 		JobOutcome<GisExportResult> result = await _app.Jobs.RunAsync("Writing " + title, (progress, ct) =>

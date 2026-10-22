@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:v="using:Sde.App.Views"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.PhotoMarkupSheetView"
+             x:DataType="sh:PhotoMarkupSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" Text="{Binding Instruction}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+
+    <StackPanel Spacing="10" IsVisible="{Binding IsEditable}">
+      <ListBox Classes="segmented" ItemsSource="{x:Static sh:PhotoMarkupSheetViewModel.ToolNames}" SelectedIndex="{Binding ToolIndex}"
+               AutomationProperties.Name="What to draw" HorizontalAlignment="Left" />
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+        <ListBox Classes="segmented" ItemsSource="{x:Static sh:PhotoMarkupSheetViewModel.Colours}" SelectedItem="{Binding Colour}"
+                 AutomationProperties.Name="Colour of the mark" VerticalAlignment="Center">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="sh:MarkupColour">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <Border Width="12" Height="12" CornerRadius="6" Background="{Binding Brush}" BorderBrush="{DynamicResource BorderStrong}" BorderThickness="1" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBox Grid.Column="1" Text="{Binding Label}" PlaceholderText="{Binding LabelPlaceholder}" IsVisible="{Binding UsesLabel}" MaxLength="200"
+                 AutomationProperties.Name="Words on the mark" VerticalAlignment="Center" />
+      </Grid>
+    </StackPanel>
+
+    <Border Classes="card flush" Height="440" Background="{DynamicResource BgSubtle}" ClipToBounds="True">
+      <Panel>
+        <v:MarkupCanvas Source="{Binding Picture}" AutomationProperties.Name="{Binding FileName, StringFormat='{}{0}: drag across it to draw a mark'}" />
+        <TextBlock Classes="muted" Text="{Binding FileName}" IsVisible="{Binding !HasPicture}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Panel>
+    </Border>
+    <TextBlock Classes="muted" TextWrapping="Wrap"
+               Text="The photo itself doesn't change: the thumbnail, the reports and the submission folder's marked-up copies draw the marks on, and FEMA's export keeps the original." />
+
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <DockPanel>
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsEditable}" VerticalAlignment="Center">
+        <Button Content="Undo" Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}" ToolTip.Tip="Take back the last change" />
+        <Button Classes="link danger" Content="Clear all" Command="{Binding ClearAllCommand}" IsEnabled="{Binding HasMarks}" VerticalAlignment="Center"
+                AutomationProperties.Name="Take every mark off the photo" />
+        <TextBlock Classes="muted" Text="{Binding CountText}" VerticalAlignment="Center" Margin="4,0,0,0" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" IsVisible="{Binding IsEditable}" />
+        <Button Classes="primary" Content="Save" IsDefault="True" Command="{Binding SaveCommand}" IsVisible="{Binding IsEditable}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Done" IsDefault="True" Command="{Binding CancelCommand}" IsVisible="{Binding !IsEditable}" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

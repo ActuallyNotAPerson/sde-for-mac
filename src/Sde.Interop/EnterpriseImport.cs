@@ -1,4 +1,5 @@
 using Sde.Core;
+using Sde.Core.Addresses;
 using Sde.Core.Records;
 using Sde.Data;
 using Sde.Interop.Internal;

@@ -1,3 +1,4 @@
+using Sde.Core.Photos;
 using SkiaSharp;
 
 namespace Sde.Reports.Internal;
@@ -16,8 +17,11 @@ internal static class PhotoPrep
 
 	public const int JpegQuality = 85;
 
-	/// <summary>The upright, resized JPEG and its size, or null when the file isn't an image Skia can read.</summary>
-	public static (byte[] Jpeg, int Width, int Height)? Prepare(string path)
+	/// <summary>
+	/// The upright, resized JPEG and its size, with <paramref name="markup"/> drawn on it when given, or null when the
+	/// file isn't an image Skia can read.
+	/// </summary>
+	public static (byte[] Jpeg, int Width, int Height)? Prepare(string path, PhotoMarkup markup = null, int maxEdge = MaxEdge)
 	{
 		using SKCodec codec = SKCodec.Create(path);
 		if (codec == null)
@@ -31,7 +35,7 @@ internal static class PhotoPrep
 		}
 
 		SKEncodedOrigin origin = codec.EncodedOrigin;
-		double scale = Math.Min(1.0, (double)MaxEdge / Math.Max(decoded.Width, decoded.Height));
+		double scale = Math.Min(1.0, (double)maxEdge / Math.Max(decoded.Width, decoded.Height));
 		int w = Math.Max(1, (int)Math.Round(decoded.Width * scale));
 		int h = Math.Max(1, (int)Math.Round(decoded.Height * scale));
 		bool quarterTurn = origin is SKEncodedOrigin.LeftTop or SKEncodedOrigin.RightTop or SKEncodedOrigin.RightBottom or SKEncodedOrigin.LeftBottom;
@@ -45,6 +49,8 @@ internal static class PhotoPrep
 			canvas.SetMatrix(Orientation(origin, outW, outH));
 			using SKImage image = SKImage.FromBitmap(decoded);
 			canvas.DrawImage(image, SKRect.Create(0, 0, w, h), new SKSamplingOptions(SKCubicResampler.Mitchell));
+			canvas.ResetMatrix();
+			PhotoMarkupRenderer.Draw(canvas, markup, outW, outH);
 		}
 		using SKData data = output.Encode(SKEncodedImageFormat.Jpeg, JpegQuality);
 		return data == null ? null : (data.ToArray(), outW, outH);

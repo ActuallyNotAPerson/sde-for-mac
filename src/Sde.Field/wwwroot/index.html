@@ -38,9 +38,18 @@
 
   <!-- Search and add -->
   <section id="find" hidden aria-labelledby="find-heading">
+    <div id="mine" hidden>
+      <h2 id="mine-heading">My assignments</h2>
+      <label for="team">Team</label>
+      <select id="team">
+        <option value="">Choose your team</option>
+      </select>
+      <ul id="assignments" class="results" aria-labelledby="mine-heading"></ul>
+    </div>
+
     <h2 id="find-heading">Find a structure</h2>
     <form id="search-form" role="search">
-      <label for="search">Address, owner, parcel or record ID</label>
+      <label for="search">Address, owner, parcel, record ID or worksheet code</label>
       <div class="row">
         <input id="search" type="search" autocomplete="off" enterkeyhint="search">
         <button type="submit">Search</button>

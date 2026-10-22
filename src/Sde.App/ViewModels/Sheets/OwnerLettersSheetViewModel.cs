@@ -64,6 +64,9 @@ public sealed partial class LetterKindRowViewModel : ObservableObject
 /// </summary>
 public sealed partial class OwnerLettersSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private readonly AppServices _app;
 	private readonly List<(AssessmentFile File, string Kind)> _letters = new();
 	private List<Guid> _written = new();

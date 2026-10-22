@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.SelectByAttributeSheetView"
+             x:DataType="sh:SelectByAttributeSheetViewModel">
+  <StackPanel Spacing="14">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Select in" />
+      <ComboBox ItemsSource="{Binding Layers}" SelectedItem="{Binding Layer}" MinWidth="260" AutomationProperties.Name="Layer to select in">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:MapLayerViewModel">
+            <TextBlock Text="{Binding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Classes="fieldLabel" Text="Where" />
+      <ItemsControl ItemsSource="{Binding Conditions}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sh:AttributeConditionViewModel">
+            <Grid ColumnDefinitions="2*,Auto,*,Auto" ColumnSpacing="8" Margin="0,0,0,6">
+              <ComboBox ItemsSource="{Binding Fields}" SelectedItem="{Binding Field}" HorizontalAlignment="Stretch" MaxDropDownHeight="400"
+                        AutomationProperties.Name="Field" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Operators}" SelectedItem="{Binding Operator}" MinWidth="130"
+                        AutomationProperties.Name="Comparison" />
+              <TextBox Grid.Column="2" Text="{Binding Value}" IsVisible="{Binding NeedsValue}" PlaceholderText="Value"
+                       AutomationProperties.Name="Value to compare with" />
+              <Button Grid.Column="3" Classes="icon sm" Command="{Binding RemoveCommand}" AutomationProperties.Name="Remove this condition">
+                <c:Icon Kind="Close" />
+              </Button>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Button Classes="link" Content="Add a condition" Command="{Binding AddConditionCommand}" HorizontalAlignment="Left" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="16">
+      <RadioButton GroupName="AttributeCombine" Content="Every condition (AND)" IsChecked="{Binding MatchAll}"
+                   AutomationProperties.Name="Select features that meet every condition" />
+      <RadioButton GroupName="AttributeCombine" Content="Any condition (OR)" IsChecked="{Binding MatchAny}"
+                   AutomationProperties.Name="Select features that meet any condition" />
+    </StackPanel>
+    <CheckBox Content="Add to what is already selected" IsChecked="{Binding AddToSelection}" />
+
+    <TextBlock Classes="medium" Text="{Binding CountText}" AutomationProperties.LiveSetting="Polite" />
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Select" Command="{Binding SelectCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

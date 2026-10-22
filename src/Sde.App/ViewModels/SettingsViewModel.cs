@@ -135,6 +135,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		_checkLatLong = _prefs.LatLong;
 		_useDefaults = _prefs.UseDefaults;
 		LoadSnippets();
+		SelectedCategory = Categories[0];
 	}
 
 	public ObservableCollection<FieldGroupViewModel> DefaultGroups { get; } = new();
@@ -170,6 +171,24 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		Snippets.Remove(snippet);
 	}
 
+	/// <summary>The address of USGS's high-water mark service; blank uses the built-in one.</summary>
+	public string UsgsStnUrl
+	{
+		get => _app.Settings.UsgsStnUrl ?? "";
+		set
+		{
+			string clean = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+			if (clean != _app.Settings.UsgsStnUrl)
+			{
+				_app.Settings.UsgsStnUrl = clean;
+				_app.Settings.Save();
+				OnPropertyChanged();
+			}
+		}
+	}
+
+	public string UsgsStnDefault => Sde.Interop.Online.StnClient.DefaultBaseUrl;
+
 	/// <summary>The name written in edit history (Settings, Preferences).</summary>
 	public string YourName
 	{
@@ -188,7 +207,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
 	[RelayCommand]
 	private void RestoreBackup() => _ = _app.Sheets.ShowAsync(new Sheets.RestoreBackupSheetViewModel(_app));
 
-	/// <summary>The phone form (its own card on this page).</summary>
+	/// <summary>The phone form (Settings, Phone form).</summary>
 	public PhoneFormService PhoneForm => _app.PhoneForm;
 
 	public string AttachmentsPath => _app.Store.AttachmentsFolder;
@@ -292,7 +311,10 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		OpenPath(path);
 	}
 
-	/// <summary>Writes a consistent copy of the database (SQLite VACUUM INTO) plus its photos folder.</summary>
+	/// <summary>
+	/// Saves a copy of the database in a new folder, with its photos, documents and map layers (a consistent copy: SQLite
+	/// VACUUM INTO). The copy isn't opened.
+	/// </summary>
 	[RelayCommand]
 	private async Task BackUp()
 	{
@@ -301,26 +323,12 @@ public sealed partial class SettingsViewModel : ViewModelBase
 		{
 			return;
 		}
-		string attachments = AttachmentsPath;
 		Sde.Data.SdeDatabase database = _app.Store.Database;
 		JobOutcome<string> outcome = await _app.Jobs.RunAsync("Backing up", (progress, ct) =>
 		{
 			string target = Path.Combine(folder, "SDE backup " + DateTime.Now.ToString("yyyy-MM-dd HHmm"));
-			Directory.CreateDirectory(target);
-			string dbCopy = Path.Combine(target, "sde.sqlite");
-			database.Read(c => c.Execute("VACUUM INTO @dbCopy", new { dbCopy }));
-			string photos = Path.Combine(target, "attachments");
-			Directory.CreateDirectory(photos);
-			if (Directory.Exists(attachments))
-			{
-				string[] files = Directory.GetFiles(attachments);
-				for (int i = 0; i < files.Length; i++)
-				{
-					ct.ThrowIfCancellationRequested();
-					progress.Report(new JobProgress(i, files.Length, "Copying photos"));
-					File.Copy(files[i], Path.Combine(photos, Path.GetFileName(files[i])));
-				}
-			}
+			IProgress<(int Done, int Total)> files = new Progress<(int Done, int Total)>(x => progress.Report(new JobProgress(x.Done, x.Total, "Copying photos and documents")));
+			Sde.Data.DatabaseFiles.Copy(database, Path.Combine(target, "sde.sqlite"), files);
 			return target;
 		}, "Couldn't back up", canStop: false);
 		if (outcome.Completed)
@@ -328,5 +336,31 @@ public sealed partial class SettingsViewModel : ViewModelBase
 			_app.Dialogs.Notify("Backup saved", outcome.Value);
 			_app.Dialogs.Reveal(outcome.Value);
 		}
+	}
+
+	/// <summary>
+	/// Moves the database, with its photos, documents and map layers, to another folder (a shared drive, say) and opens
+	/// it from there.
+	/// </summary>
+	[RelayCommand]
+	private async Task MoveDatabase()
+	{
+		string current = _app.Store.Database.FilePath;
+		string path = await _app.Dialogs.SaveFileAsync("Move the database to", Path.GetFileName(current), "SDE database", "sqlite");
+		if (path == null)
+		{
+			return;
+		}
+		if (File.Exists(path))
+		{
+			_app.Dialogs.Notify("Choose another place", "There's already a file with that name there.", isError: true);
+			return;
+		}
+		if (!await _app.Dialogs.ConfirmAsync("Move the database?",
+			$"SDE moves \"{Path.GetFileName(current)}\", its photos, documents and map layers to {Path.GetDirectoryName(path)}, then opens it from there.", "Move"))
+		{
+			return;
+		}
+		await _app.MoveOrCopyDatabaseAsync(path, move: true);
 	}
 }

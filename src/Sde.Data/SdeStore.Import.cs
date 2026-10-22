@@ -72,12 +72,13 @@ public sealed partial class SdeStore
 			foreach (ImportedAssessment item in items)
 			{
 				Guid id = item.File.Assessment.AssessmentID;
-				if (!ctx.AllowLocked && id != Guid.Empty && GetStatus(c, tx, id).IsLocked)
+				if (!ctx.AllowLocked && id != Guid.Empty && (GetStatus(c, tx, id).IsLocked || IsCheckedOut(c, tx, id)))
 				{
 					locked.Add(id);
 					continue;
 				}
-				SaveTracked(c, tx, item.File, ctx);
+				SaveTracked(c, tx, item.File, ctx,
+					item.ShapeTotal is decimal total ? new[] { new ShapeRecord { ShapeType = "c", TotalSqFt = total } } : null);
 				ExternalLinkRecord link = item.Link;
 				link.AssessmentID = item.File.Assessment.AssessmentID;
 				link.InspectionId ??= "";
@@ -88,12 +89,6 @@ public sealed partial class SdeStore
 					AND AssessmentID <> @AssessmentID AND AssessmentID IN (SELECT AssessmentID FROM Assessment WHERE Active = 0)
 					""", new { link.Source, link.RecordId, link.InspectionId, link.AssessmentID }, tx);
 				TableMap<ExternalLinkRecord>.Upsert(c, link, tx);
-				if (item.ShapeTotal is decimal total)
-				{
-					Guid propertyId = item.File.Property.PropertyID;
-					TableMap<ShapeRecord>.Delete(c, "PropertyID = @propertyId", new { propertyId }, tx);
-					TableMap<ShapeRecord>.Insert(c, new ShapeRecord { ShapeType = "c", PropertyID = propertyId, TotalSqFt = total }, tx);
-				}
 			}
 		});
 		return locked;

@@ -21,7 +21,8 @@ Thanks for helping. SDE for Mac is used to make substantial damage determination
 - Nothing specific to one city, county, state agency or software vendor: anything like that belongs in a profile or a
   setting the user creates.
 - Test data is synthetic. Never commit real addresses, owner names or photos.
-- Dependencies must be under a license that fits the MIT license (MIT, Apache-2.0, BSD). PDFsharp and MigraDoc stay
+- Dependencies must be under a license that fits the MIT license (MIT, Apache-2.0, BSD). Every package version is
+  set in `Directory.Packages.props`; project files list packages without versions. PDFsharp and MigraDoc stay
   on 6.2.x, the last MIT release, because 6.5 and later are AGPL-3.0 or commercial. SkiaSharp moves to a new major
   version only together with Avalonia, which ships its native library.
 

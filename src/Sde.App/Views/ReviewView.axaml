@@ -1,0 +1,269 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:v="using:Sde.App.Views"
+             xmlns:app="using:Sde.App"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.ReviewView"
+             x:DataType="vm:ReviewViewModel">
+  <UserControl.Resources>
+    <!-- One quality finding: where, what, and Open / Set aside (or, set aside, the reason and Bring back) -->
+    <DataTemplate x:Key="FindingRow" x:DataType="vm:QaFindingViewModel">
+      <Border Classes="listRow">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+          <StackPanel Spacing="1" VerticalAlignment="Center">
+            <TextBlock Classes="medium" Text="{Binding Address}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Classes="secondary" Text="{Binding Message}" TextWrapping="Wrap" />
+            <TextBlock Classes="muted" Text="{Binding DismissedText}" TextWrapping="Wrap" IsVisible="{Binding IsDismissed}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button Content="{Binding OpenText}" IsVisible="{Binding CanOpen}" ToolTip.Tip="{Binding OpenTip}"
+                    Command="{Binding Open}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding AccessibleOpen}" />
+            <Button Content="Set aside…" IsVisible="{Binding CanDismiss}"
+                    Command="{Binding Dismiss}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding AccessibleDismiss}" />
+            <Button Content="Bring back" IsVisible="{Binding IsDismissed}"
+                    Command="{Binding BringBack}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding AccessibleBringBack}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <!-- The title band says "Review"; the header says what it covers and holds the page's actions -->
+  <DockPanel Margin="{StaticResource PagePadding}">
+    <c:PageHeader DockPanel.Dock="Top" Subtitle="{Binding Subtitle}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Command="{Binding RunChecksCommand}" ToolTip.Tip="Read the assessments again and run the quality checks" AutomationProperties.Name="Check again">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="Restore" Size="14" />
+            <TextBlock Text="Check again" />
+          </StackPanel>
+        </Button>
+        <Button Classes="primary" Command="{Binding MarkReviewedCommand}" AutomationProperties.Name="Mark reviewed"
+                ToolTip.Tip="The checked assessments, or the selected one. Final and Letter sent ones are left alone.">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="Check" Size="14" />
+            <TextBlock Text="Mark reviewed" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </c:PageHeader>
+
+    <!-- Headline numbers: each one shows its part of the page -->
+    <UniformGrid DockPanel.Dock="Top" Columns="4" Margin="-6,-6,-6,10">
+      <c:KpiTile Margin="6" Tone="Accent" Value="{Binding WaitingCount}" Label="In review" Caption="Draft or Reviewed, not Final yet"
+                 Command="{Binding ShowWaitingCommand}" AutomationProperties.Name="{Binding WaitingCount, StringFormat='Show the assessments in review: {0}'}" />
+      <c:KpiTile Margin="6" Tone="Warning" Value="{Binding OpenFindingCount}" Label="Open checks" Caption="Possible problems to look at"
+                 Command="{Binding ShowAllFindingsCommand}" AutomationProperties.Name="{Binding OpenFindingCount, StringFormat='Show the open checks: {0}'}" />
+      <c:KpiTile Margin="6" Tone="Danger" Value="{Binding ErrorCount}" Label="Errors" Caption="Fix before exporting"
+                 Command="{Binding ShowErrorsCommand}" AutomationProperties.Name="{Binding ErrorCount, StringFormat='Show the errors: {0}'}" />
+      <c:KpiTile Margin="6" Tone="Info" Value="{Binding OpenCommentCount}" Label="Open comments" Caption="Threads not resolved yet"
+                 Command="{Binding ShowCommentedCommand}" AutomationProperties.Name="{Binding OpenCommentCount, StringFormat='Show the assessments with open comments: {0}'}" />
+    </UniformGrid>
+
+    <!-- Tabs and the filters for the one showing -->
+    <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,2">
+      <ListBox Classes="segmented" SelectedIndex="{Binding TabIndex}" Margin="0,0,12,8" AutomationProperties.Name="Queue or quality checks">
+        <ListBoxItem Content="{Binding QueueTabText}" AutomationProperties.Name="Queue" />
+        <ListBoxItem Content="{Binding ChecksTabText}" AutomationProperties.Name="Quality checks" />
+      </ListBox>
+      <ComboBox ItemsSource="{x:Static vm:ReviewViewModel.StatusChoices}" SelectedIndex="{Binding StatusFilter}" Width="190" Margin="0,0,8,8"
+                IsVisible="{Binding IsQueueTab}" AutomationProperties.Name="Status filter" />
+      <ComboBox ItemsSource="{x:Static vm:ReviewViewModel.SeverityChoices}" SelectedIndex="{Binding SeverityFilter}" Width="190" Margin="0,0,8,8"
+                IsVisible="{Binding IsChecksTab}" AutomationProperties.Name="Which checks to show" />
+      <CheckBox Content="Show the ones set aside" IsChecked="{Binding ShowDismissed}" Margin="0,0,12,8" IsVisible="{Binding IsChecksTab}" />
+      <Button Classes="chip" IsVisible="{Binding HasOnly}" Command="{Binding ClearOnlyCommand}" VerticalAlignment="Top" Margin="0,2,8,8"
+              ToolTip.Tip="Show every assessment again" AutomationProperties.Name="{Binding OnlyLabel, StringFormat='{}{0}. Show every assessment'}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="{Binding OnlyLabel}" VerticalAlignment="Center" />
+          <c:Icon Kind="Close" Size="12" VerticalAlignment="Center" />
+        </StackPanel>
+      </Button>
+    </WrapPanel>
+
+    <Panel>
+      <!-- The queue, with the selected assessment's checks and comments beside it -->
+      <Grid ColumnDefinitions="*,320" ColumnSpacing="14" IsVisible="{Binding IsQueueTab}">
+        <Border Classes="card flush">
+          <DockPanel>
+            <Panel DockPanel.Dock="Top" Height="40">
+              <Border Classes="tableBar">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <TextBlock Classes="semibold" Text="{Binding CountText}" />
+                  <TextBlock Classes="muted" Text="Problems first. Double-click to open." VerticalAlignment="Center" />
+                </StackPanel>
+              </Border>
+              <Border Classes="tableBar selection" IsVisible="{Binding HasChecked}">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                  <TextBlock Classes="semibold" Text="{Binding CheckedText}" />
+                  <Button Classes="link" Content="Clear" Command="{Binding ClearCheckedCommand}" AutomationProperties.Name="Uncheck every assessment" />
+                </StackPanel>
+              </Border>
+            </Panel>
+            <Grid>
+              <DataGrid Name="Queue" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}" IsVisible="{Binding HasRows}"
+                        IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="False" CanUserResizeColumns="True" SelectionMode="Single"
+                        GridLinesVisibility="Horizontal" HeadersVisibility="Column" RowHeight="{StaticResource TableRowHeight}"
+                        AutomationProperties.Name="Assessments to review" DoubleTapped="OnQueueDoubleTapped" KeyDown="OnQueueKeyDown">
+                <DataGrid.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Open" Command="{Binding OpenSelectedCommand}" />
+                    <MenuItem Header="Mark reviewed" Command="{Binding MarkReviewedCommand}" />
+                  </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                  <DataGridTemplateColumn Width="44" CanUserSort="False" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <CheckBox IsChecked="{Binding IsChecked}" HorizontalAlignment="Center" AutomationProperties.Name="{Binding AccessibleCheck}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Structure" SortMemberPath="Address" Width="1.2*" MinWidth="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <TextBlock Classes="cell medium" Text="{Binding Address}" ToolTip.Tip="{Binding Detail}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Status" SortMemberPath="StatusOrder" Width="84">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <TextBlock Classes="cell secondary" Text="{Binding Status}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Inspected" SortMemberPath="InspectedOn" Width="112">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <TextBlock Classes="cell secondary" Text="{Binding Inspected}" ToolTip.Tip="{Binding Inspector}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Damaged" SortMemberPath="PercentSort" Width="84">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <TextBlock Classes="cell money semibold" Text="{Binding PercentText}"
+                                   app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Result" SortMemberPath="Result" Width="1.3*" MinWidth="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <Border Classes="pill" Margin="12,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
+                          <TextBlock Text="{Binding Result}" TextTrimming="CharacterEllipsis"
+                                     app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
+                        </Border>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Checks" SortMemberPath="FindingCount" Width="70">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <c:Badge Text="{Binding FindingText}" Tone="{Binding FindingTone}" IsVisible="{Binding HasFindings}" Margin="12,0,0,0"
+                                 HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip.Tip="{Binding FindingTip}" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Header="Comments" SortMemberPath="CommentCount" Width="88">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:ReviewRowViewModel">
+                        <c:Badge Text="{Binding CommentText}" Tone="Info" IsVisible="{Binding HasComments}" Margin="12,0,0,0"
+                                 HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip.Tip="Open comment threads" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+
+              <c:EmptyState IsVisible="{Binding IsQueueEmpty}" Icon="Review" Title="{Binding QueueEmptyTitle}" Text="{Binding QueueEmptyText}" />
+              <c:EmptyState IsVisible="{Binding NoRowsMatch}" Icon="Filter" Title="Nothing with this status" Text="No assessments have this status. Choose another, or Every status.">
+                <Button Content="Show the assessments in review" Command="{Binding ShowWaitingCommand}" />
+              </c:EmptyState>
+            </Grid>
+          </DockPanel>
+        </Border>
+
+        <!-- The selected assessment -->
+        <Border Grid.Column="1" Classes="card" Padding="0">
+          <Grid>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasSelection}">
+              <StackPanel Spacing="14" Margin="16,14">
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="h3" Text="{Binding SelectedTitle}" TextWrapping="Wrap" />
+                  <TextBlock Classes="muted" Text="{Binding SelectedDetail}" TextWrapping="Wrap" />
+                  <Button Classes="link" Content="Open the assessment" Command="{Binding OpenSelectedCommand}" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                </StackPanel>
+
+                <StackPanel Spacing="4" IsVisible="{Binding HasSelectedFindings}">
+                  <TextBlock Classes="eyebrow" Text="OPEN CHECKS" />
+                  <ItemsControl ItemsSource="{Binding SelectedFindings}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:QaFindingViewModel">
+                        <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                          <c:Icon Kind="{Binding Icon}" Size="14" Classes.danger="{Binding IsError}" Classes.warning="{Binding IsWarning}" Classes.accent="{Binding IsNote}"
+                                  Margin="0,2,8,0" VerticalAlignment="Top" />
+                          <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Classes="medium sm" Text="{Binding Rule.Title}" TextWrapping="Wrap" />
+                            <TextBlock Classes="secondary sm" Text="{Binding Message}" TextWrapping="Wrap" />
+                            <Button Classes="link" Content="{Binding OpenText}" HorizontalAlignment="Left" IsVisible="{Binding HasField}"
+                                    Command="{Binding Open}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding AccessibleOpen}" />
+                          </StackPanel>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="eyebrow" Text="COMMENTS" />
+                  <v:CommentThreadsView DataContext="{Binding SelectedComments}" />
+                </StackPanel>
+              </StackPanel>
+            </ScrollViewer>
+            <c:EmptyState IsVisible="{Binding !HasSelection}" Icon="Comment" Title="Choose an assessment"
+                          Text="Its open checks and reviewers' comments appear here." />
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- The quality checks, grouped by check -->
+      <Grid IsVisible="{Binding IsChecksTab}">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding HasGroups}">
+          <ItemsControl ItemsSource="{Binding Groups}" Margin="0,0,12,0">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Spacing="12" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:QaGroupViewModel">
+                <Border Classes="card flush">
+                  <StackPanel>
+                    <Border Classes="tableBar" Padding="16,12">
+                      <StackPanel Spacing="3">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <c:Badge Text="{Binding SeverityText}" Tone="{Binding Tone}" VerticalAlignment="Center" />
+                          <TextBlock Classes="h3" Text="{Binding Title}" VerticalAlignment="Center" />
+                          <TextBlock Classes="muted" Text="{Binding CountText}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Classes="secondary" Text="{Binding Description}" TextWrapping="Wrap" />
+                        <TextBlock Classes="muted" Text="{Binding NoDismissNote}" IsVisible="{Binding HasNoDismissNote}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+                    <ItemsControl ItemsSource="{Binding Findings}" ItemTemplate="{StaticResource FindingRow}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+        <Border Classes="card" IsVisible="{Binding ChecksEmpty}">
+          <c:EmptyState Icon="CheckCircle" Title="{Binding ChecksEmptyTitle}" Text="{Binding ChecksEmptyText}" />
+        </Border>
+      </Grid>
+    </Panel>
+  </DockPanel>
+</UserControl>

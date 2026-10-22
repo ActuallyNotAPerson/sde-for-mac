@@ -20,6 +20,14 @@ public sealed class DeletedItemViewModel(DeletedItemRecord item)
 		_ => "Structure",
 	};
 
+	/// <summary>The icon beside the item: a house, a clipboard or a photo.</summary>
+	public string Icon => Item.Value switch
+	{
+		DeletedKind.Assessment => "Clipboard",
+		DeletedKind.Photo => "Image",
+		_ => "Structures",
+	};
+
 	public string When => $"Deleted {Item.DeletedOn:MMM d, yyyy h:mm tt}" + (string.IsNullOrEmpty(Item.DeletedBy) ? "" : " by " + Item.DeletedBy);
 
 	public string DaysLeft

@@ -4,7 +4,7 @@
              xmlns:help="using:Sde.App.Help"
              x:Class="Sde.App.Views.HelpIndexSheetView"
              x:DataType="sh:HelpIndexSheetViewModel">
-  <StackPanel Spacing="10" Width="700">
+  <StackPanel Spacing="10">
     <TextBlock Classes="secondary" TextWrapping="Wrap"
                Text="What to enter in each field, with the page of FEMA's SDE User Manual that covers it. The same help opens from the ? beside a field." />
     <TextBox Text="{Binding Search}" PlaceholderText="Search the help" AutomationProperties.Name="Search the help" />
@@ -14,7 +14,7 @@
         <ListBox.ItemTemplate>
           <DataTemplate DataType="help:FieldHelpEntry">
             <StackPanel Margin="2">
-              <TextBlock Text="{Binding Label}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="medium" Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
               <TextBlock Classes="muted" Text="{Binding Step}" TextTrimming="CharacterEllipsis" />
             </StackPanel>
           </DataTemplate>

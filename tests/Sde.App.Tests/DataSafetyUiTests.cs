@@ -140,7 +140,7 @@ public class DataSafetyUiTests
 		ui.Services.Open(path);            // a database opened normally gets automatic backups
 		await ui.Services.OpeningBackup;
 		SampleCases.RanchFlood(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 
 		ui.Main.RestoreBackupCommand.Execute(null);
 		ui.Pump();
@@ -154,6 +154,33 @@ public class DataSafetyUiTests
 		ui.Pump();
 		Assert.Equal((0, 0), ui.Store.Counts());
 		Assert.Empty(ui.Main.Structures.Rows);
-		Assert.Contains(ui.Services.Backups.List(), b => b.Reason == "before restore" && b.Structures == 1);
+		Assert.Contains(ui.Services.Backups.List(withCounts: true), b => b.Reason == "before restore" && b.Structures == 1);
+	}
+
+	[AvaloniaFact]
+	public async Task MoveTheDatabase_TakesItsPhotos_AndOpensItThere()
+	{
+		if (OperatingSystem.IsWindows())
+		{
+			return;
+		}
+		using UiSession ui = new UiSession();
+		ui.Services.Open(Path.Combine(ui.Folder, "event.sqlite"));
+		await ui.Services.OpeningBackup;
+		SampleCases.RanchFlood(ui.Store);
+		string old = ui.Store.Database.FilePath;
+		string target = Path.Combine(ui.Folder, "shared drive", "event.sqlite");
+		ui.Dialogs.Answers.Enqueue(target);
+		ui.Dialogs.Answers.Enqueue(true);
+
+		await ui.Main.Settings.MoveDatabaseCommand.ExecuteAsync(null);
+		ui.Pump();
+
+		Assert.Equal(target, ui.Store.Database.FilePath);
+		Assert.False(File.Exists(old));
+		Assert.Equal((1, 1), ui.Store.Counts());
+		Assert.Equal(target, ui.Services.Settings.DatabasePath);
+		Assert.DoesNotContain(old, ui.Services.RecentDatabases());
 	}
 }
+

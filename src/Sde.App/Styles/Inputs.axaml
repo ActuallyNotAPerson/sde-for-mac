@@ -1,0 +1,82 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Inputs: text boxes, number boxes, date pickers and pop-up menus are 28 px high (ControlHeight) with a 1 px border;
+    with the keyboard in them they get a Focus border and a soft halo (FocusHalo). Check boxes, radio buttons, switches
+    and sliders take the accent from the tokens (Fluent's palette is set from BrandAccentColor in App.axaml).
+  -->
+
+  <Style Selector="TextBox">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBox[AcceptsReturn=True]">
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+  </Style>
+  <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+    <Setter Property="BoxShadow" Value="{DynamicResource FocusHalo}" />
+  </Style>
+  <!-- The text box inside a number box or date picker draws no border of its own; the outer one shows the focus. -->
+  <Style Selector="NumericUpDown, CalendarDatePicker, ComboBox, AutoCompleteBox">
+    <Setter Property="MinHeight" Value="{StaticResource ControlHeight}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ComboBox /template/ PathIcon#DropDownGlyph">
+    <Setter Property="Data" Value="{StaticResource IconCaretDown}" />
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+    <Setter Property="Margin" Value="0,0,8,0" />
+  </Style>
+  <Style Selector="ComboBox:focus-visible /template/ Border#HighlightBackground">
+    <Setter Property="BoxShadow" Value="{DynamicResource FocusHalo}" />
+  </Style>
+  <Style Selector="ComboBoxItem">
+    <Setter Property="MinHeight" Value="{StaticResource ControlHeight}" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Margin" Value="4,1" />
+  </Style>
+
+  <Style Selector="CalendarDatePicker:focus-within:not(CalendarDatePicker:focus) /template/ Border#Background">
+    <Setter Property="BoxShadow" Value="{DynamicResource FocusHalo}" />
+  </Style>
+
+  <Style Selector="CheckBox">
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  </Style>
+  <Style Selector="RadioButton">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  </Style>
+
+  <!-- Menus and flyouts: the surface colour and a hairline border (Fluent's presenters, with the tokens' colours) -->
+  <Style Selector="MenuItem">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="MenuFlyoutPresenter MenuItem, ContextMenu MenuItem">
+    <Setter Property="Margin" Value="0" />
+  </Style>
+  <Style Selector="ToolTip">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeFootnote}" />
+  </Style>
+  <Style Selector="Separator">
+    <Setter Property="Background" Value="{DynamicResource BorderDefault}" />
+  </Style>
+
+  <!-- Expanders: flat, on the card they sit in -->
+  <Style Selector="Expander">
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl}" />
+  </Style>
+
+  <!-- Progress bars use the accent -->
+  <Style Selector="ProgressBar">
+    <Setter Property="Foreground" Value="{DynamicResource AccentFill}" />
+    <Setter Property="Background" Value="{DynamicResource BgPressed}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}" />
+  </Style>
+</Styles>

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.Http.Headers;
 using Sde.Core;
 using Sde.Core.Assessments;
 using Sde.Core.Records;
@@ -109,7 +108,7 @@ public sealed class OnlineLookup
 	public static readonly Lazy<HttpClient> SharedClient = new Lazy<HttpClient>(() =>
 	{
 		HttpClient client = new HttpClient();
-		client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SDE-for-Mac", "2.0"));
+		client.DefaultRequestHeaders.UserAgent.ParseAdd(Maps.TileCache.UserAgent); // "SDE-for-Mac/<version> (...)", as the tiles send
 		return client;
 	});
 

@@ -23,7 +23,7 @@ public class OutputsUiTests
 	{
 		UiSession ui = new UiSession();
 		ScreenTourTests.AddSamples(ui.Store);
-		ui.Main.Structures.Reload();
+		ui.Services.RaiseDataChanged();
 		ui.Pump();
 		return ui;
 	}
@@ -285,6 +285,7 @@ public class OutputsUiTests
 
 		// Turned on in Settings.
 		ui.Main.ShowCommand.Execute(ViewModels.Page.Settings);
+		ui.Main.Settings.Show(SettingsCategory.ReportsAndLetters);
 		OutputSettingsViewModel settings = ui.Main.Settings.Outputs;
 		Assert.False(settings.CumulativeEnabled);
 		settings.CumulativeEnabled = true;
@@ -317,6 +318,7 @@ public class OutputsUiTests
 	{
 		using UiSession ui = new UiSession();
 		ui.Main.ShowCommand.Execute(ViewModels.Page.Settings);
+		ui.Main.Settings.Show(SettingsCategory.ReportsAndLetters);
 		OutputSettingsViewModel o = ui.Main.Settings.Outputs;
 		Assert.Equal(50m, o.SiThreshold);
 		o.SiThreshold = 40m;

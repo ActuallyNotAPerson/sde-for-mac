@@ -43,7 +43,20 @@ public sealed class ImprovementProjectRowViewModel(ImprovementProjectRecord proj
 public sealed record SiLineViewModel(string Project, string Cost, string Reason, bool Counted);
 
 /// <summary>An earlier determination, for the list at the bottom of the sheet.</summary>
-public sealed record SiDeterminationRowViewModel(string When, string Result, string Detail);
+public sealed record SiDeterminationRowViewModel(string When, string Result, string Detail)
+{
+	public Guid DeterminationId { get; init; }
+
+	/// <summary>A substantial improvement: the building must be brought into compliance, so it can have a compliance case.</summary>
+	public bool IsSubstantial { get; init; }
+
+	/// <summary>"Open compliance case…", or "Compliance case…" when it has one.</summary>
+	public string CaseText { get; init; }
+
+	public string AccessibleCase => (CaseText ?? "").TrimEnd('…') + " for the determination of " + When;
+
+	public IAsyncRelayCommand<SiDeterminationRowViewModel> OpenCase { get; init; }
+}
 
 /// <summary>
 /// ⋯, then Improvements and SI: a structure's improvement projects (permits), the live substantial improvement (SI)
@@ -52,6 +65,9 @@ public sealed record SiDeterminationRowViewModel(string When, string Result, str
 /// </summary>
 public sealed partial class ImprovementsSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private static readonly CultureInfo Us = CultureInfo.GetCultureInfo("en-US");
 	private readonly AppServices _app;
 	private readonly Guid _propertyId;
@@ -336,7 +352,13 @@ public sealed partial class ImprovementsSheetViewModel : SheetViewModel
 		{
 			string pct = d.Percent is decimal p ? p.ToString("0.0", Us) + "% of " + (d.MarketValue?.ToString("C0", Us) ?? "?") : "no market value";
 			Determinations.Add(new SiDeterminationRowViewModel(d.DeterminedOn.ToString("MMM d, yyyy", Us), d.Result,
-				$"{d.CumulativeCost.ToString("C0", Us)} ({pct})" + (string.IsNullOrEmpty(d.DeterminedBy) ? "" : " · " + d.DeterminedBy)));
+				$"{d.CumulativeCost.ToString("C0", Us)} ({pct})" + (string.IsNullOrEmpty(d.DeterminedBy) ? "" : " · " + d.DeterminedBy))
+			{
+				DeterminationId = d.DeterminationID,
+				IsSubstantial = d.Result == SiResult.SubstantialImprovement,
+				CaseText = _app.Store.GetComplianceCaseForImprovement(d.DeterminationID) == null ? "Open compliance case…" : "Compliance case…",
+				OpenCase = OpenComplianceCaseCommand,
+			});
 		}
 		OnPropertyChanged(nameof(HasDeterminations));
 	}
@@ -398,6 +420,41 @@ public sealed partial class ImprovementsSheetViewModel : SheetViewModel
 			return;
 		}
 		_app.Dialogs.Open(path);
+	}
+
+	/// <summary>
+	/// The compliance case for a substantial improvement determination: opens one (after asking) when it has none, then
+	/// shows it on top of this sheet.
+	/// </summary>
+	[RelayCommand]
+	private async Task OpenComplianceCase(SiDeterminationRowViewModel row)
+	{
+		if (row == null || !row.IsSubstantial)
+		{
+			return;
+		}
+		ComplianceCaseRecord existing = _app.Store.GetComplianceCaseForImprovement(row.DeterminationId);
+		if (existing == null)
+		{
+			if (!await _app.Dialogs.ConfirmAsync("Open a compliance case?",
+				"A compliance case follows the improved building until it is brought into compliance: the permit and deadline, the elevation certificate and the final inspection.",
+				"Open case"))
+			{
+				return;
+			}
+			try
+			{
+				existing = _app.Store.OpenComplianceCaseForImprovement(row.DeterminationId);
+			}
+			catch (Exception ex) when (ex is not OutOfMemoryException)
+			{
+				_app.Errors.Show("Couldn't open a compliance case", ex);
+				return;
+			}
+		}
+		await _app.Sheets.ShowAsync(new ComplianceCaseSheetViewModel(_app, existing.CaseID));
+		LoadDeterminations();
+		_app.RaiseDataChanged();
 	}
 
 	/// <summary>A determination is about a saved project: saves the form first when it has changes.</summary>

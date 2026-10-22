@@ -57,7 +57,7 @@ do.
    a value used for every record: the cause of damage, the base cost per sq ft, the geographic adjustment, the value
    and repair bases… Each mapped field shows an example from the file. Address and owner columns are split the same
    way as in Enterprise Import (whole address, number and name, "John Doe", "Doe, John").
-   - *Start new assessments and structures from my default values* uses Settings → Default values first, with the
+   - *Start new assessments and structures from my default values* uses Settings → Defaults first, with the
      file's values on top.
    - *Copy the record ID into* a custom field puts the record ID into the FEMA package, so the state can see it.
 4. **The file's words, SDE's choices.** Any text that isn't one of FEMA's choices or a number is listed with how many

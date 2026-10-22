@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    SDE's MCP server for AI assistants (Claude Desktop, Claude Code): "SDE mcp" followed by the database (see docs/MCP.md).
+    It speaks the Model Context Protocol over stdin and stdout, using the official C# SDK (ModelContextProtocol,
+    Apache-2.0). Read tools are always on; edits work only while the database's "Mcp.AllowEdits" setting is on, and go
+    through the same store and field checks as the phone form. No Avalonia here, so the app can run the server without
+    a window or a Dock icon.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Sde.Mcp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The editor's field help, shared with the app (one file, linked). -->
+    <EmbeddedResource Include="../Sde.App/Help/field-help.json" Link="Help/field-help.json" LogicalName="Sde.Mcp.field-help.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Sde.Core/Sde.Core.csproj" />
+    <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+    <!-- Outputs and map layers: PDF reports, GeoJSON and web maps, and the layers GeoPackage. SDE.app already ships all three. -->
+    <ProjectReference Include="../Sde.Reports/Sde.Reports.csproj" />
+    <ProjectReference Include="../Sde.Interop/Sde.Interop.csproj" />
+    <ProjectReference Include="../Sde.Gis/Sde.Gis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sde.Mcp.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -12,6 +12,11 @@ using Sde.App.Views;
 
 [assembly: AvaloniaTestApplication(typeof(Sde.App.Tests.TestAppBuilder))]
 [assembly: Avalonia.Headless.XUnit.AvaloniaTestFramework]
+// One headless application for every test. With a new one per test, Avalonia forgets its UI thread between tests and the
+// first thread to ask for it next becomes the UI thread. The map engine asks from a background thread each time a map
+// redraws (Mapsui's MapControl.InvalidateCanvas), so a redraw left over from one test could take it before the next
+// test's setup, which then failed with "a different thread owns it". UiSession sets up what each test needs.
+[assembly: AvaloniaTestIsolation(AvaloniaTestIsolationLevel.PerAssembly)]
 
 namespace Sde.App.Tests;
 
@@ -60,6 +65,14 @@ public sealed class TestDialogs : IDialogs
 	public void Open(string path) => Opened.Add(path);
 
 	public void Reveal(string path) => Opened.Add("reveal:" + path);
+
+	public List<string> Copied { get; } = new();
+
+	public Task CopyTextAsync(string text)
+	{
+		Copied.Add(text);
+		return Task.CompletedTask;
+	}
 }
 
 /// <summary>The real main window and view models over a temporary database, rendered off-screen.</summary>
@@ -74,6 +87,11 @@ public sealed class UiSession : IDisposable
 		Application.Current!.RequestedThemeVariant = theme ?? ThemeVariant.Light;
 		Dialogs = new TestDialogs();
 		Services = new AppServices(Dialogs);
+		// A made-up name: without one, edit history, "deleted by" and locks carry the Mac account's full name, which must
+		// never reach a screenshot in the docs.
+		Services.SetYourName("Reviewer A");
+		Services.ProgramPath = "/Applications/SDE.app/Contents/MacOS/SDE";
+		Services.WorkPackagesFolder = Path.Combine(_db.Folder, "Work packages");
 		Main = new MainViewModel(Services);
 		Window = new MainWindow { DataContext = Main, Width = width, Height = height };
 		Window.Show();
@@ -117,6 +135,7 @@ public sealed class UiSession : IDisposable
 	{
 		Main.Editor?.Save();
 		Window.Close();
+		Services.Close();
 		Environment.SetEnvironmentVariable("SDE_DATABASE", null);
 		_db.Dispose();
 	}

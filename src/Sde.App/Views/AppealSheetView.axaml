@@ -3,9 +3,9 @@
              xmlns:sh="using:Sde.App.ViewModels.Sheets"
              x:Class="Sde.App.Views.AppealSheetView"
              x:DataType="sh:AppealSheetViewModel">
-  <StackPanel Spacing="12" Width="700">
+  <StackPanel Spacing="12">
     <StackPanel Spacing="2">
-      <TextBlock Text="{Binding Address}" FontWeight="SemiBold" />
+      <TextBlock Classes="semibold" Text="{Binding Address}" />
       <TextBlock Classes="secondary" Text="{Binding CurrentText}" TextWrapping="Wrap" />
       <TextBlock Classes="muted" Text="{Binding StatusText}" TextWrapping="Wrap" />
     </StackPanel>
@@ -35,7 +35,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Button Classes="primary" Content="Save appeal" Command="{Binding SaveAppealCommand}" />
-              <TextBlock Text="{Binding SavedText}" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Medium" />
+              <TextBlock Classes="medium" Text="{Binding SavedText}" VerticalAlignment="Center" TextWrapping="Wrap" />
             </StackPanel>
           </StackPanel>
         </Border>
@@ -52,12 +52,12 @@
                 <Border Classes="subtle" Margin="0,0,0,6" Padding="12,8">
                   <Grid ColumnDefinitions="*,190,Auto" ColumnSpacing="10">
                     <StackPanel VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Contractor}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="11.5" TextWrapping="Wrap" />
+                      <TextBlock Classes="medium" Text="{Binding Contractor}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Classes="muted xs" Text="{Binding Detail}" TextWrapping="Wrap" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                       <TextBlock Classes="eyebrow" Text="WITH THIS BID" />
-                      <TextBlock Text="{Binding WhatIfText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                      <TextBlock Classes="semibold" Text="{Binding WhatIfText}" TextWrapping="Wrap" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                       <TextBlock Classes="muted" Text="In use" VerticalAlignment="Center" IsVisible="{Binding IsInUse}" />

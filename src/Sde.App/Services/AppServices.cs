@@ -17,11 +17,20 @@ public interface IDialogs
 
 	void Notify(string title, string message, bool isError = false);
 
+	/// <summary>
+	/// A message with one action, such as "Undo", which runs <paramref name="action"/>. The window shows it as a toast
+	/// with a button; where there are no toasts (the tests' dialogs) it is an ordinary <see cref="Notify(string, string, bool)"/>.
+	/// </summary>
+	void Notify(string title, string message, string actionText, Action action, bool isError = false) => Notify(title, message, isError);
+
 	/// <summary>Opens a file with its default app (e.g. a PDF in Preview).</summary>
 	void Open(string path);
 
 	/// <summary>Shows a file or folder in Finder.</summary>
 	void Reveal(string path);
+
+	/// <summary>Puts text on the clipboard (for setup commands to paste elsewhere). The tests' dialogs keep it instead.</summary>
+	Task CopyTextAsync(string text) => Task.CompletedTask;
 }
 
 /// <summary>Remembered between launches (~/Library/Application Support/SDE/app-settings.json).</summary>
@@ -54,26 +63,81 @@ public sealed class AppSettings
 	/// <summary>The first-run walkthrough has been shown (Help, then Show the Walkthrough, shows it again).</summary>
 	public bool SeenWalkthrough { get; set; }
 
+	/// <summary>USGS's high-water mark service (STN), when it moves; null uses <see cref="Sde.Interop.Online.StnClient.DefaultBaseUrl"/>.</summary>
+	public string UsgsStnUrl { get; set; }
+
 	public const int MaxRecent = 8;
 
-	private static string FilePath => Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "app-settings.json");
+	/// <summary>
+	/// ~/Library/Application Support/SDE/app-settings.json, or, when SDE_DATABASE chose the database (tests, training),
+	/// a file beside that database, so a test or training session never changes the person's own settings.
+	/// </summary>
+	private static string FilePath => Environment.GetEnvironmentVariable("SDE_DATABASE") is string forced && forced.Length > 0
+		? Path.Combine(Path.GetDirectoryName(Path.GetFullPath(forced))!, "app-settings.json")
+		: Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "app-settings.json");
 
-	public static AppSettings Load()
+	/// <summary>Keeps two saves in this app from writing the temporary file at the same time.</summary>
+	private static readonly object SaveGate = new object();
+
+	/// <summary>The remembered settings (see <see cref="Load(string)"/>).</summary>
+	public static AppSettings Load() => Load(FilePath);
+
+	/// <summary>
+	/// Reads the settings at <paramref name="path"/>. When that file is missing, cut short or can't be read, the copy
+	/// kept by the last save (the same name with ".bak" added) is read instead, and failing that the defaults are used.
+	/// </summary>
+	public static AppSettings Load(string path) => Read(path) ?? Read(path + ".bak") ?? new AppSettings();
+
+	/// <summary>The settings in one file, or null when it is missing, cut short or can't be read.</summary>
+	private static AppSettings Read(string path)
 	{
 		try
 		{
-			return File.Exists(FilePath) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new AppSettings() : new AppSettings();
+			return File.Exists(path) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path)) : null;
 		}
-		catch (JsonException)
+		catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
 		{
-			return new AppSettings();
+			return null;
 		}
 	}
 
-	public void Save()
+	/// <summary>Remembers the settings (see <see cref="Save(string)"/>).</summary>
+	public void Save() => Save(FilePath);
+
+	/// <summary>
+	/// Writes the settings to a temporary file in the same folder, then moves it over <paramref name="path"/> in one
+	/// step, so a crash or a full disk never leaves a half-written settings file. The previous file is kept with ".bak"
+	/// added to its name, for <see cref="Load(string)"/> to fall back to.
+	/// </summary>
+	public void Save(string path)
 	{
-		Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-		File.WriteAllText(FilePath, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
+		byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, new JsonSerializerOptions { WriteIndented = true });
+		lock (SaveGate)
+		{
+			Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+			string temp = path + ".tmp";
+			try
+			{
+				using (FileStream stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+				{
+					stream.Write(json);
+					stream.Flush(flushToDisk: true);
+				}
+				if (File.Exists(path))
+				{
+					File.Replace(temp, path, path + ".bak");
+				}
+				else
+				{
+					File.Move(temp, path);
+				}
+			}
+			finally
+			{
+				// Gone already when the save worked; a save that failed part-way leaves nothing behind.
+				File.Delete(temp);
+			}
+		}
 	}
 }
 
@@ -101,6 +165,7 @@ public sealed class AppServices
 		Errors = new ErrorPresenter(Sheets);
 		Jobs = new JobRunner(Errors);
 		Writes = new AssessmentWriteCoordinator(this);
+		Changes = new ExternalChangeMonitor(this);
 		PhoneForm = new PhoneFormService(this);
 		Manual = new ManualService(dialogs);
 		Settings = AppSettings.Load();
@@ -109,9 +174,11 @@ public sealed class AppServices
 		if (!string.IsNullOrEmpty(forced))
 		{
 			Store = new SdeStore(SdeDatabase.OpenOrCreate(forced));
+			StartWatching(Store);
 			IsSample = Store.GetSetting<bool>(SampleDatabase.SettingKey);
 			Tidy(Store);
 			Store.UserName = UserName;
+			Scope.Restore(Store);
 			// Keep everything a test or training session writes next to its database.
 			ImportProfiles = new ImportProfiles(Path.Combine(Path.GetDirectoryName(Store.Database.FilePath)!, ImportProfiles.FolderName));
 			DepthTables = new DepthTables(Path.Combine(Path.GetDirectoryName(Store.Database.FilePath)!, DepthTables.FolderName));
@@ -123,6 +190,12 @@ public sealed class AppServices
 	}
 
 	public IDialogs Dialogs { get; }
+
+	/// <summary>
+	/// SDE's program inside the app, which AI assistants run to reach the database (Settings › AI assistants). Tests set
+	/// the installed path, so screenshots never show where the test runner lives.
+	/// </summary>
+	public string ProgramPath { get; set; } = Environment.ProcessPath;
 
 	/// <summary>Panels shown over the window (see <see cref="SheetHost"/>).</summary>
 	public SheetHost Sheets { get; }
@@ -138,6 +211,21 @@ public sealed class AppServices
 
 	/// <summary>Undo and redo for assessments.</summary>
 	public UndoService Undo { get; } = new UndoService();
+
+	/// <summary>The event chosen in the sidebar, which scopes the pages to its assessments.</summary>
+	public EventScope Scope { get; } = new EventScope();
+
+	/// <summary>
+	/// This app's lease on the open database: shared while it is open, to itself during a restore or a move, which are
+	/// refused while another copy of SDE holds one (see <see cref="DatabaseLease"/>). Null where leases aren't available.
+	/// </summary>
+	public DatabaseLease Lease { get; private set; }
+
+	/// <summary>Notices saves made to the open database by other programs (polled by <see cref="Changes"/>).</summary>
+	public ChangeWatcher Watcher { get; private set; }
+
+	/// <summary>Tells the window about saves made by other programs while it is active.</summary>
+	public ExternalChangeMonitor Changes { get; }
 
 	/// <summary>
 	/// Automatic backups of the open database. Off (null) when SDE_DATABASE chose the database, so tests and training
@@ -161,6 +249,9 @@ public sealed class AppServices
 
 	/// <summary>Where the sample database is made (a fresh copy each time it is opened).</summary>
 	public string SampleFolder { get; set; } = Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, SampleDatabase.FolderName);
+
+	/// <summary>Where work packages are unpacked when opened on a field Mac (one folder per package). Tests use their own.</summary>
+	public string WorkPackagesFolder { get; set; } = Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "Work packages");
 
 	/// <summary>
 	/// The first-run walkthrough opens on the first launch, but never when SDE_DATABASE is set (tests and training
@@ -200,6 +291,8 @@ public sealed class AppServices
 		string previous = Store?.Database.FilePath;
 		bool previousWasSample = IsSample;
 		Store = store;
+		Scope.Restore(store);
+		StartWatching(store);
 		IsSample = store.GetSetting<bool>(SampleDatabase.SettingKey);
 		if (IsSample && !previousWasSample)
 		{
@@ -208,7 +301,7 @@ public sealed class AppServices
 		// The sample is practice: no backups of it, and it isn't what SDE opens next time.
 		Backups = IsSample ? null : new BackupService(store.Database);
 		BackupService backups = Backups;
-		OpeningBackup = Task.Run(() =>
+		OpeningBackup = backups == null ? Task.CompletedTask : Task.Run(() =>
 		{
 			try
 			{
@@ -283,13 +376,89 @@ public sealed class AppServices
 		}
 	}
 
-	/// <summary>Replaces the open database with a backup (after backing up the current state) and reopens it.</summary>
+	/// <summary>
+	/// Replaces the open database with a backup (after backing up the current state) and reopens it. Refused while
+	/// another copy of SDE has the database open.
+	/// </summary>
 	public void RestoreBackup(BackupInfo backup)
 	{
 		string path = Store.Database.FilePath;
 		OpeningBackup.Wait(TimeSpan.FromSeconds(30));
-		new BackupService(Store.Database).Restore(backup);
+		Watcher?.Dispose();
+		Watcher = null;
+		try
+		{
+			new BackupService(Store.Database).Restore(backup, Lease);
+		}
+		catch
+		{
+			Watcher = new ChangeWatcher(Store.Database);
+			throw;
+		}
 		Open(path);
+	}
+
+	/// <summary>
+	/// Moves the open database (with its photos, documents and map layers) to <paramref name="newPath"/>, or copies it
+	/// there, as a job with progress, then opens the new one. A move is refused while another copy of SDE has the
+	/// database open. Returns false when it didn't happen (the job runner has shown why).
+	/// </summary>
+	public async Task<bool> MoveOrCopyDatabaseAsync(string newPath, bool move)
+	{
+		OpeningBackup.Wait(TimeSpan.FromSeconds(30));
+		SdeDatabase database = Store.Database;
+		DatabaseLease lease = Lease;
+		if (move)
+		{
+			Watcher?.Dispose();
+			Watcher = null;
+		}
+		JobOutcome<bool> outcome = await Jobs.RunAsync(move ? "Moving the database" : "Copying the database", (progress, ct) =>
+		{
+			IProgress<(int Done, int Total)> files = new Progress<(int Done, int Total)>(x => progress.Report(new JobProgress(x.Done, x.Total, "Copying photos and documents")));
+			if (move)
+			{
+				DatabaseFiles.Move(database, newPath, lease, files);
+			}
+			else
+			{
+				DatabaseFiles.Copy(database, newPath, files);
+			}
+			return true;
+		}, move ? "Couldn't move the database" : "Couldn't copy the database", canStop: false);
+		if (!outcome.Completed)
+		{
+			if (Watcher == null && File.Exists(database.FilePath))
+			{
+				Watcher = new ChangeWatcher(database);
+			}
+			return false;
+		}
+		if (move)
+		{
+			Settings.RecentDatabases.RemoveAll(p => string.Equals(p, database.FilePath, StringComparison.Ordinal));
+		}
+		Open(newPath);
+		return true;
+	}
+
+	/// <summary>Takes this app's lease on a newly opened database and starts noticing others' saves to it.</summary>
+	private void StartWatching(SdeStore store)
+	{
+		Watcher?.Dispose();
+		Lease?.Dispose();
+		Lease = DatabaseLease.TryShared(store.Database.LockPath);
+		Watcher = new ChangeWatcher(store.Database);
+	}
+
+	/// <summary>Lets go of the open database's lease and connection (on quitting; tests call it for each window).</summary>
+	public void Close()
+	{
+		Changes.IsActive = false;
+		Watcher?.Dispose();
+		Watcher = null;
+		Lease?.Dispose();
+		Lease = null;
 	}
 
 	/// <summary>On opening a database: removes what has been in Recently deleted for more than 30 days.</summary>

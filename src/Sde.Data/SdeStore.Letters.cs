@@ -11,7 +11,7 @@ public sealed class LetterLogRecord
 
 	public Guid AssessmentID { get; set; }
 
-	/// <summary>"Substantial damage", "Not substantially damaged" or "Substantial improvement".</summary>
+	/// <summary>"Substantial damage", "Not substantially damaged", "Substantial improvement", or a compliance letter ("Compliance options", "ICC support", "Deadline reminder").</summary>
 	public string Kind { get; set; }
 
 	/// <summary>The template's file name.</summary>

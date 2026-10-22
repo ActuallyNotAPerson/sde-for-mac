@@ -1,0 +1,129 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Text classes. Views set sizes and weights only through these (or the FontSize* tokens), never with numbers.
+      Roles:   h1 (22 semibold, page titles), h2 (17 semibold, step and section titles), h3 (13 semibold, card titles),
+               title (15 semibold), kpi (22 semibold, tabular), display (28 semibold, tabular), eyebrow (11 caps label),
+               secondary (13, TextSecondary), muted (12, TextTertiary), caption (11, TextTertiary)
+      Sizes:   xs 11, sm 12, md 13, lg 15, xl 17, xxl 22
+      Weights: medium, semibold, bold
+      Numbers: money (tabular, right-aligned), num (tabular)
+    The weight classes also work on buttons and other controls (they set TextElement.FontWeight).
+  -->
+
+  <!-- Roles -->
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLargeTitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="-0.2" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector="TextBlock.h3">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector=":is(TextBlock).title">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSubheadline}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+  </Style>
+  <Style Selector=":is(TextBlock).kpi">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLargeTitle}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontFeatures" Value="+tnum" />
+  </Style>
+  <Style Selector=":is(TextBlock).display">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeDisplay}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="-0.4" />
+    <Setter Property="FontFeatures" Value="+tnum" />
+  </Style>
+  <Style Selector=":is(TextBlock).secondary">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+  </Style>
+  <Style Selector=":is(TextBlock).muted">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeFootnote}" />
+  </Style>
+  <Style Selector=":is(TextBlock).caption">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+  </Style>
+  <Style Selector=":is(TextBlock).eyebrow">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="LetterSpacing" Value="0.6" />
+  </Style>
+
+  <!-- Sizes -->
+  <Style Selector=":is(TextBlock).xs">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+  </Style>
+  <Style Selector=":is(TextBlock).sm">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeFootnote}" />
+  </Style>
+  <Style Selector=":is(TextBlock).md">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  </Style>
+  <Style Selector=":is(TextBlock).lg">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeSubheadline}" />
+  </Style>
+  <Style Selector=":is(TextBlock).xl">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}" />
+  </Style>
+  <Style Selector=":is(TextBlock).xxl">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeLargeTitle}" />
+  </Style>
+
+  <!-- Weights (on any element: TextBlock, Button, CheckBox…) -->
+  <Style Selector=":is(Control).medium">
+    <Setter Property="TextElement.FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector=":is(Control).semibold">
+    <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector=":is(Control).bold">
+    <Setter Property="TextElement.FontWeight" Value="Bold" />
+  </Style>
+  <Style Selector=":is(Control).regular">
+    <Setter Property="TextElement.FontWeight" Value="Normal" />
+  </Style>
+
+  <!-- Numbers -->
+  <Style Selector=":is(TextBlock).money">
+    <Setter Property="FontFeatures" Value="+tnum" />
+    <Setter Property="TextAlignment" Value="Right" />
+  </Style>
+  <Style Selector=":is(TextBlock).num">
+    <Setter Property="FontFeatures" Value="+tnum" />
+  </Style>
+  <Style Selector=":is(TextBlock).mono">
+    <Setter Property="FontFamily" Value="Menlo, Consolas, monospace" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+  </Style>
+  <Style Selector="TextBox.mono">
+    <Setter Property="FontFamily" Value="Menlo, Consolas, monospace" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+  </Style>
+
+  <!-- Colours by meaning -->
+  <Style Selector=":is(TextBlock).accent">
+    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+  </Style>
+  <Style Selector=":is(TextBlock).danger">
+    <Setter Property="Foreground" Value="{DynamicResource DangerFg}" />
+  </Style>
+  <Style Selector=":is(TextBlock).warning">
+    <Setter Property="Foreground" Value="{DynamicResource WarningFg}" />
+  </Style>
+  <Style Selector=":is(TextBlock).success">
+    <Setter Property="Foreground" Value="{DynamicResource SuccessFg}" />
+  </Style>
+</Styles>

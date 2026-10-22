@@ -1,30 +1,44 @@
+using System.Reflection;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Mapsui;
+using Mapsui.Extensions;
+using Mapsui.Layers;
+using Mapsui.Styles;
+using Mapsui.Tiling.Fetcher;
+using Mapsui.Tiling.Layers;
+using Mapsui.UI.Avalonia;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Strtree;
+using Sde.Gis.Features;
+using Brush = Mapsui.Styles.Brush;
+using MColor = Mapsui.Styles.Color;
+using Pen = Mapsui.Styles.Pen;
+using Geometry = NetTopologySuite.Geometries.Geometry;
+using Point = Avalonia.Point;
 
 namespace Sde.App.Maps;
 
-/// <summary>A dot on the map: which structure, where, and what colour.</summary>
-public readonly record struct MapMarker(Guid Id, double Latitude, double Longitude, IBrush Fill);
-
-/// <summary>What dragging does on the map.</summary>
-public enum MapDrag
-{
-	/// <summary>Dragging moves the map. Holding Command and dragging draws a box instead.</summary>
-	Pan,
-
-	/// <summary>Dragging draws a box around the structures to select.</summary>
-	Box,
-}
-
 /// <summary>
-/// A small slippy map: Web Mercator tiles from a <see cref="TileCache"/> with a dot for each structure on top. Drag to
-/// move, scroll or pinch to zoom, arrow keys and + / - from the keyboard. Command-drag (or <see cref="Drag"/> set to
-/// Box) draws a selection box. It knows nothing about structures beyond the markers it is given, so the page decides
-/// what a click means.
+/// The Map page's map: tiles (a basemap and overlays such as FEMA's flood zones), layers of features, and a dot for
+/// each structure on top. Drag to move, scroll or pinch to zoom, arrow keys and = / - from the keyboard. Command-drag
+/// (or <see cref="Drag"/> set to Box) draws a selection box; <see cref="Sketch"/> turns clicks into the corners of a
+/// line or polygon. It knows nothing about structures beyond the markers it is given, so the page decides what a
+/// click means.
 /// </summary>
-public sealed class MapCanvas : Control
+/// <remarks>
+/// This is the only class that holds the map engine's control (Mapsui's MapControl); with MapsuiLayers.cs,
+/// MapLabels.cs and SdeTileSource.cs it is all the code that knows about Mapsui, so a new major version of the engine is
+/// these files' problem. Clicks are handled here rather than by the engine (which waits 300 ms for a double click and
+/// only hits a dot's own pixels): a click within 11 px of a dot hits it, found through an STRtree.
+/// </remarks>
+public sealed partial class MapCanvas : Panel, IDisposable
 {
 	public const double MinZoom = 2;
 	public const double MaxZoom = 19;
@@ -32,32 +46,72 @@ public sealed class MapCanvas : Control
 	/// <summary>How close (in pixels) a click has to be to a dot to count as hitting it.</summary>
 	private const double HitRadius = 11;
 
-	private const double DotRadius = 6.5;
+	/// <summary>How close (in pixels) a click has to be to a point or line of a layer.</summary>
+	private const double FeatureHitRadius = 6;
 
-	public static readonly StyledProperty<IBrush> BackgroundProperty = AvaloniaProperty.Register<MapCanvas, IBrush>(nameof(Background));
+	/// <summary>A structure dot's diameter in pixels.</summary>
+	internal const double DotDiameter = 13;
 
+	/// <summary>A press that moves less than this (pixels) is a click, not a drag.</summary>
+	private const double DragThreshold = 5;
+
+	/// <summary>How far an arrow key moves the map, in pixels.</summary>
+	private const double KeyPanPixels = 80;
+
+	private readonly Canvas _overlay = new Canvas { IsHitTestVisible = false };
+	private readonly Rectangle _box = new Rectangle { StrokeThickness = 1.5, IsVisible = false };
+	private readonly Polyline _sketchLine = new Polyline { StrokeThickness = 2.5, IsVisible = false };
+	private readonly Avalonia.Controls.Shapes.Polygon _sketchArea = new Avalonia.Controls.Shapes.Polygon { StrokeThickness = 2.5, IsVisible = false };
+	private readonly List<LatLon> _sketch = new List<LatLon>();
+	private readonly Dispatcher _ui;
+	private bool _sketchFinished;
+	private readonly Dictionary<string, BuiltFeatureLayer> _built = new Dictionary<string, BuiltFeatureLayer>();
+	private readonly Dictionary<string, (TileLayer Layer, SdeTileSource Source)> _overlays = new Dictionary<string, (TileLayer, SdeTileSource)>();
+	private MapControl _control;
+	private MapTheme _theme = new MapTheme();
+	private TileLayer _basemapLayer;
+	private SdeTileSource _basemapSource;
+	private MemoryLayer _structures;
+	private MemoryLayer _rings;
+	private MemoryLayer _structureLabels;
+	private STRtree<int> _markerIndex = new STRtree<int>();
+	private (double X, double Y)[] _markerMetres = Array.Empty<(double, double)>();
 	private IReadOnlyList<MapMarker> _markers = Array.Empty<MapMarker>();
-	private double _centerU = WebMercator.U(-96.0);
-	private double _centerV = WebMercator.V(38.5);
-	private double _zoom = 4;
+	private IReadOnlyList<object> _layers = Array.Empty<object>();
+	private IReadOnlyCollection<Guid> _selectedMarkers = Array.Empty<Guid>();
 	private Point? _pressedAt;
-	private Point _lastPoint;
-	private bool _moved;
 	private bool _boxing;
-	private Rect _box;
+	private bool _moved;
+	private bool _disposed;
 
 	static MapCanvas()
 	{
-		AffectsRender<MapCanvas>(BackgroundProperty);
+		MapLabelRenderer.Register();
 		FocusableProperty.OverrideDefaultValue<MapCanvas>(true);
 		ClipToBoundsProperty.OverrideDefaultValue<MapCanvas>(true);
+		Mapsui.Logging.Logger.LogDelegate = (level, message, ex) =>
+		{
+			if (level <= Mapsui.Logging.LogLevel.Error && ex != null)
+			{
+				Services.AppLog.Write("Map: " + message, ex);
+			}
+		};
 	}
 
-	public IBrush Background
+	public MapCanvas()
 	{
-		get => GetValue(BackgroundProperty);
-		set => SetValue(BackgroundProperty, value);
+		_ui = Dispatcher.UIThread;
+		_overlay.Children.Add(_sketchArea);
+		_overlay.Children.Add(_sketchLine);
+		_overlay.Children.Add(_box);
+		CreateControl();
+		AddHandler(PointerPressedEvent, OnPressed, RoutingStrategies.Tunnel);
+		AddHandler(PointerMovedEvent, OnMoved, RoutingStrategies.Tunnel);
+		AddHandler(PointerReleasedEvent, OnReleased, RoutingStrategies.Tunnel);
+		ActualThemeVariantChanged += (_, _) => ApplyTheme();
 	}
+
+	// ───────────── Properties the page sets ─────────────
 
 	/// <summary>Where tiles come from; null (or a basemap with no tiles) shows the plain background.</summary>
 	public TileCache Tiles
@@ -65,16 +119,9 @@ public sealed class MapCanvas : Control
 		get => _tiles;
 		set
 		{
-			if (_tiles != null)
-			{
-				_tiles.Changed -= InvalidateVisual;
-			}
 			_tiles = value;
-			if (_tiles != null)
-			{
-				_tiles.Changed += InvalidateVisual;
-			}
-			InvalidateVisual();
+			ShowBasemap();
+			ShowLayers(_layers);
 		}
 	}
 
@@ -87,13 +134,26 @@ public sealed class MapCanvas : Control
 		{
 			_basemap = value ?? Basemaps.None;
 			_tiles?.ResetFailures();
-			InvalidateVisual();
+			ShowBasemap();
 		}
 	}
 
 	private Basemap _basemap = Basemaps.None;
 
 	public MapDrag Drag { get; set; } = MapDrag.Pan;
+
+	/// <summary>What clicks draw; changing it starts a new shape.</summary>
+	public MapSketch Sketch
+	{
+		get => _sketchKind;
+		set
+		{
+			_sketchKind = value;
+			ClearSketch();
+		}
+	}
+
+	private MapSketch _sketchKind;
 
 	/// <summary>The structure to ring (the one picked in the list beside the map), if any.</summary>
 	public Guid? Highlighted
@@ -102,30 +162,96 @@ public sealed class MapCanvas : Control
 		set
 		{
 			_highlighted = value;
-			InvalidateVisual();
+			ShowRings();
 		}
 	}
 
 	private Guid? _highlighted;
 
+	/// <summary>The structures that are selected (ringed in the accent colour).</summary>
+	public IReadOnlyCollection<Guid> SelectedMarkers
+	{
+		get => _selectedMarkers;
+		set
+		{
+			_selectedMarkers = value ?? Array.Empty<Guid>();
+			ShowRings();
+		}
+	}
+
+	/// <summary>The structure dots, drawn in this order (the last on top).</summary>
 	public IReadOnlyList<MapMarker> Markers
 	{
 		get => _markers;
 		set
 		{
 			_markers = value ?? Array.Empty<MapMarker>();
-			InvalidateVisual();
+			ShowMarkers();
 		}
 	}
 
-	public double Zoom => _zoom;
+	/// <summary>How structure labels look (their text is each marker's Label); null for no labels.</summary>
+	public Sde.Gis.Styles.LabelStyle MarkerLabels
+	{
+		get => _markerLabels;
+		set
+		{
+			_markerLabels = value;
+			ShowMarkers();
+		}
+	}
 
-	public double CenterLatitude => WebMercator.Latitude(_centerV);
+	private Sde.Gis.Styles.LabelStyle _markerLabels;
 
-	public double CenterLongitude => WebMercator.Longitude(_centerU);
+	/// <summary>
+	/// The key of the layer that clicks and boxes select in (in Select mode); null selects structures. In other modes a
+	/// click on a layer's feature reports it with <see cref="FeatureClicked"/>.
+	/// </summary>
+	public string SelectLayer { get; set; }
 
-	/// <summary>A dot was clicked.</summary>
-	public event Action<Guid> MarkerClicked;
+	/// <summary>The screen's pixel density (2 on a Retina screen), for sharper tiles.</summary>
+	public double PixelDensity => TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
+
+	// ───────────── Where the map is ─────────────
+
+	public double Zoom => WebMercator.ZoomOf(Viewport.Resolution);
+
+	public double CenterLatitude => WebMercator.FromMetres(Viewport.CenterX, Viewport.CenterY).Latitude;
+
+	public double CenterLongitude => WebMercator.FromMetres(Viewport.CenterX, Viewport.CenterY).Longitude;
+
+	/// <summary>The map scale denominator at the centre (24000 for 1:24,000).</summary>
+	public double Scale => WebMercator.Scale(Viewport.Resolution, CenterLatitude);
+
+	/// <summary>The middle of the view in Web Mercator metres, and metres per pixel (for printing the same area).</summary>
+	public (double X, double Y, double Resolution) ViewInMetres => (Viewport.CenterX, Viewport.CenterY, Viewport.Resolution);
+
+	/// <summary>The area in view, in longitude and latitude.</summary>
+	public MapExtent Extent
+	{
+		get
+		{
+			(double lat0, double lon0) = ToLatLon(new Point(0, Bounds.Height));
+			(double lat1, double lon1) = ToLatLon(new Point(Bounds.Width, 0));
+			return new MapExtent(lon0, lat0, lon1, lat1);
+		}
+	}
+
+	/// <summary>Where the map is: the engine's view, or the one kept while the page is closed.</summary>
+	private Viewport Viewport => _control?.Map.Navigator.Viewport ?? _parked;
+
+	private Viewport _parked = new Viewport(WebMercator.ToMetres(-96.0, 38.5).X, WebMercator.ToMetres(-96.0, 38.5).Y, WebMercator.Resolution(4), 0, 0, 0);
+
+	/// <summary>The corners of the line or polygon being drawn.</summary>
+	public IReadOnlyList<LatLon> SketchPoints => _sketch;
+
+	// ───────────── Events ─────────────
+
+	/// <summary>A dot was clicked. True when Command was held (adds to a selection).</summary>
+	public event Action<Guid, bool> MarkerClicked;
+
+	/// <summary>A feature of a layer was clicked: the layer's key, the feature, and whether Command was held.</summary>
+	public event Action<string, Feature, bool> FeatureClicked;
 
 	/// <summary>Empty map was clicked (not a drag): latitude and longitude of the spot.</summary>
 	public event Action<double, double> MapClicked;
@@ -133,18 +259,40 @@ public sealed class MapCanvas : Control
 	/// <summary>A box was drawn: the dots inside it (maybe none). True when Command was held to draw it, which adds to the selection.</summary>
 	public event Action<IReadOnlyList<Guid>, bool> AreaSelected;
 
+	/// <summary>A box was drawn while <see cref="SelectLayer"/> names a layer: that layer's key, the features in it, and Command.</summary>
+	public event Action<string, IReadOnlyList<Feature>, bool> FeaturesSelected;
+
+	/// <summary>A corner was added to (or taken from) the shape being drawn; true when the shape was finished.</summary>
+	public event Action<IReadOnlyList<LatLon>, bool> SketchChanged;
+
+	/// <summary>The map moved or zoomed.</summary>
+	public event Action ViewChanged;
+
 	// ───────────── View ─────────────
 
 	public void SetView(double latitude, double longitude, double zoom)
 	{
-		_zoom = Math.Clamp(zoom, MinZoom, MaxZoom);
-		_centerU = WebMercator.U(longitude);
-		_centerV = WebMercator.V(latitude);
-		ClampCenter();
-		InvalidateVisual();
+		(double x, double y) = WebMercator.ToMetres(longitude, latitude);
+		Navigate(x, y, WebMercator.Resolution(Math.Clamp(zoom, MinZoom, MaxZoom)));
 	}
 
-	public void ZoomBy(double steps) => ZoomAround(new Point(Bounds.Width / 2, Bounds.Height / 2), steps);
+	public void ZoomBy(double steps)
+	{
+		Viewport v = Viewport;
+		Navigate(v.CenterX, v.CenterY, WebMercator.Resolution(Math.Clamp(Zoom + steps, MinZoom, MaxZoom)));
+	}
+
+	/// <summary>Moves the map at once (no animation). While the page is closed, the view is kept for when it opens again.</summary>
+	private void Navigate(double x, double y, double resolution)
+	{
+		if (_control == null)
+		{
+			_parked = _parked with { CenterX = x, CenterY = y, Resolution = resolution };
+			return;
+		}
+		_control.Map.Navigator.CenterOnAndZoomTo(new MPoint(x, y), resolution, 0);
+		Refresh();
+	}
 
 	/// <summary>Shows every dot (or the whole country when there are none).</summary>
 	public void FitToMarkers()
@@ -154,180 +302,588 @@ public sealed class MapCanvas : Control
 			SetView(38.5, -96.0, 4);
 			return;
 		}
-		double minU = _markers.Min(m => WebMercator.U(m.Longitude));
-		double maxU = _markers.Max(m => WebMercator.U(m.Longitude));
-		double minV = _markers.Min(m => WebMercator.V(m.Latitude));
-		double maxV = _markers.Max(m => WebMercator.V(m.Latitude));
+		FitTo(new MapExtent(_markers.Min(m => m.Longitude), _markers.Min(m => m.Latitude), _markers.Max(m => m.Longitude), _markers.Max(m => m.Latitude)), 17);
+	}
+
+	/// <summary>Shows an area (with a margin of <paramref name="margin"/> pixels in all), no closer than <paramref name="maxZoom"/>.</summary>
+	public void FitTo(MapExtent extent, double maxZoom = 18, double margin = 80)
+	{
+		if (Bounds.Width < 10 || Bounds.Height < 10)
+		{
+			return;
+		}
+		double minU = WebMercator.U(extent.MinLongitude);
+		double maxU = WebMercator.U(extent.MaxLongitude);
+		double minV = WebMercator.V(extent.MaxLatitude);
+		double maxV = WebMercator.V(extent.MinLatitude);
 		double spanU = Math.Max(maxU - minU, 1e-7);
 		double spanV = Math.Max(maxV - minV, 1e-7);
-		// Leave a margin so the outer dots aren't on the edge, and don't zoom closer than a street.
-		double zoomU = Math.Log2(Math.Max(Bounds.Width - 80, 40) / (WebMercator.TileSize * spanU));
-		double zoomV = Math.Log2(Math.Max(Bounds.Height - 80, 40) / (WebMercator.TileSize * spanV));
-		_zoom = Math.Clamp(Math.Min(Math.Min(zoomU, zoomV), 17), MinZoom, MaxZoom);
-		_centerU = (minU + maxU) / 2;
-		_centerV = (minV + maxV) / 2;
-		InvalidateVisual();
+		// Leave a margin so the outer dots aren't on the edge.
+		double zoomU = Math.Log2(Math.Max(Bounds.Width - margin, 40) / (WebMercator.TileSize * spanU));
+		double zoomV = Math.Log2(Math.Max(Bounds.Height - margin, 40) / (WebMercator.TileSize * spanV));
+		double zoom = Math.Clamp(Math.Min(Math.Min(zoomU, zoomV), maxZoom), MinZoom, MaxZoom);
+		SetView(WebMercator.Latitude((minV + maxV) / 2), WebMercator.Longitude((minU + maxU) / 2), zoom);
 	}
 
 	/// <summary>Moves the map so the point is in view, without changing the zoom unless it is far out.</summary>
-	public void CenterOn(double latitude, double longitude, double atLeastZoom = 15)
-	{
-		_zoom = Math.Clamp(Math.Max(_zoom, atLeastZoom), MinZoom, MaxZoom);
-		_centerU = WebMercator.U(longitude);
-		_centerV = WebMercator.V(latitude);
-		ClampCenter();
-		InvalidateVisual();
-	}
+	public void CenterOn(double latitude, double longitude, double atLeastZoom = 15) =>
+		SetView(latitude, longitude, Math.Max(Zoom, atLeastZoom));
 
 	/// <summary>Where a latitude and longitude is on this control.</summary>
 	public Point ToScreen(double latitude, double longitude)
 	{
-		double scale = WebMercator.WorldPixels(_zoom);
-		return new Point((WebMercator.U(longitude) - _centerU) * scale + Bounds.Width / 2, (WebMercator.V(latitude) - _centerV) * scale + Bounds.Height / 2);
+		(double x, double y) = WebMercator.ToMetres(longitude, latitude);
+		(double sx, double sy) = Viewport.WorldToScreenXY(x, y);
+		return new Point(sx, sy);
 	}
 
 	/// <summary>The latitude and longitude under a point on this control.</summary>
 	public (double Latitude, double Longitude) ToLatLon(Point p)
 	{
-		double scale = WebMercator.WorldPixels(_zoom);
-		double u = _centerU + (p.X - Bounds.Width / 2) / scale;
-		double v = _centerV + (p.Y - Bounds.Height / 2) / scale;
-		return (WebMercator.Latitude(Math.Clamp(v, 0, 1)), WebMercator.Longitude(Math.Clamp(u, 0, 1)));
+		(double x, double y) = Viewport.ScreenToWorldXY(p.X, p.Y);
+		x = Math.Clamp(x, -WebMercator.HalfWorld, WebMercator.HalfWorld);
+		y = Math.Clamp(y, -WebMercator.HalfWorld, WebMercator.HalfWorld);
+		(double lon, double lat) = WebMercator.FromMetres(x, y);
+		return (lat, lon);
 	}
 
-	/// <summary>The topmost dot within reach of a point, or null.</summary>
+	/// <summary>The nearest dot within reach of a point (the topmost when two are as close), or null.</summary>
 	public Guid? MarkerAt(Point p)
 	{
-		for (int i = _markers.Count - 1; i >= 0; i--)
+		double resolution = Viewport.Resolution;
+		if (_markers.Count == 0 || !(resolution > 0))
 		{
-			Point m = ToScreen(_markers[i].Latitude, _markers[i].Longitude);
-			if ((m - p).X * (m - p).X + (m - p).Y * (m - p).Y <= HitRadius * HitRadius)
+			return null;
+		}
+		(double x, double y) = Viewport.ScreenToWorldXY(p.X, p.Y);
+		double reach = HitRadius * resolution;
+		int best = -1;
+		double bestDistance = double.MaxValue;
+		foreach (int i in _markerIndex.Query(new Envelope(x - reach, x + reach, y - reach, y + reach)))
+		{
+			double dx = _markerMetres[i].X - x;
+			double dy = _markerMetres[i].Y - y;
+			double d = Math.Sqrt(dx * dx + dy * dy);
+			if (d <= reach && (d < bestDistance || d == bestDistance && i > best))
 			{
-				return _markers[i].Id;
+				best = i;
+				bestDistance = d;
+			}
+		}
+		return best < 0 ? null : _markers[best].Id;
+	}
+
+	/// <summary>The dots inside a rectangle of the control.</summary>
+	public IReadOnlyList<Guid> MarkersIn(Rect area)
+	{
+		Envelope box = WorldBox(area);
+		return _markerIndex.Query(box).OrderBy(i => i).Where(i => box.Contains(_markerMetres[i].X, _markerMetres[i].Y)).Select(i => _markers[i].Id).ToList();
+	}
+
+	/// <summary>The topmost feature of a visible layer under a point, with its layer's key, or null.</summary>
+	public (string Layer, Feature Feature)? FeatureAt(Point p, string onlyLayer = null)
+	{
+		(double x, double y) = Viewport.ScreenToWorldXY(p.X, p.Y);
+		double reach = FeatureHitRadius * Viewport.Resolution;
+		foreach (object layer in _layers.Reverse())
+		{
+			if (layer is MapFeatureLayer spec && spec.Visible && (onlyLayer == null || spec.Key == onlyLayer)
+				&& _built.TryGetValue(spec.Key, out BuiltFeatureLayer built) && built.Layer.Enabled && built.FeatureAt(x, y, reach) is Feature f)
+			{
+				return (spec.Key, f);
 			}
 		}
 		return null;
 	}
 
-	/// <summary>The dots inside a rectangle of the control.</summary>
-	public IReadOnlyList<Guid> MarkersIn(Rect area) =>
-		_markers.Where(m => area.Contains(ToScreen(m.Latitude, m.Longitude))).Select(m => m.Id).ToList();
-
-	private void ZoomAround(Point at, double steps)
+	/// <summary>The features of a layer that touch a rectangle of the control.</summary>
+	public IReadOnlyList<Feature> FeaturesIn(string layer, Rect area)
 	{
-		double before = _zoom;
-		double after = Math.Clamp(before + steps, MinZoom, MaxZoom);
-		if (after == before)
+		if (layer == null || !_built.TryGetValue(layer, out BuiltFeatureLayer built))
 		{
-			return;
+			return Array.Empty<Feature>();
 		}
-		// Keep the spot under the pointer where it is.
-		(double lat, double lon) = ToLatLon(at);
-		_zoom = after;
-		double scale = WebMercator.WorldPixels(_zoom);
-		_centerU = WebMercator.U(lon) - (at.X - Bounds.Width / 2) / scale;
-		_centerV = WebMercator.V(lat) - (at.Y - Bounds.Height / 2) / scale;
-		ClampCenter();
-		InvalidateVisual();
+		Envelope box = WorldBox(area);
+		Geometry boxShape = new GeometryFactory().ToGeometry(box);
+		return built.Query(box).OrderBy(i => i).Where(i => built.Shapes[i].Intersects(boxShape)).Select(i => built.Features[i]).ToList();
 	}
 
-	private void ClampCenter()
+	private Envelope WorldBox(Rect area)
 	{
-		_centerU = Math.Clamp(_centerU, 0, 1);
-		_centerV = Math.Clamp(_centerV, 0, 1);
+		(double x0, double y0) = Viewport.ScreenToWorldXY(area.Left, area.Top);
+		(double x1, double y1) = Viewport.ScreenToWorldXY(area.Right, area.Bottom);
+		return new Envelope(x0, x1, y0, y1);
 	}
 
-	// ───────────── Drawing ─────────────
+	// ───────────── Layers ─────────────
 
-	public override void Render(DrawingContext context)
+	/// <summary>
+	/// The layers to draw over the basemap, bottom first: <see cref="MapFeatureLayer"/> and <see cref="MapTileLayer"/>.
+	/// Layers already drawn are kept when their revision hasn't changed.
+	/// </summary>
+	public void ShowLayers(IReadOnlyList<object> layers)
 	{
-		Rect all = new Rect(Bounds.Size);
-		context.DrawRectangle(Background ?? Brushes.LightGray, null, all);
-		if (all.Width < 1 || all.Height < 1)
+		_layers = layers ?? Array.Empty<object>();
+		if (_control == null)
 		{
 			return;
 		}
-		DrawTiles(context);
-		DrawMarkers(context);
-		if (_boxing)
+		HashSet<string> keys = new HashSet<string>();
+		foreach (object layer in _layers)
 		{
-			IBrush accent = this.TryFindResource("Accent", ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.DodgerBlue;
-			context.DrawRectangle(new SolidColorBrush(Color.FromArgb(50, 40, 110, 220)), new Pen(accent, 1.5), _box);
-		}
-	}
-
-	private void DrawTiles(DrawingContext context)
-	{
-		if (_tiles == null || !_basemap.HasTiles)
-		{
-			return;
-		}
-		int tz = Math.Clamp((int)Math.Round(_zoom), 0, _basemap.MaxZoom);
-		int count = 1 << tz;
-		double scale = WebMercator.WorldPixels(_zoom);
-		double tilePixels = scale / count;
-		double left = _centerU - Bounds.Width / 2 / scale;
-		double right = _centerU + Bounds.Width / 2 / scale;
-		double top = _centerV - Bounds.Height / 2 / scale;
-		double bottom = _centerV + Bounds.Height / 2 / scale;
-		int x0 = Math.Max(0, (int)Math.Floor(left * count));
-		int x1 = Math.Min(count - 1, (int)Math.Floor(right * count));
-		int y0 = Math.Max(0, (int)Math.Floor(top * count));
-		int y1 = Math.Min(count - 1, (int)Math.Floor(bottom * count));
-		if ((x1 - x0 + 1) * (y1 - y0 + 1) > 120)
-		{
-			return;
-		}
-		for (int x = x0; x <= x1; x++)
-		{
-			for (int y = y0; y <= y1; y++)
+			switch (layer)
 			{
-				Avalonia.Media.Imaging.Bitmap tile = _tiles.TryGet(_basemap, tz, x, y);
-				if (tile == null)
-				{
-					continue;
-				}
-				double px = (x / (double)count - _centerU) * scale + Bounds.Width / 2;
-				double py = (y / (double)count - _centerV) * scale + Bounds.Height / 2;
-				// A little overlap hides hairline gaps between tiles at fractional zoom.
-				context.DrawImage(tile, new Rect(tile.Size), new Rect(px, py, tilePixels + 0.5, tilePixels + 0.5));
+				case MapFeatureLayer spec:
+					keys.Add(spec.Key);
+					if (!_built.TryGetValue(spec.Key, out BuiltFeatureLayer built) || built.Spec.Revision != spec.Revision || !ReferenceEquals(built.Spec.Data, spec.Data))
+					{
+						built?.Dispose();
+						built = BuiltFeatureLayer.Build(spec, _theme, (float)PixelDensity);
+						_built[spec.Key] = built;
+					}
+					else
+					{
+						bool editsChanged = (spec.Edits?.Revision ?? 0) != built.EditRevision;
+						if (editsChanged)
+						{
+							built.ShowEdits(spec.Edits);
+						}
+						if (editsChanged || built.Spec.SelectionRevision != spec.SelectionRevision || built.Spec.Visible != spec.Visible || !ReferenceEquals(built.Spec.Display, spec.Display))
+						{
+							built.ShowSelection(spec, _theme);
+						}
+					}
+					built.Layer.Opacity = spec.Display?.ClampedOpacity ?? 1;
+					break;
+				case MapTileLayer tiles:
+					keys.Add(tiles.Key);
+					if (_tiles != null && (!_overlays.TryGetValue(tiles.Key, out (TileLayer Layer, SdeTileSource Source) o) || o.Source.Basemap != tiles.Source))
+					{
+						if (_overlays.TryGetValue(tiles.Key, out o))
+						{
+							o.Layer.Dispose();
+							o.Source.Dispose();
+						}
+						SdeTileSource source = new SdeTileSource(tiles.Source, _tiles, PixelDensity > 1.5 ? 2 : 1);
+						// Only the tiles of the zoom level shown: FEMA's map service draws each one on request.
+						TileLayer layerOfTiles = new TileLayer(source, 50, 120, new MinimalDataFetchStrategy()) { Name = tiles.Source.Name };
+						layerOfTiles.Attribution.Enabled = false;
+						_overlays[tiles.Key] = (layerOfTiles, source);
+					}
+					if (_overlays.TryGetValue(tiles.Key, out o))
+					{
+						o.Layer.Opacity = tiles.Display?.ClampedOpacity ?? 1;
+					}
+					break;
 			}
 		}
+		foreach (string gone in _built.Keys.Where(k => !keys.Contains(k)).ToList())
+		{
+			_built[gone].Dispose();
+			_built.Remove(gone);
+		}
+		foreach (string gone in _overlays.Keys.Where(k => !keys.Contains(k)).ToList())
+		{
+			_overlays[gone].Layer.Dispose();
+			_overlays[gone].Source.Dispose();
+			_overlays.Remove(gone);
+		}
+		Arrange();
 	}
 
-	private void DrawMarkers(DrawingContext context)
+	/// <summary>Puts the engine's layers in order: basemap, the page's layers, selection highlights, labels, structures.</summary>
+	private void Arrange()
 	{
-		IBrush halo = this.TryFindResource("CardBg", ActualThemeVariant, out object r) && r is IBrush b ? b : Brushes.White;
-		Pen outline = new Pen(halo, 1.8);
-		Rect view = new Rect(Bounds.Size).Inflate(DotRadius * 2);
-		foreach (MapMarker m in _markers)
+		if (_control == null)
 		{
-			Point p = ToScreen(m.Latitude, m.Longitude);
-			if (!view.Contains(p))
+			return;
+		}
+		List<ILayer> order = new List<ILayer>();
+		if (_basemapLayer != null)
+		{
+			order.Add(_basemapLayer);
+		}
+		foreach (object layer in _layers)
+		{
+			if (layer is MapFeatureLayer spec && _built.TryGetValue(spec.Key, out BuiltFeatureLayer built))
+			{
+				order.Add(built.Layer);
+				order.Add(built.Edits);
+			}
+			else if (layer is MapTileLayer tiles && _overlays.TryGetValue(tiles.Key, out (TileLayer Layer, SdeTileSource Source) o))
+			{
+				order.Add(o.Layer);
+			}
+		}
+		foreach (object layer in _layers)
+		{
+			if (layer is MapFeatureLayer spec && _built.TryGetValue(spec.Key, out BuiltFeatureLayer built))
+			{
+				order.Add(built.Selection);
+			}
+		}
+		foreach (object layer in _layers)
+		{
+			if (layer is MapFeatureLayer spec && _built.TryGetValue(spec.Key, out BuiltFeatureLayer built) && built.Labels != null)
+			{
+				order.Add(built.Labels);
+			}
+		}
+		order.Add(_structures);
+		order.Add(_rings);
+		if (_structureLabels != null)
+		{
+			order.Add(_structureLabels);
+		}
+		order.Add(Handles);
+		LayerCollection layers = _control.Map.Layers;
+		if (!layers.SequenceEqual(order))
+		{
+			layers.ClearAllGroups();
+			layers.Add(order.ToArray());
+		}
+		UpdateScaleVisibility();
+		Refresh();
+	}
+
+	/// <summary>Turns each layer and its labels on or off for the current scale, and by their Visible setting.</summary>
+	private void UpdateScaleVisibility()
+	{
+		if (_control == null)
+		{
+			return;
+		}
+		double scale = Scale;
+		foreach (object layer in _layers)
+		{
+			if (layer is MapFeatureLayer spec && _built.TryGetValue(spec.Key, out BuiltFeatureLayer built))
+			{
+				bool on = spec.Visible && (spec.Display?.IsVisibleAt(scale) ?? true);
+				built.Layer.Enabled = on;
+				built.Selection.Enabled = on;
+				built.Edits.Enabled = on;
+				if (built.Labels != null)
+				{
+					built.Labels.Enabled = on && spec.Labels.IsVisibleAt(scale);
+				}
+			}
+			else if (layer is MapTileLayer tiles && _overlays.TryGetValue(tiles.Key, out (TileLayer Layer, SdeTileSource Source) o))
+			{
+				o.Layer.Enabled = tiles.Visible && (tiles.Display?.IsVisibleAt(scale) ?? true);
+			}
+		}
+		if (_structureLabels != null)
+		{
+			_structureLabels.Enabled = _markerLabels?.IsVisibleAt(scale) ?? false;
+		}
+	}
+
+	private void ShowBasemap()
+	{
+		if (_control == null)
+		{
+			return;
+		}
+		if (_basemapLayer != null && _basemapSource?.Basemap == _basemap && _tiles != null)
+		{
+			return;
+		}
+		_basemapLayer?.Dispose();
+		_basemapSource?.Dispose();
+		_basemapLayer = null;
+		_basemapSource = null;
+		if (_tiles != null && _basemap.HasTiles)
+		{
+			_basemapSource = new SdeTileSource(_basemap, _tiles, PixelDensity > 1.5 ? 2 : 1);
+			// The tiles of the zoom level shown and of one level up (shown while the sharp ones load), no more.
+			_basemapLayer = new TileLayer(_basemapSource, 100, 200, new DataFetchStrategy(1)) { Name = _basemap.Name };
+			_basemapLayer.Attribution.Enabled = false;
+		}
+		Arrange();
+		_control.Map.RefreshData();
+	}
+
+	/// <summary>Throws away the tiles that couldn't be had and asks for them again.</summary>
+	public void RetryTiles()
+	{
+		_basemapLayer?.ClearCache();
+		foreach ((TileLayer layer, SdeTileSource _) in _overlays.Values)
+		{
+			layer.ClearCache();
+		}
+		_control?.Map.RefreshData();
+		Refresh();
+	}
+
+	private void ShowMarkers()
+	{
+		if (_control == null)
+		{
+			return;
+		}
+		STRtree<int> index = new STRtree<int>();
+		(double X, double Y)[] metres = new (double, double)[_markers.Count];
+		for (int i = 0; i < _markers.Count; i++)
+		{
+			(double x, double y) = WebMercator.ToMetres(_markers[i].Longitude, _markers[i].Latitude);
+			metres[i] = (x, y);
+			index.Insert(new Envelope(x, x, y, y), i);
+		}
+		List<IFeature> features = StructureDots.Dots(_markers, _theme);
+		List<IFeature> labels = StructureDots.LabelPoints(_markers);
+		index.Build();
+		_markerIndex = index;
+		_markerMetres = metres;
+		_structures ??= new MemoryLayer("Structures") { Style = null };
+		_structures.Attribution.Enabled = false;
+		_structures.Features = features;
+		_structures.DataHasChanged();
+		_structureLabels?.Dispose();
+		_structureLabels = _markerLabels == null ? null : StructureDots.LabelLayer(labels, _markerLabels, _theme);
+		ShowRings();
+		Arrange();
+	}
+
+	private void ShowRings()
+	{
+		if (_control == null)
+		{
+			return;
+		}
+		SymbolStyle selectedRing = new SymbolStyle
+		{
+			SymbolType = SymbolType.Ellipse,
+			SymbolScale = (DotDiameter + 7) / SymbolStyle.DefaultWidth,
+			Fill = null,
+			Outline = new Pen(_theme.Accent, 2.5),
+		};
+		SymbolStyle highlightRing = new SymbolStyle
+		{
+			SymbolType = SymbolType.Ellipse,
+			SymbolScale = (DotDiameter + 12) / SymbolStyle.DefaultWidth,
+			Fill = null,
+			Outline = new Pen(_theme.Accent, 3),
+		};
+		HashSet<Guid> selected = _selectedMarkers as HashSet<Guid> ?? new HashSet<Guid>(_selectedMarkers);
+		List<IFeature> rings = new List<IFeature>();
+		for (int i = 0; i < _markers.Count; i++)
+		{
+			bool isSelected = selected.Contains(_markers[i].Id);
+			bool isHighlighted = _highlighted == _markers[i].Id;
+			if (!isSelected && !isHighlighted)
 			{
 				continue;
 			}
-			context.DrawEllipse(m.Fill ?? Brushes.Gray, outline, p, DotRadius, DotRadius);
+			PointFeature f = new PointFeature(_markerMetres[i].X, _markerMetres[i].Y);
+			f.Styles.Add(isHighlighted ? highlightRing : selectedRing);
+			rings.Add(f);
 		}
-		if (_highlighted == null)
+		_rings ??= new MemoryLayer("Selected structures") { Style = null };
+		_rings.Attribution.Enabled = false;
+		_rings.Features = rings;
+		_rings.DataHasChanged();
+		Refresh();
+	}
+
+	// ───────────── Theme ─────────────
+
+	private void ApplyTheme()
+	{
+		_theme = new MapTheme
+		{
+			Background = ToEngine(Background ?? Resource("SubtleBg"), new MColor(242, 244, 246)),
+			DotOutline = ToEngine(Resource("CardBg"), MColor.White),
+			Accent = ToEngine(Resource("Accent"), new MColor(30, 90, 168)),
+			Text = ToEngine(Resource("TextPrimary"), new MColor(22, 25, 29)),
+			Halo = ToEngine(Resource("CardBg"), MColor.White),
+		};
+		IBrush accent = Resource("Accent") ?? Brushes.DodgerBlue;
+		Avalonia.Media.Color a = accent is ISolidColorBrush s ? s.Color : Colors.DodgerBlue;
+		_box.Stroke = accent;
+		_box.Fill = new SolidColorBrush(Avalonia.Media.Color.FromArgb(50, a.R, a.G, a.B));
+		_sketchLine.Stroke = accent;
+		_sketchArea.Stroke = accent;
+		_sketchArea.Fill = new SolidColorBrush(Avalonia.Media.Color.FromArgb(45, a.R, a.G, a.B));
+		if (_control == null)
 		{
 			return;
 		}
-		IBrush ring = this.TryFindResource("Accent", ActualThemeVariant, out object a) && a is IBrush ab ? ab : Brushes.DodgerBlue;
-		foreach (MapMarker m in _markers)
+		_control.Map.BackColor = _theme.Background;
+		// Every style that came from the theme is made again in the new colours.
+		foreach (BuiltFeatureLayer built in _built.Values)
 		{
-			if (m.Id == _highlighted)
-			{
-				context.DrawEllipse(null, new Pen(ring, 3), ToScreen(m.Latitude, m.Longitude), DotRadius + 6, DotRadius + 6);
-			}
+			built.ShowSelection(built.Spec, _theme);
+		}
+		ShowMarkers();
+		ShowHandles();
+	}
+
+	private IBrush Resource(string key) =>
+		this.TryFindResource(key, ActualThemeVariant, out object r) && r is IBrush b ? b : null;
+
+	internal static MColor ToEngine(IBrush brush, MColor fallback) =>
+		brush is ISolidColorBrush s ? new MColor(s.Color.R, s.Color.G, s.Color.B, (int)Math.Round(s.Color.A * s.Opacity)) : fallback;
+
+	protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+	{
+		base.OnPropertyChanged(change);
+		if (change.Property == Panel.BackgroundProperty)
+		{
+			ApplyTheme();
 		}
 	}
 
-	// ───────────── Mouse and keyboard ─────────────
+	// ───────────── The engine's control ─────────────
 
-	protected override void OnPointerPressed(PointerPressedEventArgs e)
+	/// <summary>Makes the engine's control (again, if the page closed and came back).</summary>
+	private void CreateControl()
 	{
-		base.OnPointerPressed(e);
+		_control = new MapControl { Focusable = false, UseFling = false };
+		AutomationProperties.SetAccessibilityView(_control, AccessibilityView.Raw);
+		Map map = _control.Map;
+		map.CRS = "EPSG:3857";
+		// No debug overlays (the engine's logging and performance widgets), no per-layer attribution widgets.
+		map.Widgets.Clear();
+		map.Navigator.RotationLock = true;
+		map.Navigator.OverrideZoomBounds = new MMinMax(WebMercator.Resolution(MaxZoom), WebMercator.Resolution(MinZoom));
+		map.Navigator.OverridePanBounds = new MRect(-WebMercator.HalfWorld, -WebMercator.HalfWorld, WebMercator.HalfWorld, WebMercator.HalfWorld);
+		map.Navigator.MouseWheelAnimation.UseContinuousMouseWheelZoom = true;
+		map.Navigator.MouseWheelAnimation.ContinuousMouseWheelZoomStepSize = 0.35;
+		map.Navigator.ViewportChanged += OnViewportChanged;
+		map.Navigator.CenterOnAndZoomTo(new MPoint(_parked.CenterX, _parked.CenterY), _parked.Resolution, 0);
+		Children.Insert(0, _control);
+		if (!Children.Contains(_overlay))
+		{
+			Children.Add(_overlay);
+		}
+		_disposed = false;
+		_basemapLayer = null;
+		_basemapSource = null;
+		_structures = null;
+		_rings = null;
+		_structureLabels = null;
+		_handles = null;
+		ApplyTheme();
+		ShowBasemap();
+		ShowLayers(_layers);
+	}
+
+	private void OnViewportChanged(object sender, EventArgs e)
+	{
+		if (!_ui.CheckAccess())
+		{
+			// The dispatcher this control was made on: a pool thread must not ask for "the" UI dispatcher (see UnhookRedrawLoop).
+			_ui.Post(() => OnViewportChanged(sender, e));
+			return;
+		}
+		UpdateScaleVisibility();
+		DrawSketch();
+		ViewChanged?.Invoke();
+	}
+
+	/// <summary>Redraws now (the engine also redraws by itself when tiles arrive).</summary>
+	private void Refresh()
+	{
+		_control?.RefreshGraphics();
+		_control?.InvalidateVisual();
+	}
+
+	/// <summary>Fetches what the current view needs (tiles, rasterized layers) and waits for it, for tests and printing.</summary>
+	public async Task LoadAsync()
+	{
+		if (_control != null)
+		{
+			await _control.Map.RefreshDataAsync();
+			Refresh();
+		}
+	}
+
+	/// <summary>The engine's own tile counts, for tests: the basemap source (null without one).</summary>
+	internal SdeTileSource BasemapSource => _basemapSource;
+
+	/// <summary>An overlay's tile source by layer key (for tests).</summary>
+	internal SdeTileSource OverlaySource(string key) => _overlays.TryGetValue(key, out (TileLayer Layer, SdeTileSource Source) o) ? o.Source : null;
+
+	/// <summary>True when a feature layer is drawn as raster tiles (for tests).</summary>
+	internal bool IsRasterized(string key) => _built.TryGetValue(key, out BuiltFeatureLayer b) && b.IsRasterized;
+
+	/// <summary>The engine's map, for the performance test.</summary>
+	internal Map EngineMap => _control?.Map;
+
+	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+	{
+		base.OnAttachedToVisualTree(e);
+		if (_disposed)
+		{
+			CreateControl();
+		}
+		ApplyTheme();
+	}
+
+	/// <summary>Stops the engine (its redraw loop, tile downloads and layers). The page calls this when it closes.</summary>
+	public void Dispose()
+	{
+		if (_disposed)
+		{
+			return;
+		}
+		_disposed = true;
+		if (_control != null)
+		{
+			_parked = _control.Map.Navigator.Viewport;
+			_control.Map.Navigator.ViewportChanged -= OnViewportChanged;
+			Children.Remove(_control);
+			RedrawLoopUnhooked = UnhookRedrawLoop(_control);
+			_control.Dispose();
+			_control = null;
+		}
+		foreach (BuiltFeatureLayer built in _built.Values)
+		{
+			built.Dispose();
+		}
+		_built.Clear();
+		foreach ((TileLayer layer, SdeTileSource source) in _overlays.Values)
+		{
+			layer.Dispose();
+			source.Dispose();
+		}
+		_overlays.Clear();
+		_basemapSource?.Dispose();
+		_basemapLayer?.Dispose();
+		_basemapLayer = null;
+		_basemapSource = null;
+	}
+
+	/// <summary>True once <see cref="Dispose"/> has run (and until the page shows the map again).</summary>
+	public bool IsDisposed => _disposed;
+
+	/// <summary>True when the last <see cref="Dispose"/> could unhook the engine's redraw loop (see <see cref="UnhookRedrawLoop"/>).</summary>
+	internal bool RedrawLoopUnhooked { get; private set; }
+
+	/// <summary>
+	/// Mapsui 5.1's redraw loop (its RenderController) asks the control for one more redraw after the control is
+	/// disposed, from a pool thread, and that reaches for Avalonia's UI dispatcher after the page has gone. In the app
+	/// this is harmless. In the headless tests it can land after a test has ended and claim the next test's dispatcher
+	/// for the wrong thread. So the loop's redraw callback is unhooked before the control is disposed. Returns false if a
+	/// later Mapsui renames the fields; MapEngineTests then fails, so an upgrade can't drop this quietly.
+	/// </summary>
+	internal static bool UnhookRedrawLoop(MapControl control)
+	{
+		FieldInfo controllerField = typeof(MapControl).GetField("_renderController", BindingFlags.Instance | BindingFlags.NonPublic);
+		object controller = controllerField?.GetValue(control);
+		FieldInfo callback = controller?.GetType().GetField("_invalidateCanvas", BindingFlags.Instance | BindingFlags.NonPublic);
+		if (callback == null || callback.FieldType != typeof(Action))
+		{
+			return false;
+		}
+		callback.SetValue(controller, null);
+		return true;
+	}
+
+	// ───────────── Mouse ─────────────
+
+	private void OnPressed(object sender, PointerPressedEventArgs e)
+	{
 		Focus();
 		PointerPoint point = e.GetCurrentPoint(this);
 		if (!point.Properties.IsLeftButtonPressed)
@@ -335,118 +891,266 @@ public sealed class MapCanvas : Control
 			return;
 		}
 		_pressedAt = point.Position;
-		_lastPoint = point.Position;
 		_moved = false;
-		_boxing = Drag == MapDrag.Box || e.KeyModifiers.HasFlag(KeyModifiers.Meta);
-		e.Pointer.Capture(this);
-		e.Handled = true;
+		if (BeginEditDrag(point.Position, e.KeyModifiers))
+		{
+			// A corner, a shape or a structure's dot is being dragged: the engine never sees it, so the map stays put.
+			_pressedAt = null;
+			e.Pointer.Capture(this);
+			e.Handled = true;
+			return;
+		}
+		if (_sketchKind != MapSketch.None && e.ClickCount >= 2)
+		{
+			// A double click finishes the line or polygon (its first click already added the last corner).
+			_pressedAt = null;
+			FinishSketch();
+			e.Handled = true;
+			return;
+		}
+		_boxing = _sketchKind == MapSketch.None && (Drag == MapDrag.Box || e.KeyModifiers.HasFlag(KeyModifiers.Meta));
+		if (_boxing)
+		{
+			// The engine never sees a box drag, so the map doesn't move under it.
+			e.Pointer.Capture(this);
+			e.Handled = true;
+		}
 	}
 
-	protected override void OnPointerMoved(PointerEventArgs e)
+	private void OnMoved(object sender, PointerEventArgs e)
 	{
-		base.OnPointerMoved(e);
+		if (_drag != null)
+		{
+			UpdateEditDrag(e.GetPosition(this));
+			e.Handled = true;
+			return;
+		}
 		if (_pressedAt is not Point start)
 		{
 			return;
 		}
 		Point now = e.GetPosition(this);
-		if (!_moved && (now - start).X * (now - start).X + (now - start).Y * (now - start).Y < 25)
+		if (!_moved && Math.Abs(now.X - start.X) < DragThreshold && Math.Abs(now.Y - start.Y) < DragThreshold)
 		{
+			if (_boxing)
+			{
+				e.Handled = true;
+			}
 			return;
 		}
 		_moved = true;
-		if (_boxing)
+		if (!_boxing)
 		{
-			_box = new Rect(Math.Min(start.X, now.X), Math.Min(start.Y, now.Y), Math.Abs(now.X - start.X), Math.Abs(now.Y - start.Y));
+			return;
 		}
-		else
-		{
-			double scale = WebMercator.WorldPixels(_zoom);
-			_centerU -= (now.X - _lastPoint.X) / scale;
-			_centerV -= (now.Y - _lastPoint.Y) / scale;
-			ClampCenter();
-		}
-		_lastPoint = now;
-		InvalidateVisual();
+		Rect r = new Rect(Math.Min(start.X, now.X), Math.Min(start.Y, now.Y), Math.Abs(now.X - start.X), Math.Abs(now.Y - start.Y));
+		Canvas.SetLeft(_box, r.X);
+		Canvas.SetTop(_box, r.Y);
+		_box.Width = r.Width;
+		_box.Height = r.Height;
+		_box.IsVisible = true;
+		e.Handled = true;
 	}
 
-	protected override void OnPointerReleased(PointerReleasedEventArgs e)
+	private void OnReleased(object sender, PointerReleasedEventArgs e)
 	{
-		base.OnPointerReleased(e);
+		if (_drag != null)
+		{
+			e.Pointer.Capture(null);
+			e.Handled = true;
+			EndEditDrag(e.GetPosition(this));
+			return;
+		}
 		if (_pressedAt is not Point start)
 		{
 			return;
 		}
 		_pressedAt = null;
-		e.Pointer.Capture(null);
-		bool wasBoxing = _boxing;
-		Rect box = _box;
-		_boxing = false;
-		InvalidateVisual();
-		if (_moved && wasBoxing)
+		bool add = e.KeyModifiers.HasFlag(KeyModifiers.Meta);
+		Point end = e.GetPosition(this);
+		if (_boxing)
 		{
-			AreaSelected?.Invoke(MarkersIn(box), e.KeyModifiers.HasFlag(KeyModifiers.Meta));
+			_boxing = false;
+			_box.IsVisible = false;
+			e.Pointer.Capture(null);
+			e.Handled = true;
+			if (_moved)
+			{
+				SelectBox(new Rect(Math.Min(start.X, end.X), Math.Min(start.Y, end.Y), Math.Abs(end.X - start.X), Math.Abs(end.Y - start.Y)), add);
+				return;
+			}
 		}
-		else if (!_moved)
+		if (!_moved)
 		{
-			Click(start);
+			// Our own click: immediate (no waiting for a double click) and with a generous reach around dots.
+			Click(start, add);
 		}
 	}
 
-	/// <summary>A click at a point of the control: opens the dot there, or reports the empty spot.</summary>
-	public void Click(Point at)
+	/// <summary>The structures, or the features of <see cref="SelectLayer"/>, inside a box of the control.</summary>
+	public void SelectBox(Rect area, bool add)
 	{
-		if (MarkerAt(at) is Guid id)
+		if (SelectLayer == null)
 		{
-			MarkerClicked?.Invoke(id);
+			AreaSelected?.Invoke(MarkersIn(area), add);
+		}
+		else
+		{
+			FeaturesSelected?.Invoke(SelectLayer, FeaturesIn(SelectLayer, area), add);
+		}
+	}
+
+	/// <summary>
+	/// A click at a point of the control: adds a corner to the shape being drawn; otherwise opens (or selects) the dot
+	/// there, or a layer's feature, or reports the empty spot.
+	/// </summary>
+	public void Click(Point at, bool add = false)
+	{
+		if (_editLayer != null && _sketchKind == MapSketch.None)
+		{
+			EditClick(at);
 			return;
 		}
-		(double lat, double lon) = ToLatLon(at);
-		MapClicked?.Invoke(lat, lon);
+		if (_sketchKind != MapSketch.None)
+		{
+			if (_sketchFinished)
+			{
+				// The last shape was finished: this click starts a new one.
+				_sketch.Clear();
+				_sketchFinished = false;
+			}
+			// While editing, corners snap to nearby corners and edges.
+			(double lat, double lon) = _editLayer != null ? SnappedLatLon(at) : ToLatLon(at);
+			_sketch.Add(new LatLon(lat, lon));
+			DrawSketch();
+			SketchChanged?.Invoke(_sketch.ToList(), false);
+			return;
+		}
+		if (Drag == MapDrag.Box && SelectLayer != null && FeatureAt(at, SelectLayer) is (string target, Feature picked))
+		{
+			// Selecting in a layer: its features come before the dots over them.
+			FeatureClicked?.Invoke(target, picked, add);
+			return;
+		}
+		if (MarkerAt(at) is Guid id)
+		{
+			MarkerClicked?.Invoke(id, add);
+			return;
+		}
+		if (FeatureAt(at) is (string layer, Feature feature))
+		{
+			FeatureClicked?.Invoke(layer, feature, add);
+			return;
+		}
+		(double latitude, double longitude) = ToLatLon(at);
+		MapClicked?.Invoke(latitude, longitude);
 	}
 
-	protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+	// ───────────── Drawing a line or polygon ─────────────
+
+	/// <summary>Finishes the shape being drawn (Return or a double click).</summary>
+	public void FinishSketch()
 	{
-		base.OnPointerWheelChanged(e);
-		ZoomAround(e.GetPosition(this), Math.Clamp(e.Delta.Y, -3, 3) * 0.35);
-		e.Handled = true;
+		if (_sketchKind == MapSketch.None || _sketch.Count == 0)
+		{
+			return;
+		}
+		List<LatLon> points = _sketch.ToList();
+		_sketchFinished = true;
+		SketchChanged?.Invoke(points, true);
 	}
+
+	/// <summary>Forgets the shape being drawn.</summary>
+	public void ClearSketch()
+	{
+		_sketch.Clear();
+		_sketchFinished = false;
+		DrawSketch();
+	}
+
+	/// <summary>Removes the last corner (Delete).</summary>
+	public void UndoSketchPoint()
+	{
+		if (_sketch.Count == 0)
+		{
+			return;
+		}
+		_sketch.RemoveAt(_sketch.Count - 1);
+		_sketchFinished = false;
+		DrawSketch();
+		SketchChanged?.Invoke(_sketch.ToList(), false);
+	}
+
+	private void DrawSketch()
+	{
+		Points points = new Points(_sketch.Select(p => ToScreen(p.Latitude, p.Longitude)));
+		bool area = _sketchKind == MapSketch.Polygon && _sketch.Count >= 3;
+		_sketchArea.Points = area ? points : new Points();
+		_sketchArea.IsVisible = area;
+		_sketchLine.Points = points;
+		_sketchLine.IsVisible = !area && _sketch.Count >= 2;
+	}
+
+	// ───────────── Keyboard ─────────────
 
 	protected override void OnKeyDown(KeyEventArgs e)
 	{
 		base.OnKeyDown(e);
-		double step = 80.0 / WebMercator.WorldPixels(_zoom);
+		if (_control == null)
+		{
+			return;
+		}
+		if (EditKey(e.Key))
+		{
+			e.Handled = true;
+			return;
+		}
+		Viewport v = Viewport;
+		double step = KeyPanPixels * v.Resolution;
 		switch (e.Key)
 		{
 			case Key.Left:
-				_centerU -= step;
+				Pan(-step, 0);
 				break;
 			case Key.Right:
-				_centerU += step;
+				Pan(step, 0);
 				break;
 			case Key.Up:
-				_centerV -= step;
+				Pan(0, step);
 				break;
 			case Key.Down:
-				_centerV += step;
+				Pan(0, -step);
 				break;
 			case Key.OemPlus or Key.Add:
 				ZoomBy(1);
-				e.Handled = true;
-				return;
+				break;
 			case Key.OemMinus or Key.Subtract:
 				ZoomBy(-1);
-				e.Handled = true;
-				return;
+				break;
 			case Key.D0 or Key.NumPad0:
 				FitToMarkers();
-				e.Handled = true;
-				return;
+				break;
+			case Key.Enter when _sketchKind != MapSketch.None:
+				FinishSketch();
+				break;
+			case Key.Back or Key.Delete when _sketchKind != MapSketch.None:
+				UndoSketchPoint();
+				break;
+			case Key.Escape when _sketch.Count > 0 || _boxing:
+				_boxing = false;
+				_box.IsVisible = false;
+				ClearSketch();
+				SketchChanged?.Invoke(Array.Empty<LatLon>(), false);
+				break;
 			default:
 				return;
 		}
-		ClampCenter();
-		InvalidateVisual();
 		e.Handled = true;
+	}
+
+	private void Pan(double dx, double dy)
+	{
+		Viewport v = Viewport;
+		Navigate(v.CenterX + dx, v.CenterY + dy, v.Resolution);
 	}
 }

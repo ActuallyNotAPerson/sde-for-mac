@@ -43,6 +43,9 @@ public sealed class EventSummary
 	/// <summary>The event name the caller gave, or null.</summary>
 	public string EventName { get; init; }
 
+	/// <summary>The event's recorded details (kind, disaster number, dates) when the summary is of an event, or null.</summary>
+	public EventDetails Event { get; init; }
+
 	public decimal SubstantialPercent { get; init; }
 	public decimal ClosePercent { get; init; }
 
@@ -93,13 +96,16 @@ public sealed class EventSummary
 	/// <paramref name="assessments"/> count as not yet assessed. Null when unknown.</param>
 	/// <param name="eventName">A name for the event, kept as given.</param>
 	/// <param name="reference">Used to add the street suffix ("River Street"); streets are grouped by name alone without it.</param>
+	/// <param name="details">The event's recorded details, when the summary is of one event; its name is used when
+	/// <paramref name="eventName"/> is null.</param>
 	public static EventSummary Build(
 		IEnumerable<AssessmentFile> assessments,
 		IEnumerable<PropertyRecord> allProperties = null,
 		string eventName = null,
 		ReferenceData reference = null,
 		decimal substantialPercent = Determinations.DefaultSubstantialPercent,
-		decimal closePercent = Determinations.DefaultClosePercent)
+		decimal closePercent = Determinations.DefaultClosePercent,
+		EventDetails details = null)
 	{
 		List<AssessmentFile> files = (assessments ?? Enumerable.Empty<AssessmentFile>()).Where(f => f?.Assessment != null).ToList();
 		Dictionary<DeterminationClass, int> counts = Enum.GetValues<DeterminationClass>().ToDictionary(c => c, c => 0);
@@ -137,7 +143,8 @@ public sealed class EventSummary
 
 		return new EventSummary
 		{
-			EventName = eventName,
+			EventName = eventName ?? details?.Name,
+			Event = details,
 			SubstantialPercent = substantialPercent,
 			ClosePercent = closePercent,
 			AssessmentCount = files.Count,

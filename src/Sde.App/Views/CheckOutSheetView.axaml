@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.CheckOutSheetView"
+             x:DataType="sh:CheckOutSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="A file to take to a Mac in the field. Open it there with SDE (the database button, then Open a work package), work without a connection, then send it back. Until it is checked in here, these assessments are read-only." />
+    <TextBlock Classes="medium" Text="{Binding Summary}" TextWrapping="Wrap" />
+    <StackPanel Classes="field">
+      <TextBlock Classes="fieldLabel" Text="Checked out to" />
+      <TextBox Text="{Binding CheckedOutTo}" PlaceholderText="Team North, or a person" AutomationProperties.Name="Who the work package is checked out to" />
+    </StackPanel>
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Save work package…" IsDefault="True" Command="{Binding CreateCommand}" IsEnabled="{Binding CanCheckOut}" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

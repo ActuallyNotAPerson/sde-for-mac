@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.WebMapSheetView"
+             x:DataType="sh:WebMapSheetViewModel">
+  <StackPanel Spacing="14">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="Makes a folder with a web page of these structures on a map. Open it in any browser, or put the folder on a web server. It works offline except for the background map." />
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Title" />
+      <TextBox Text="{Binding MapTitle}" AutomationProperties.Name="Title of the web map" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Who it is for" />
+      <RadioButton GroupName="WebMapPrivacy" IsChecked="{Binding IsInternal}" AutomationProperties.Name="For the office and partners: a dot for each structure with its address">
+        <TextBlock TextWrapping="Wrap" Text="The office and partners: a dot for each structure, with its address and result." />
+      </RadioButton>
+      <RadioButton GroupName="WebMapPrivacy" IsChecked="{Binding IsPublic}" AutomationProperties.Name="For the public: counts in grid squares, no owners or exact locations">
+        <TextBlock TextWrapping="Wrap" Text="The public: counts in grid squares. No owners, no exact locations." />
+      </RadioButton>
+    </StackPanel>
+
+    <!-- Internal: popup fields -->
+    <StackPanel Spacing="6" IsVisible="{Binding IsInternal}">
+      <TextBlock Classes="fieldLabel" Text="Also show in each structure's popup" />
+      <ItemsControl ItemsSource="{Binding PopupFields}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate><WrapPanel ItemSpacing="16" LineSpacing="4" /></ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sh:PopupFieldOption">
+            <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Classes="muted" TextWrapping="Wrap" Text="The address, the result and the percent damaged are always shown." />
+    </StackPanel>
+
+    <!-- Public: addresses and grid -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16" IsVisible="{Binding IsPublic}">
+      <StackPanel Spacing="4">
+        <TextBlock Classes="fieldLabel" Text="Addresses" />
+        <RadioButton GroupName="WebMapAddresses" IsChecked="{Binding ShowBlocks}" Content="Cut to the block (100 block of River St)" />
+        <RadioButton GroupName="WebMapAddresses" IsChecked="{Binding !ShowBlocks}" Content="Hidden" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="4">
+        <TextBlock Classes="fieldLabel" Text="Grid squares" />
+        <ListBox Classes="segmented" ItemsSource="{x:Static sh:WebMapSheetViewModel.CellSizeNames}" SelectedIndex="{Binding CellSizeIndex}"
+                 AutomationProperties.Name="Size of the grid squares" />
+      </StackPanel>
+    </Grid>
+
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Background map" />
+      <ListBox Classes="segmented" SelectedIndex="{Binding BasemapIndex}" AutomationProperties.Name="Background map" HorizontalAlignment="Left">
+        <ListBoxItem Content="USGS topographic" />
+        <ListBoxItem Content="OpenStreetMap" />
+        <ListBoxItem Content="None" />
+      </ListBox>
+      <TextBlock Classes="muted" TextWrapping="Wrap" Text="The background map needs the internet when the page is opened; with None the page needs nothing." />
+    </StackPanel>
+
+    <CheckBox Content="{Binding SummaryLabel}" IsChecked="{Binding IncludeSummary}" />
+
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding !IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Make web map…" Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

@@ -31,6 +31,10 @@ public sealed partial class SubmissionViewModel(AppServices app, MainViewModel m
 	[NotifyPropertyChangedFor(nameof(CanWrite), nameof(Count))]
 	public partial bool IncludeIncomplete { get; set; }
 
+	/// <summary>Also write a copy of each marked-up photo with its marks drawn on (FEMA's package keeps the originals).</summary>
+	[ObservableProperty]
+	public partial bool IncludeMarkedUpCopies { get; set; }
+
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(CanWrite), nameof(CancelText))]
 	public partial bool IsWriting { get; set; }
@@ -93,7 +97,8 @@ public sealed partial class SubmissionViewModel(AppServices app, MainViewModel m
 			return;
 		}
 		main.Editor?.Save(); // write what's on screen, not the last autosave
-		if (!await ExportWarnings.ConfirmNotFinalAsync(app, _ids.ToList()))
+		if (!await ExportWarnings.ConfirmNotFinalAsync(app, _ids.ToList())
+			|| !await ExportWarnings.ConfirmQaAsync(app, _ids.ToList(), main.Review.ShowErrorsFor))
 		{
 			return;
 		}
@@ -102,6 +107,7 @@ public sealed partial class SubmissionViewModel(AppServices app, MainViewModel m
 			PerAssessmentReport = ReportIndex == 1 ? ReportKind.Detail : ReportKind.Summary,
 			IncludePhotos = IncludePhotos,
 			IncludeIncomplete = IncludeIncomplete,
+			IncludeMarkedUpCopies = IncludeMarkedUpCopies,
 		};
 		_cancel = new CancellationTokenSource();
 		CancellationToken token = _cancel.Token;

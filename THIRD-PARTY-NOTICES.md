@@ -25,6 +25,7 @@ Versions are those resolved for the macOS app. Licenses are taken from each pack
 | Avalonia.Fonts.Inter | 12.1.3 | MIT (the Inter font inside it is SIL OFL 1.1, see below) | https://avaloniaui.net/ |
 | Avalonia.Remote.Protocol | 12.1.3 | MIT | https://avaloniaui.net/ |
 | Avalonia.FreeDesktop, Avalonia.FreeDesktop.AtSpi, Avalonia.X11, Avalonia.Win32 | 12.1.3 | MIT | https://avaloniaui.net/ |
+| Avalonia.Angle.Windows.Natives (Windows only, pulled in by Avalonia.Win32; a build of Google's ANGLE) | 2.1.27548.20260419 | BSD-3-Clause (the package's `LICENSE` file) | https://avaloniaui.net/ |
 | Avalonia.BuildServices | 11.3.2 | MIT | https://avaloniaui.net/ |
 | MicroCom.Runtime | 0.11.6 | MIT | https://github.com/kekekeks/MicroCom |
 | Tmds.DBus.Protocol | 0.94.1 | MIT | https://github.com/tmds/Tmds.DBus |
@@ -41,6 +42,8 @@ AvaloniaUI.DiagnosticsSupport (developer tools) is referenced for Debug builds o
 | HarfBuzzSharp | 8.3.1.3 | MIT | https://github.com/mono/SkiaSharp |
 | HarfBuzzSharp.NativeAssets.macOS (also .Linux, .Win32, .WebAssembly) | 8.3.1.3 | MIT | https://github.com/mono/SkiaSharp |
 | SixLabors.Fonts | 1.0.0 | Apache-2.0 | https://github.com/SixLabors/Fonts |
+| SkiaSharp.HarfBuzz (pulled in by the map engine) | 3.119.2 | MIT | https://github.com/mono/SkiaSharp |
+| Topten.RichTextKit (pulled in by the map engine) | 0.4.167 | Apache-2.0 | https://github.com/toptensoftware/richtextkit |
 
 The SkiaSharp native library is a build of Google's Skia (BSD-3-Clause) and carries its own bundled components
 (FreeType, libpng, zlib, expat and others) under their respective permissive licenses; the HarfBuzzSharp native library
@@ -66,28 +69,99 @@ and https://github.com/harfbuzz/harfbuzz/blob/main/COPYING.
 | ClosedXML.Parser | 2.0.0 | MIT | https://github.com/ClosedXML/ClosedXML.Parser |
 | ExcelNumberFormat | 1.1.0 | MIT | https://github.com/andersnm/ExcelNumberFormat |
 | ExcelDataReader | 3.9.0 | MIT | https://github.com/ExcelDataReader/ExcelDataReader |
-| DocumentFormat.OpenXml, DocumentFormat.OpenXml.Framework | 3.1.1 | MIT | https://github.com/dotnet/Open-XML-SDK |
+| DocumentFormat.OpenXml, DocumentFormat.OpenXml.Framework | 3.3.0 | MIT | https://github.com/dotnet/Open-XML-SDK |
 | PDFsharp, PDFsharp-MigraDoc | 6.2.4 | MIT | https://docs.pdfsharp.net/ |
 | RBush.Signed | 4.0.0 | MIT | https://github.com/viceroypenguin/RBush |
 | Newtonsoft.Json | 13.0.4 | MIT | https://www.newtonsoft.com/json |
-| QRCoder (the phone form's pairing QR code) | 1.6.0 | MIT | https://github.com/Shane32/QRCoder |
+| QRCoder (the phone form's pairing QR code and the field worksheets' codes) | 1.6.0 | MIT | https://github.com/Shane32/QRCoder |
 
 PDFsharp and MigraDoc are kept on 6.2.x: version 6.5 and later are licensed under the AGPL-3.0 or a commercial
 license, not MIT.
+
+### Photos
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| MetadataExtractor (reads the date and GPS position in photos) | 2.9.3 | Apache-2.0 | https://github.com/drewnoakes/metadata-extractor-dotnet |
+| XmpCore (pulled in by MetadataExtractor) | 6.1.10.1 | BSD-3-Clause | https://github.com/drewnoakes/xmp-core-dotnet |
+
+XmpCore's `.nuspec` has no license expression, only a link to Adobe's license for the XMP library it is ported from
+(https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html). Its README says the same BSD license applies; Adobe
+publishes its XMP Toolkit SDK under BSD-3-Clause (https://github.com/adobe/XMP-Toolkit-SDK).
+
+### AI assistant server (`SDE mcp`)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| ModelContextProtocol, ModelContextProtocol.Core | 2.3.0 | Apache-2.0 | https://github.com/modelcontextprotocol/csharp-sdk |
+| Microsoft.Extensions.AI.Abstractions (pulled in by ModelContextProtocol.Core) | 10.11.0 | MIT | https://github.com/dotnet/extensions |
+| Microsoft.Extensions.Hosting and the Microsoft.Extensions libraries it uses (configuration, dependency injection, logging, options) | 10.0.13 | MIT | https://github.com/dotnet/runtime |
+
+The MCP C# SDK ships no NOTICE file (none in the 2.3.0 packages or in its repository at that release). Its `LICENSE`
+says some older contributions remain under the MIT license, and its `THIRD-PARTY-NOTICES.txt` lists the MIT-licensed
+code it includes; both are in the repository linked above. In SDE.app the Microsoft.Extensions libraries are the copies
+in the ASP.NET Core shared framework (below), whose version they match.
+
+### Map engine (the Map page)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| Mapsui | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Avalonia12 | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Nts | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Rendering.Skia | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Tiling | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| BruTile (map tiles for Mapsui) | 6.0.0 | Apache-2.0 | https://github.com/BruTile/BruTile |
+
+Mapsui depends on Svg.Skia (and through it Svg.Custom, Svg.Model, ShimSkiaSharp and ExCSS) for SVG map symbols. SDE
+never draws SVG symbols and leaves those packages out of SDE.app (Svg.Custom is MS-PL), so they are not shipped and not
+listed here. BruTile's `.nuspec` names its license file rather than an expression; the file is the Apache License 2.0.
+
+### Maps and GIS (Sde.Gis)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| NetTopologySuite (geometry and spatial operations) | 2.6.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite |
+| NetTopologySuite.Features (pulled in by the two readers below) | 2.2.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.Features |
+| NetTopologySuite.IO.Esri.Shapefile (reads and writes Shapefiles) | 1.2.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.IO.Esri |
+| NetTopologySuite.IO.GeoJSON4STJ (reads and writes GeoJSON) | 4.0.0 | BSD-3-Clause | https://github.com/NetTopologySuite/NetTopologySuite.IO.GeoJSON |
+| BitMiracle.LibTiff.NET (reads GeoTIFF grids) | 2.4.660 | BSD-3-Clause ("New BSD") | https://bitmiracle.com/libtiff/ |
+
+NetTopologySuite.IO.Esri.Shapefile is used rather than NetTopologySuite.IO.ShapeFile, which is LGPL. BitMiracle.LibTiff.NET's
+`.nuspec` has no license expression, only a link to its license (https://bitmiracle.github.io/libtiff.net/help/articles/license.html),
+which is the three-clause BSD license; LibTiff.NET is based in part on LibTIFF (Copyright (c) 1988-1997 Sam Leffler, Copyright
+(c) 1991-1997 Silicon Graphics, Inc.) and on the Independent JPEG Group's software, under their own permissive licenses.
+
+SDE converts coordinates with its own code (EPSG Guidance Note 7-2's formulas), not a projection library. The parameters of
+the State Plane, UTM and Albers coordinate systems it knows by EPSG code (`src/Sde.Gis/Projections/EpsgUs.csv`) are taken
+from the EPSG Geodetic Parameter Dataset, version v12.029 (2025-10-02), as copied into PROJ's proj.db. The EPSG Dataset is
+owned by the International Association of Oil and Gas Producers (IOGP) and is used, copied and distributed here under the
+EPSG Dataset Terms of Use (https://epsg.org/terms-of-use.html), which apply to anyone you pass it on to. Its data is
+provided "as is", without warranty of any kind, and neither IOGP nor its members accept liability for any use of it. The
+only changes made are those the terms permit: angles are written in decimal degrees and false eastings and northings in
+metres. SDE is free; nothing is charged for the dataset.
 
 ### Microsoft libraries pulled in by the packages above
 
 | Package | Version | License | Project |
 | --- | --- | --- | --- |
-| Microsoft.Extensions.DependencyInjection.Abstractions | 8.0.2 | MIT | https://github.com/dotnet/runtime |
-| Microsoft.Extensions.Logging.Abstractions | 8.0.3 | MIT | https://github.com/dotnet/runtime |
+| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.13 | MIT | https://github.com/dotnet/runtime |
+| Microsoft.Extensions.Logging.Abstractions | 10.0.13 | MIT | https://github.com/dotnet/runtime |
 | Microsoft.IO.RecyclableMemoryStream | 3.0.1 | MIT | https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream |
 | System.IO.Packaging | 8.0.1 | MIT | https://github.com/dotnet/runtime |
-| System.Security.Cryptography.Pkcs | 8.0.1 | MIT | https://github.com/dotnet/runtime |
+| System.Security.Cryptography.Pkcs | 8.0.2 | MIT | https://github.com/dotnet/runtime |
 
 SDE is published self-contained, so the .NET runtime (MIT, https://github.com/dotnet/runtime) travels inside the app,
 together with the ASP.NET Core shared framework (MIT, https://github.com/dotnet/aspnetcore), whose Kestrel web server
 runs the phone form.
+
+## Web libraries
+
+| Library | Version | License | Project |
+| --- | --- | --- | --- |
+| Leaflet, inlined into the web maps SDE writes (Share a web map) | 1.9.4 | BSD-2-Clause; Copyright (c) 2010-2023 Volodymyr Agafonkin, Copyright (c) 2010-2011 CloudMade | https://leafletjs.com/ |
+
+Each web map folder also contains Leaflet's license as `LICENSE-Leaflet.txt`.
 
 ## Fonts
 
@@ -100,6 +174,27 @@ Public Sans is a modified version of Libre Franklin (also OFL 1.1) by the U.S. G
 full license text is in `src/Sde.Reports/Fonts/OFL.txt` and `src/Sde.Reports/Fonts/LICENSE-PublicSans.md`, and is
 reproduced at https://openfontlicense.org/open-font-license-official-text/. The fonts are used unmodified and are not
 sold on their own.
+
+## Icons
+
+| Icons | License | Source |
+| --- | --- | --- |
+| Phosphor Icons, "regular" weight (about 90 icons, from @phosphor-icons/core 2.1.1) | MIT; Copyright (c) 2023 Phosphor Icons | https://github.com/phosphor-icons/core |
+
+The icons' path data is copied, unmodified, into `src/Sde.App/Styles/Icons.axaml`. The MIT license's text:
+
+> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+> documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+> rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+> persons to whom the Software is furnished to do so, subject to the following conditions:
+>
+> The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+> Software.
+>
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+> WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+> COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+> OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## mdbtools (separate programs)
 

@@ -12,9 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.1" />
-    <PackageReference Include="ExcelDataReader" Version="3.9.0" />
-    <PackageReference Include="MetadataExtractor" Version="2.9.3" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="ExcelDataReader" />
+    <PackageReference Include="MetadataExtractor" />
+    <PackageReference Include="PDFsharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,11 @@
   <!-- The KMZ GeoFile's legend and pin icons, from FEMA's SDE (extracted/images; US-government work, public domain). -->
   <ItemGroup>
     <EmbeddedResource Include="Assets/*.png" LogicalName="Sde.Interop.Assets.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Leaflet 1.9.4 (BSD-2-Clause), inlined into exported web maps. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Assets/leaflet/*" LogicalName="Sde.Interop.Leaflet.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- Example import profiles offered on the import page ("Start from an example"). -->

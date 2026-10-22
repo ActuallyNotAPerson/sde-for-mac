@@ -14,6 +14,9 @@ namespace Sde.App.ViewModels.Sheets;
 /// <summary>Asks for a name (a saved view, a snippet).</summary>
 public sealed partial class NameSheetViewModel(string title, string label, string placeholder, string initial = null) : SheetViewModel(title)
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Small;
+
 	public string Label { get; } = label;
 
 	public string Placeholder { get; } = placeholder;
@@ -41,6 +44,9 @@ public sealed record FieldChoice(FieldInfo Field)
 /// </summary>
 public sealed partial class BulkEditSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	private readonly AppServices _app;
 	private readonly IReadOnlyList<Guid> _ids;
 	private readonly AssessmentFile _scratch;
@@ -153,6 +159,9 @@ public sealed partial class BulkEditSheetViewModel : SheetViewModel
 /// </summary>
 public sealed partial class SearchReplaceSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Large;
+
 	private readonly AppServices _app;
 
 	public SearchReplaceSheetViewModel(AppServices app)
@@ -254,6 +263,9 @@ public sealed partial class CopyStepViewModel(int step, string title, bool isChe
 /// </summary>
 public sealed partial class CopyFromSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	private readonly AppServices _app;
 	private readonly Guid _target;
 	private readonly List<StructureSummary> _all;

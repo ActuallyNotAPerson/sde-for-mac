@@ -31,6 +31,39 @@ internal static class FieldPhotos
 		return jpeg.ToArray();
 	}
 
+	/// <summary>
+	/// A made-up 960×720 photo of a house wall after a flood (sky, lap siding, a window, a door, a darker stain below the
+	/// water line at 62% down), for the markup screenshots.
+	/// </summary>
+	public static byte[] Wall()
+	{
+		using SKBitmap bitmap = new SKBitmap(960, 720);
+		using (SKCanvas canvas = new SKCanvas(bitmap))
+		{
+			canvas.Clear(new SKColor(0xB8, 0xD4, 0xE8));
+			using SKPaint siding = new SKPaint { Color = new SKColor(0xE9, 0xE2, 0xD3) };
+			using SKPaint seam = new SKPaint { Color = new SKColor(0xC9, 0xC0, 0xAE), StrokeWidth = 2 };
+			canvas.DrawRect(0, 90, 960, 630, siding);
+			for (int y = 110; y < 720; y += 26)
+			{
+				canvas.DrawLine(0, y, 960, y, seam);
+			}
+			using SKPaint trim = new SKPaint { Color = new SKColor(0xFA, 0xFA, 0xF7) };
+			using SKPaint glass = new SKPaint { Color = new SKColor(0x5D, 0x6D, 0x7E) };
+			canvas.DrawRect(110, 210, 230, 190, trim);
+			canvas.DrawRect(124, 224, 202, 162, glass);
+			using SKPaint door = new SKPaint { Color = new SKColor(0x7B, 0x4A, 0x2E) };
+			canvas.DrawRect(560, 250, 150, 470, trim);
+			canvas.DrawRect(574, 264, 122, 456, door);
+			using SKPaint stain = new SKPaint { Color = new SKColor(0x6B, 0x5A, 0x3E, 0x70) };
+			canvas.DrawRect(0, 446, 960, 274, stain);
+			using SKPaint ground = new SKPaint { Color = new SKColor(0x5E, 0x55, 0x45) };
+			canvas.DrawRect(0, 690, 960, 30, ground);
+		}
+		using SKData data = bitmap.Encode(SKEncodedImageFormat.Jpeg, 85);
+		return data.ToArray();
+	}
+
 	/// <summary>An APP1 segment (marker, length, "Exif\0\0", little-endian TIFF) with the date and GPS position.</summary>
 	private static byte[] Exif(DateTime? takenOn, double? latitude, double? longitude)
 	{

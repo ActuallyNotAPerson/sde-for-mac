@@ -26,13 +26,16 @@ public sealed class BackupRowViewModel(BackupInfo backup)
 /// <summary>File, then Restore from Backup: pick an automatic backup and put the database back to how it was then.</summary>
 public sealed partial class RestoreBackupSheetViewModel : SheetViewModel
 {
+	/// <summary>The sheet's width (see <see cref="SheetSize"/>).</summary>
+	public override SheetSize Size => SheetSize.Medium;
+
 	private readonly AppServices _app;
 
 	public RestoreBackupSheetViewModel(AppServices app)
 		: base("Restore from a backup")
 	{
 		_app = app;
-		foreach (BackupInfo b in app.Backups?.List() ?? new List<BackupInfo>())
+		foreach (BackupInfo b in app.Backups?.List(withCounts: true) ?? new List<BackupInfo>())
 		{
 			Backups.Add(new BackupRowViewModel(b));
 		}

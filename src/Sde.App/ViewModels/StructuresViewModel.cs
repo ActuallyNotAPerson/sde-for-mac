@@ -45,7 +45,9 @@ public sealed partial class StructureRowViewModel(StructureSummary s, ReferenceD
 
 	public string FirmZone => reference?.LookupName(Summary.FIRMZone) ?? "";
 
-	public string Status => Summary.AssessmentID == null ? "" : AssessmentStatuses.Label(AssessmentStatuses.Parse(Summary.Status));
+	/// <summary>"Draft", or "Draft, checked out" while the assessment is in a work package.</summary>
+	public string Status => Summary.AssessmentID == null ? ""
+		: AssessmentStatuses.Label(AssessmentStatuses.Parse(Summary.Status)) + (Summary.CheckedOut ? ", checked out" : "");
 
 	public string Updated => Summary.LastUpdate?.ToString("MMM d, yyyy") ?? "";
 
@@ -122,9 +124,11 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>Columns that can be shown or hidden, in order; true = shown by default.</summary>
 	private static readonly (string Key, string Header, bool Visible)[] OptionalColumns =
 	{
+		("Owner", "Owner", true),
 		("Community", "Community", true),
 		("Type", "Type", true),
 		("Inspected", "Inspected", true),
+		("Inspector", "Inspector", false),
 		("Status", "Status", true),
 		("Zip", "ZIP", false),
 		("Parcel", "Parcel", false),
@@ -250,9 +254,41 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	public partial int IncompleteCount { get; set; }
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(HasChecked), nameof(CheckedText))]
 	public partial int CheckedCount { get; set; }
 
+	/// <summary>True while any structure is checked (the selection bar shows).</summary>
+	public bool HasChecked => CheckedCount > 0;
+
+	/// <summary>"3 selected", for the selection bar.</summary>
+	public string CheckedText => $"{CheckedCount:N0} selected";
+
+	/// <summary>"3 structures", or "2 of 3 structures" while a search or filter hides some.</summary>
+	public string CountText => Rows.Count == _all.Count
+		? $"{_all.Count:N0} structure{(_all.Count == 1 ? "" : "s")}"
+		: $"{Rows.Count:N0} of {_all.Count:N0} structure{(_all.Count == 1 ? "" : "s")}";
+
+	/// <summary>The selection bar's Clear: unchecks every structure, shown or not.</summary>
+	[RelayCommand]
+	private void ClearChecked()
+	{
+		foreach (StructureRowViewModel r in _all)
+		{
+			r.IsChecked = false;
+		}
+	}
+
 	public bool IsEmpty => _all.Count == 0;
+
+	/// <summary>How many structures the list holds (a structure with two assessments is one).</summary>
+	public int StructureCount => _all.Select(r => r.Summary.PropertyID).Distinct().Count();
+
+	/// <summary>The empty state's title: there are no structures at all, or none in the chosen event.</summary>
+	public string EmptyTitle => _app.Scope.IsAll ? "No structures yet" : $"Nothing in {_app.Scope.Event.Name} yet";
+
+	public string EmptyText => _app.Scope.IsAll
+		? "Start a new residential or non-residential assessment, or bring in data from FEMA's SDE or another system on the Import & export page."
+		: "A new assessment started while this event is chosen joins it. To add existing ones, choose All events, tick them, then use Change, Set event.";
 
 	public bool HasRows => Rows.Count > 0;
 
@@ -261,7 +297,7 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>How many of the extra filters (Filters ▾) are in use.</summary>
 	public int ExtraFilterCount => new object[] { InspectedFrom, InspectedTo, MinPercent, MaxPercent, Blank(StreetFilter), Blank(ZipFilter), Blank(ParcelFilter), StatusFilter == 0 ? null : (object)StatusFilter }.Count(v => v != null);
 
-	public string FiltersButtonText => ExtraFilterCount == 0 ? "Filters ▾" : $"Filters ({ExtraFilterCount}) ▾";
+	public string FiltersButtonText => ExtraFilterCount == 0 ? "Filters" : $"Filters ({ExtraFilterCount})";
 
 	private static string Blank(string s) => string.IsNullOrWhiteSpace(s) ? null : s;
 
@@ -327,7 +363,9 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		}
 		HashSet<Guid> checkedIds = _all.Where(r => r.IsChecked && r.AssessmentID != null).Select(r => r.AssessmentID!.Value).ToHashSet();
 		ReferenceData reference = _app.Store.Reference;
-		_all = _app.Store.ListStructures().Select(s => new StructureRowViewModel(s, reference) { IsChecked = s.AssessmentID is Guid id && checkedIds.Contains(id) }).ToList();
+		// The event chosen in the sidebar limits the list to its assessments.
+		_all = _app.Store.ListStructures().Where(s => _app.Scope.Includes(s.AssessmentID))
+			.Select(s => new StructureRowViewModel(s, reference) { IsChecked = s.AssessmentID is Guid id && checkedIds.Contains(id) }).ToList();
 		foreach (StructureRowViewModel r in _all)
 		{
 			r.PropertyChanged += RowChanged;
@@ -345,6 +383,8 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>Another database was opened: its own remembered view and saved views.</summary>
 	public void DatabaseChanged()
 	{
+		// Ticks belong to the database they were made in (a work package holds the same assessments as the office).
+		ClearChecked();
 		RestoreState(_app.Store.GetSetting<ListViewState>(ViewSettingKey));
 		ReloadSavedViews();
 		Reload();
@@ -469,8 +509,11 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			Rows.Add(r);
 		}
 		OnPropertyChanged(nameof(IsEmpty));
+		OnPropertyChanged(nameof(EmptyTitle));
+		OnPropertyChanged(nameof(EmptyText));
 		OnPropertyChanged(nameof(HasRows));
 		OnPropertyChanged(nameof(NoMatches));
+		OnPropertyChanged(nameof(CountText));
 		OnPropertyChanged(nameof(AllChecked));
 		OnPropertyChanged(nameof(ExtraFilterCount));
 		OnPropertyChanged(nameof(FiltersButtonText));
@@ -506,6 +549,8 @@ public sealed partial class StructuresViewModel : ViewModelBase
 
 	private string Text(StructureRowViewModel r) => SortKey switch
 	{
+		"Owner" => r.Owner ?? "",
+		"Inspector" => r.Inspector ?? "",
 		"Community" => r.Place ?? "",
 		"Type" => r.Type,
 		"Result" => r.Result,
@@ -565,6 +610,20 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		StatusFilter = 0;
 		_restoring = false;
 		Changed();
+	}
+
+	/// <summary>"Nothing matches", then Show everything: clears the search, the tiles' filter, every filter and the import list.</summary>
+	[RelayCommand]
+	private void ShowEverything()
+	{
+		_restoring = true;
+		Search = null;
+		Filter = StructureFilter.All;
+		TypeFilter = 0;
+		SourceFilter = 0;
+		_restoring = false;
+		ShowOnly(null, null);
+		ClearFilters();
 	}
 
 	// ───────────── Remembered state and saved views ─────────────
@@ -739,6 +798,53 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	[RelayCommand]
 	private async Task ExportCheckedToExcel() => await _main.ImportExport.ExportExcelAsync(TargetIds());
 
+	/// <summary>Change ▾, then Assign to team: the checked structures (or every one shown) go to a team for the field.</summary>
+	[RelayCommand]
+	private async Task AssignToTeam()
+	{
+		IEnumerable<StructureRowViewModel> rows = CheckedCount > 0 ? _all.Where(r => r.IsChecked) : Rows;
+		List<Guid> structures = rows.Select(r => r.Summary.PropertyID).Distinct().ToList();
+		if (structures.Count == 0)
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new AssignTeamSheetViewModel(_app, structures)) is string done)
+		{
+			_app.Dialogs.Notify("Assigned", done);
+		}
+	}
+
+	/// <summary>Export ▾, then Work package for the field: checks the checked assessments (or the list) out to a field Mac.</summary>
+	[RelayCommand]
+	private async Task WorkPackage()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			return;
+		}
+		_main.Editor?.Save();
+		if (await _app.Sheets.ShowAsync(new CheckOutSheetViewModel(_app, ids)) is string done)
+		{
+			_app.Dialogs.Notify("Work package saved", done);
+		}
+	}
+
+	/// <summary>Export ▾, then Web map: a web map folder of the checked structures (or the list), for the office or the public.</summary>
+	[RelayCommand]
+	private async Task WebMap()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new WebMapSheetViewModel(_app, ids)) is string done)
+		{
+			_app.Dialogs.Notify("Web map made", done);
+		}
+	}
+
 	// ───────────── Changing many at once ─────────────
 
 	/// <summary>Set a field on all the checked assessments (or all shown).</summary>
@@ -752,6 +858,40 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			return;
 		}
 		await _app.Sheets.ShowAsync(new BulkEditSheetViewModel(_app, ids));
+	}
+
+	/// <summary>Change, then Set event: puts the checked assessments (or all shown) in an event, or takes them out.</summary>
+	[RelayCommand]
+	private async Task SetEvent()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to change", "Check some structures first, or clear the search.");
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new SetEventSheetViewModel(_app, ids)) is int changed)
+		{
+			_app.RaiseDataChanged();
+			_app.Dialogs.Notify("Event set", changed == 0 ? "They were already there." : $"{changed:N0} assessment{(changed == 1 ? "" : "s")} changed.");
+		}
+	}
+
+	/// <summary>Change, then Flood depth from high-water marks: for the checked assessments (or all shown).</summary>
+	[RelayCommand]
+	private async Task FloodDepth()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to change", "Check some structures first, or clear the search.");
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new DepthSheetViewModel(_app, ids)) is DepthApplyResult result)
+		{
+			_app.Dialogs.Notify("Flood depths saved", $"{result.Changed:N0} assessment{(result.Changed == 1 ? "" : "s")} changed."
+				+ (result.Refused.Count > 0 ? $" {result.Refused.Count:N0} Final, Letter sent or checked out {(result.Refused.Count == 1 ? "was" : "were")} left alone." : ""));
+		}
 	}
 
 	/// <summary>Edit, then Search and Replace.</summary>
@@ -792,6 +932,26 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			_app.Errors.Show("Couldn't delete " + row.Address, ex);
 			return;
 		}
-		_app.Dialogs.Notify("Moved to Recently deleted", $"{row.Address} can be restored from Recently deleted for {SdeStore.KeepDays} days.");
+		DeletedItemRecord deleted = _app.Store.GetDeletedItems().FirstOrDefault(d => row.AssessmentID is Guid aid && d.AssessmentID == aid && d.Value == DeletedKind.Assessment
+			|| d.PropertyID == row.Summary.PropertyID && d.Value == DeletedKind.Structure);
+		_app.Dialogs.Notify("Moved to Recently deleted", $"{row.Address} can be restored from Recently deleted for {SdeStore.KeepDays} days.",
+			"Undo", () => UndoTrash(deleted, row.Address));
+	}
+
+	/// <summary>The toast's Undo after moving a structure or assessment to Recently deleted: puts it back.</summary>
+	private void UndoTrash(DeletedItemRecord deleted, string address)
+	{
+		if (deleted == null)
+		{
+			return;
+		}
+		try
+		{
+			_app.Writes.Write(deleted.AssessmentID is Guid id ? new[] { id } : null, () => _app.Store.Restore(deleted.ItemKey));
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			_app.Errors.Show("Couldn't put back " + address, ex);
+		}
 	}
 }

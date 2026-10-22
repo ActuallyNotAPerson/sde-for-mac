@@ -1,0 +1,6 @@
+[
+  {"id":23,"event_name":"2011 Example Hurricane","event_start_date":"2011-08-26T04:00:00Z","event_end_date":"2011-09-05T04:00:00Z","event_description":"Synthetic event for tests","event_type_id":2,"event_type_name":"Hurricane","event_status_id":2,"event_status_name":"Completed","event_coordinator":501},
+  {"id":"901","event_name":"2026 Example River Flood","event_start_date":"2026-09-14T04:00:00Z","event_end_date":null,"event_description":"","event_type_id":"1","event_type_name":"River Flood","event_status_id":"1","event_status_name":"Active","event_coordinator":"502"},
+  {"id":334,"event_name":"2023 Example Summer Flood","event_start_date":"2023-07-09T04:00:00Z","event_end_date":"2023-07-20T04:00:00Z","event_description":"","event_type_id":1,"event_type_name":"River Flood","event_status_id":2,"event_status_name":"Completed","event_coordinator":503},
+  {"id":999,"event_description":"No name, so it is skipped"}
+]

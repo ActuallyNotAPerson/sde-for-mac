@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.MoveStructureSheetView"
+             x:DataType="sh:MoveStructureSheetViewModel">
+  <StackPanel Spacing="14">
+    <TextBlock Classes="medium" Text="{Binding Question}" TextWrapping="Wrap" />
+    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4">
+      <TextBlock Classes="muted" Text="From" />
+      <TextBlock Grid.Column="1" Classes="mono" Text="{Binding FromText}" />
+      <TextBlock Grid.Row="1" Classes="muted" Text="To" />
+      <TextBlock Grid.Row="1" Grid.Column="1" Classes="mono" Text="{Binding ToText}" />
+    </Grid>
+    <TextBlock Classes="muted" TextWrapping="Wrap" Text="The new latitude and longitude are saved to the structure, and the change is listed in its history." />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" AutomationProperties.Name="Cancel: leave the structure where it was" />
+      <Button Classes="primary" Content="Move" Command="{Binding MoveCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center"
+              AutomationProperties.Name="Move the structure" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

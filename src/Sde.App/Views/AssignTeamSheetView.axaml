@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.AssignTeamSheetView"
+             x:DataType="sh:AssignTeamSheetViewModel">
+  <StackPanel Spacing="14">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Team" />
+      <ComboBox ItemsSource="{Binding Teams}" SelectedItem="{Binding Team}" HorizontalAlignment="Stretch" AutomationProperties.Name="Team" />
+      <TextBox Text="{Binding NewTeamName}" IsVisible="{Binding IsNewTeam}" PlaceholderText="The new team's name" AutomationProperties.Name="The new team's name" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Event" />
+      <ComboBox ItemsSource="{Binding Events}" SelectedItem="{Binding Event}" HorizontalAlignment="Stretch" AutomationProperties.Name="Event the assignment is for" />
+    </StackPanel>
+    <CheckBox IsChecked="{Binding AlsoSetTeamName}" AutomationProperties.Name="Also set FEMA's Team name field on the structures">
+      <TextBlock TextWrapping="Wrap" Text="Also set FEMA's Team name field. It is part of the SDE export." />
+    </CheckBox>
+    <TextBlock Classes="muted" TextWrapping="Wrap" Text="A structure already assigned for this event moves to the new team. This is one change in edit history." />
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Assign" Command="{Binding AssignCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

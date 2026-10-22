@@ -2,36 +2,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:Sde.App"
              xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.SourceImportView"
              x:DataType="vm:SourceImportViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="28,18,28,28" Spacing="16" MaxWidth="1120" HorizontalAlignment="Left">
-      <Button Classes="subtle" Content="‹ Import &amp; export" Command="{Binding BackCommand}" HorizontalAlignment="Left" Margin="-10,0,0,0" />
-      <StackPanel Spacing="2">
-        <TextBlock Classes="h1" Text="Import inspections or parcels" />
-        <TextBlock Classes="secondary" TextWrapping="Wrap"
-                   Text="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures. Each one remembers its source and record ID, so importing an updated file later only changes what changed in it: your edits in SDE are kept, and a blank cell never clears anything." />
-      </StackPanel>
+    <StackPanel Margin="{StaticResource PagePadding}" Spacing="14" MaxWidth="1120" HorizontalAlignment="Left">
+      <!-- The title band shows "Import & export › Import inspections or parcels" (the breadcrumb goes back) -->
+      <c:PageHeader Margin="0"
+                    Subtitle="Turn inspections from a permit system or a spreadsheet into assessments, or a parcel list or assessor roll into structures. Each one remembers its source and record ID, so importing an updated file later only changes what changed in it: your edits in SDE are kept, and a blank cell never clears anything." />
 
       <!-- No file yet -->
       <Border Classes="card" IsVisible="{Binding !HasFile}">
-        <StackPanel Spacing="12">
-          <TextBlock Classes="h2" Text="Start with a file" />
-          <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="Export the inspections or parcels from the system that holds them (a permit system's inspection report, an assessor roll, a spreadsheet, a shapefile's .dbf) as Excel, CSV or DBF. It can have one row per record, or one row per checklist item. You can also drop the file on this page." />
-          <Button Classes="primary" Content="Choose file…" Command="{Binding ChooseFileCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
+        <c:EmptyState Icon="Import" Title="Start with a file" MaxWidth="560"
+                      Text="Export the inspections or parcels from the system that holds them (a permit system's inspection report, an assessor roll, a spreadsheet, a shapefile's .dbf) as Excel, CSV or DBF. It can have one row per record, or one row per checklist item. You can also drop the file on this page.">
+          <Button Classes="primary" Content="Choose file…" Command="{Binding ChooseFileCommand}" />
+        </c:EmptyState>
       </Border>
 
-      <StackPanel Spacing="16" IsVisible="{Binding HasFile}">
+      <StackPanel Spacing="14" IsVisible="{Binding HasFile}">
         <!-- 1. The export and the profile -->
         <Border Classes="card">
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="2">
-                <TextBlock Classes="h2" Text="1. The file" />
+                <TextBlock Classes="title" Text="1. The file" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
-                  <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" />
+                  <TextBlock Classes="semibold" Text="{Binding FileName}" />
                   <TextBlock Text="{Binding TableSummary}" Classes="muted" VerticalAlignment="Center" />
                 </StackPanel>
               </StackPanel>
@@ -44,7 +40,7 @@
             <Border Classes="subtle" Padding="14">
               <StackPanel Spacing="8">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Text="Profile" VerticalAlignment="Center" FontWeight="Medium" />
+                  <TextBlock Classes="medium" Text="Profile" VerticalAlignment="Center" />
                   <ComboBox ItemsSource="{Binding SavedProfiles}" SelectedItem="{Binding SelectedProfile}" MinWidth="220" PlaceholderText="None saved yet" AutomationProperties.Name="Saved profile" />
                   <TextBlock Text="Save as" VerticalAlignment="Center" Classes="secondary" Margin="8,0,0,0" />
                   <TextBox Text="{Binding ProfileName}" Width="200" AutomationProperties.Name="Profile name" />
@@ -74,11 +70,11 @@
         <Border Classes="card">
           <StackPanel Spacing="12">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="2. What the file is and how it's laid out" />
+              <TextBlock Classes="title" Text="2. What the file is and how it's laid out" />
               <TextBlock Classes="muted" TextWrapping="Wrap" Text="The source and record ID link each assessment or structure to its record. With an inspection ID too, every inspection of a record becomes its own assessment." />
             </StackPanel>
             <Grid ColumnDefinitions="170,320,40,170,320" RowDefinitions="Auto,Auto" RowSpacing="10">
-              <TextBlock Text="Source" VerticalAlignment="Center" FontWeight="Medium" />
+              <TextBlock Classes="medium" Text="Source" VerticalAlignment="Center" />
               <TextBox Grid.Column="1" Text="{Binding SourceName}" PlaceholderText="e.g. Permits, County assessor"
                        ToolTip.Tip="The system or list the file comes from. It's shown next to each record ID and keeps two sources' record IDs apart."
                        AutomationProperties.Name="Source name" />
@@ -111,7 +107,7 @@
               <ComboBox Grid.Column="4" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding FilterColumn}" HorizontalAlignment="Stretch"
                         ToolTip.Tip="For example Inspection Type, to leave out other kinds of inspection" AutomationProperties.Name="Filter column" />
 
-              <TextBlock Grid.Row="1" Text="Record ID" VerticalAlignment="Center" FontWeight="Medium" />
+              <TextBlock Classes="medium" Grid.Row="1" Text="Record ID" VerticalAlignment="Center" />
               <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding RecordIdColumn}" HorizontalAlignment="Stretch" AutomationProperties.Name="Record ID column" />
               <TextBlock Grid.Row="1" Grid.Column="3" Text="Inspection ID" VerticalAlignment="Center" IsVisible="{Binding IsInspectionsMode}" />
               <ComboBox Grid.Row="1" Grid.Column="4" ItemsSource="{Binding RawColumns}" SelectedItem="{Binding InspectionIdColumn}" HorizontalAlignment="Stretch"
@@ -143,7 +139,7 @@
           <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="2">
-                <TextBlock Classes="h2" Text="3. Where each SDE field comes from" />
+                <TextBlock Classes="title" Text="3. Where each SDE field comes from" />
                 <TextBlock Classes="muted" TextWrapping="Wrap"
                            Text="Pick the column for each field, or type a value to use for every record (e.g. the cause of damage, or the base cost). Checklist items appear as “Checklist: …” columns. Anything left out can be filled in later in SDE. Importing structures uses only the structure's fields." />
               </StackPanel>
@@ -201,7 +197,7 @@
         <Border Classes="card" IsVisible="{Binding HasValues}">
           <StackPanel Spacing="10">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="4. The file's words, SDE's choices" />
+              <TextBlock Classes="title" Text="4. The file's words, SDE's choices" />
               <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding ValuesSummary}" />
             </StackPanel>
             <Grid ColumnDefinitions="200,240,130,*" ColumnSpacing="10">
@@ -214,7 +210,7 @@
                 <DataTemplate x:DataType="vm:SourceValueRowViewModel">
                   <Grid ColumnDefinitions="200,240,130,*" ColumnSpacing="10" Margin="0,3">
                     <TextBlock Text="{Binding FieldLabel}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Column="1" Text="{Binding Text}" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="medium" Grid.Column="1" Text="{Binding Text}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Column="2" Text="{Binding CountText}" Classes="muted" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="3" ItemsSource="{Binding Choices}" SelectedItem="{Binding Choice}" IsVisible="{Binding HasChoices}" MinWidth="300"
                               AutomationProperties.Name="{Binding AccessibleName}" />
@@ -231,7 +227,7 @@
         <Border Classes="card">
           <StackPanel Spacing="10">
             <StackPanel Spacing="2">
-              <TextBlock Classes="h2" Text="5. What will happen" />
+              <TextBlock Classes="title" Text="5. What will happen" />
               <TextBlock Classes="muted" TextWrapping="Wrap" Text="Each record is matched by its source and record (and inspection) ID. A new record goes to a structure already in SDE only when it matches exactly one (as chosen under New records match); a Final assessment is never changed." />
             </StackPanel>
             <TextBlock Text="Working it out…" Classes="muted" IsVisible="{Binding IsBusy}" />
@@ -239,13 +235,13 @@
                        IsVisible="{Binding MappingProblems, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             <Border Classes="subtle" Padding="14,10" IsVisible="{Binding NeedsBuildingValueConfirmation}">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                <TextBlock Text="{Binding BuildingValueQuestion}" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="{Binding BuildingValueQuestion}" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Content="Confirm building value…" Command="{Binding ConfirmBuildingValueCommand}" />
               </Grid>
             </Border>
             <TextBlock Text="{Binding ShapeNotes}" Classes="issue recommended" TextWrapping="Wrap"
                        IsVisible="{Binding ShapeNotes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{Binding PreviewSummary}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Classes="semibold" Text="{Binding PreviewSummary}" TextWrapping="Wrap" />
             <Grid ColumnDefinitions="30,190,1.4*,150,270,1.6*" ColumnSpacing="8">
               <TextBlock Grid.Column="1" Classes="eyebrow" Text="RECORD ID" />
               <TextBlock Grid.Column="2" Classes="eyebrow" Text="STRUCTURE" />
@@ -264,9 +260,9 @@
                     <TextBlock Grid.Column="2" Text="{Binding Address}" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
                     <TextBlock Grid.Column="3" Text="{Binding Status}" Classes="secondary" VerticalAlignment="Top" Margin="0,4,0,0" />
                     <Border Grid.Column="4" Classes="pill" VerticalAlignment="Top" HorizontalAlignment="Left"
-                            Background="{Binding State, Converter={x:Static app:Converters.StatusBackground}}">
-                      <TextBlock Text="{Binding Result}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis"
-                                 Foreground="{Binding State, Converter={x:Static app:Converters.StatusForeground}}" />
+                            app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
+                      <TextBlock Classes="sm medium" Text="{Binding Result}" TextTrimming="CharacterEllipsis"
+                                 app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
                     </Border>
                     <TextBlock Grid.Column="5" Text="{Binding Note}" Classes="issue" Classes.required="{Binding IsProblem}" Classes.recommended="{Binding !IsProblem}"
                                VerticalAlignment="Top" TextWrapping="Wrap" Margin="0,4,0,0" />
@@ -278,7 +274,7 @@
             <!-- What the last import did -->
             <Border Classes="subtle" Padding="14,10" IsVisible="{Binding HasResult}">
               <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="{Binding LastResult}" TextWrapping="Wrap" VerticalAlignment="Center" />
                 <Button Grid.Column="1" Classes="primary" Content="{Binding ReviewText}" Command="{Binding ReviewCommand}" />
               </Grid>
             </Border>

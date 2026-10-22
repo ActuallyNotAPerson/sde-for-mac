@@ -1,0 +1,29 @@
+{
+ "currentVersion": 10.22,
+ "id": 1,
+ "name": "Old Levee Areas",
+ "type": "Feature Layer",
+ "geometryType": "esriGeometryPolygon",
+ "maxRecordCount": 1000,
+ "supportedQueryFormats": "JSON, AMF",
+ "advancedQueryCapabilities": {
+  "supportsPagination": true
+ },
+ "fields": [
+  {
+   "name": "FID",
+   "type": "esriFieldTypeOID",
+   "alias": "FID"
+  },
+  {
+   "name": "NAME",
+   "type": "esriFieldTypeString",
+   "alias": "Name"
+  },
+  {
+   "name": "BUILT",
+   "type": "esriFieldTypeDate",
+   "alias": "Built"
+  }
+ ]
+}

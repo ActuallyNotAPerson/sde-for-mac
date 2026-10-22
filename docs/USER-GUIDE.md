@@ -25,9 +25,10 @@ File menu and choose New Database. ⌘ is the Command key, ⇧ is Shift and ⌥ 
 13. [Appeals and contractor bids](#13-appeals-and-contractor-bids)
 14. [Cumulative damage](#14-cumulative-damage)
 15. [The phone form](#15-the-phone-form)
-16. [Backups, moving and sharing](#16-backups-moving-and-sharing)
-17. [Troubleshooting](#17-troubleshooting)
-18. [Keyboard shortcuts](#18-keyboard-shortcuts)
+16. [AI assistants](#16-ai-assistants)
+17. [Backups, moving and sharing](#17-backups-moving-and-sharing)
+18. [Troubleshooting](#18-troubleshooting)
+19. [Keyboard shortcuts](#19-keyboard-shortcuts)
 
 ---
 
@@ -40,7 +41,8 @@ File menu and choose New Database. ⌘ is the Command key, ⇧ is Shift and ⌥ 
 | **Assessment** | One damage inspection of a structure: what was damaged, how much, and the result. A structure can have more than one (a second inspection, or damage from a later event). |
 | **Percent damaged** | The cost of repairs divided by the value of the building before the damage. |
 | **Result** (determination) | FEMA's finding for an assessment, such as *Substantially Damaged* (50 percent or more) or *Not Substantially Damaged*. |
-| **Database** | One file holding structures, assessments and photos. Keep one database per event. |
+| **Database** | One file holding structures, assessments and photos. Many offices keep one database per event. |
+| **Event** | A disaster (a flood, a storm) with its name, dates and FEMA disaster number. A database can hold several; each assessment belongs to one at most. |
 
 ### The window
 The sidebar on the left switches between pages:
@@ -48,13 +50,18 @@ The sidebar on the left switches between pages:
 | Page | What it's for | Shortcut |
 |---|---|---|
 | **Structures** | The list of every structure with its latest result. This is home. | ⌘1 |
-| **Map** | Every structure on a map, coloured by result. | ⌘4 |
-| **Event dashboard** | Totals for the event, and files to share. | |
-| **Import & export** | Exchanging data with FEMA's SDE, spreadsheets, photos and GIS. | ⌘2 |
-| **Settings** | Your name, default values, the database, letters and other options. | ⌘3 |
-| **Recently deleted** | What you deleted in the last 30 days. | |
+| **Map** | Every structure on a map, coloured by result. | ⌘2 |
+| **Dashboard** | Totals for the event, and files to share. | ⌘3 |
+| **Review** | Assessments waiting for review, and the checks that flag problems. | ⌘4 |
+| **Compliance** | Follow-up on substantially damaged structures: permits, deadlines, ICC claims. | ⌘5 |
+| **Assignments** | Teams and the structures assigned to them. | ⌘6 |
+| **Import & export** | Exchanging data with FEMA's SDE, spreadsheets, photos and GIS. | ⌘7 |
+| **Settings** | Your name, default values, letters, the phone form, backups and other options. | ⌘8 |
+| **Recently deleted** | What you deleted in the last 30 days. | ⌘9 |
 
-The bottom of the sidebar shows which database is open and how many structures and assessments it holds.
+The bar across the top shows where you are (for example **Structures › 123 River Street**; click **Structures** to go
+back), a search field that finds structures, pages and commands (⌘K), and **New**. The top of the sidebar chooses the
+event, and the bottom shows which database is open and how many structures it holds.
 
 ![The Structures list](screenshots/01-structures.png)
 
@@ -67,7 +74,7 @@ you want to be sure before closing the lid.
 - Photos are kept in an `attachments` folder next to the database file.
 - Automatic backups are kept in a `Backups` folder next to the database file.
 
-**Settings > Database** shows the file and the photos folder, each with **Show in Finder**.
+**Settings > Backups** shows the database file and the photos folder, with **Show in Finder**.
 
 ---
 
@@ -75,26 +82,28 @@ you want to be sure before closing the lid.
 Do this once at the start of each event. It takes about ten minutes and saves a lot of typing later.
 
 ### 2.1 Make a database for the event
-1. Choose **File > New Database…** (or **Settings > Database > New empty database…**).
+1. Choose **File > New Database…** (or **Settings > Backups > New empty database…**).
 2. In the save panel, make a new folder named for the event (for example `2026-09 River flood`) and save the database
    inside it. Its photos and backups will go into the same folder, so the whole event stays together.
 3. SDE switches to the new, empty database. To go back to another one, use **File > Open Recent** or **File > Open
    Database…** (⌘O).
 
 ### 2.2 Tell SDE who you are
-1. Open **Settings** (⌘3).
-2. Under **Preferences**, check **Your name**. It starts as your Mac account's name and is shown in each assessment's
+1. Open **Settings** (⌘8). It opens at **General**.
+2. Check **Your name**. It starts as your Mac account's name and is shown in each assessment's
    history next to the changes you make.
 
 ### 2.3 Fill in default values
 Default values are filled into every new structure and assessment, so you type what is the same for every building
 in this event only once (FEMA calls this *Enter Default Data*).
 
-1. In **Settings > Default values**, fill in what is the same for most buildings: for example the community, the
+1. In **Settings > Defaults**, fill in what is the same for most buildings: for example the community, the
    FIRM panel information, the cause and date of the damage, and the cost data. They save as you type.
-2. Turn on **Fill new structures with my default values** under **Preferences**.
+2. Turn on **Fill new structures with my default values** at the top of the same page.
 
 ### 2.4 Optional preferences
+These are in **Settings > General**.
+
 - **Check that latitude and longitude are inside the structure's state**: FEMA's *Lat/Long Validation*. Turn it on to
   catch coordinates typed with a wrong sign or swapped.
 - **Your fields**: three extra fields on every assessment. Name them for what your office tracks, such as *Permit
@@ -105,13 +114,32 @@ in this event only once (FEMA calls this *Enter Default Data*).
 ### 2.5 Things to set up only if you need them
 | If you will… | Set it up in | Guide |
 |---|---|---|
-| Send letters to owners | Settings > Owner letters | [Chapter 11](#11-owner-letters) |
-| Track substantial improvement permits | Settings > Substantial improvement | [Chapter 12](#12-substantial-improvement) |
-| Count damage from several events together | Settings > Cumulative damage | [Chapter 14](#14-cumulative-damage) |
+| Send letters to owners | Settings > Reports & letters | [Chapter 11](#11-owner-letters) |
+| Track substantial improvement permits | Settings > Reports & letters | [Chapter 12](#12-substantial-improvement) |
+| Count damage from several events together | Settings > Reports & letters | [Chapter 14](#14-cumulative-damage) |
 | Use your community's depth-damage table | Settings > Depth tables | [Step 6 in chapter 4](#step-6-damage-by-element) |
 | Let inspectors use phones | Settings > Phone form | [Chapter 15](#15-the-phone-form) |
+| Let an AI assistant such as Claude work with the database | Settings > AI assistants | [Chapter 16](#16-ai-assistants) |
 
-**Sharing the setup with colleagues:** see [Share your setup](#share-your-setup) in chapter 16.
+**Sharing the setup with colleagues:** see [Share your setup](#share-your-setup) in chapter 17.
+
+### 2.6 Events
+When one database holds more than one disaster, give each an event, so you can see one at a time.
+
+1. Click the event switcher at the top of the sidebar and choose **New event…**. Give it a name, the kind, FEMA's
+   disaster number if there is one, and its dates. The **datum offset** is only needed when high-water marks use a
+   different vertical datum from the structures' elevations: it is added to the marks.
+2. SDE chooses the new event. While it is chosen, **Structures**, the **Map**, the **Dashboard** and the reports,
+   letters and exports you make from them cover only its assessments, and a new assessment you start joins it.
+3. To put existing assessments in it, choose **All events**, tick them on the Structures list, then **Change > Set
+   event…**. In the editor, **⋯ > Set event…** does the same for one assessment.
+4. When an assessment's damage date falls between an event's dates and it is in no event, the editor offers to add it.
+
+**Manage events…** in the switcher renames or deletes events. Deleting an event keeps its assessments; they just
+belong to no event. SDE remembers the chosen event for each database. Cumulative damage still counts every event
+together (chapter 14).
+
+![The event dashboard](screenshots/88-dashboard-event.png)
 
 ---
 
@@ -244,6 +272,8 @@ longitude. **Look up online…** fills in the coordinates from the address ([cha
 **NFIP community ID**, **Community name**, **FIRM panel number**, **Panel suffix**, **FIRM panel date**, **FIRM zone**,
 **Base flood elevation (BFE)**, **Regulatory floodway**, **Elevation of lowest floor** and **Datum**. **Look up
 online…** proposes values from FEMA's National Flood Hazard Layer for you to confirm.
+**Elevation certificate…** reads these values from a filled elevation certificate (see
+[Elevation certificates](#elevation-certificates)).
 
 ### Step 5: Cost & depreciation
 1. **Square footage.** Add the building's footprint as shapes (**+ Rectangle**, **+ L-shape**, **+ T-shape**,
@@ -317,6 +347,21 @@ structure and tick the steps to copy. The location, owner and damage are never c
 
 ![Photo order](screenshots/61-photo-order.png)
 
+### Marking up a photo
+Click the pencil at the top of a photo to draw on it: a **Water line** where the water reached (with an optional
+label such as "Water 2 ft 6 in"), an **Arrow**, a **Box**, an **Ellipse** or **Text**.
+
+1. Choose what to draw and a colour. A water line is blue and the others red unless you pick a colour.
+2. Drag across the photo: along the water line, from an arrow's tail to its point, or from one corner of a box or
+   ellipse to the other. For text, type the words first, then click where they go.
+3. **Undo** takes back the last change and **Clear all** takes every mark off. Click **Save**.
+
+The photo file itself never changes. The thumbnail, the printed reports and the submission folder's marked-up copies
+draw the marks on, while FEMA's export keeps the original photo. The marks of a Final or Letter sent assessment can be
+looked at but not changed.
+
+![Photo markup](screenshots/61b-photo-markup.png)
+
 ### Matching a whole folder of photos to structures
 When field teams bring back a folder of photos:
 
@@ -344,6 +389,33 @@ such as **Draft ▾**):
 | **Appeal** | The owner has appealed and it is being reconsidered. |
 
 The Structures list has a **Status** column and a status filter, so you can list everything not yet Final.
+
+### The Review page
+**Review** (⌘4) is where a reviewer works through the assessments before they are made Final. It follows the event
+chosen in the sidebar. Its badge counts the assessments in review (Draft or Reviewed).
+
+- **Queue** lists the assessments in review, the ones with the most problems first. Each row shows the result, how
+  many quality checks found something (**Checks**) and how many comment threads are open (**Comments**). Choose
+  another status above the list, or **Every status**. Click a column's header to sort by it. Double-click a row to
+  open the assessment; closing it brings you back to Review.
+- **Quality checks** lists what the checks found, grouped by check, with what each check looks for. Errors, such as an
+  inspection dated before the damage, should be fixed before you export. Warnings and notes are worth a look.
+  - **Go to field** opens the assessment at the field to fix.
+  - When something doesn't need fixing (two units on one parcel, say), click **Set aside…** and say why.
+  - Tick **Show the ones set aside** to see them with their reasons. **Bring back** lists one again.
+  - Setting aside and bringing back are kept in the history.
+- Select an assessment in the queue to see its open checks and its **comments** beside the list. Write a comment for
+  the inspector or other reviewers, **Reply** to one, and **Resolve** it when it is settled. In the editor, the
+  **Comments** button (or **⋯ > Comments…**) shows the same threads. A comment about a field links to it.
+- **Mark reviewed** sets the ticked assessments (or the selected one) to Reviewed. Final and Letter sent assessments
+  are left alone.
+- The tiles at the top count the assessments in review, the open checks, the errors and the open comments. Click one
+  to see them.
+
+The flood map zone and high-water mark checks need an online look-up or a marks file, so the Review page doesn't run
+them.
+
+![The Review page](screenshots/110-review.png)
 
 ### Locks
 A **Final** or **Letter sent** assessment can't be changed: not in the editor, not by bulk changes, not by imports and
@@ -404,6 +476,52 @@ allows, with a preview before anything changes.
 **Open**, **Copy from another structure…**, **Set a field on the checked structures…** and **Move to Recently
 Deleted**.
 
+### Field teams and routes
+The **Assignments** page sends structures out to field teams, each with its structures in a driving order, a route
+sheet and worksheets. With an event chosen in the sidebar, it shows that event's assignments.
+
+1. Click **New team…** and give the team a name, its members and a colour.
+2. On Structures, check the structures (or filter the list) and choose **Change ▾ > Assign to team…**, or select
+   structures on the map and click **Assign to team…**. Pick the team and, if you like, the event.
+3. On **Assignments**, choose the team. **Order the route** puts its structures in a short driving order
+   (straight-line distance); structures without coordinates go at the end.
+4. **Route sheet…** saves a one-page list of the stops, and **Worksheets…** a page per structure with a short code the
+   phone form's search accepts and a small map around it (from the map's background, when it has one). The pin beside
+   a structure opens directions in Maps. **Offline…** keeps the map of the team's area on this Mac for the field.
+5. As the team works, set each structure's **Status**: Assigned, Visited, Done or Skipped. The team's line shows how
+   many are assigned, assessed and done, and the Dashboard has a **Field teams** chart with the same numbers.
+6. To take structures off a team, tick them and click **Take the ticked structures off the team…**.
+
+![Assignments](screenshots/115-assignments.png)
+
+### Work packages: assessing on another Mac without a connection
+A work package takes assessments to a Mac in the field and brings the work back.
+
+**At the office**
+1. On Structures, check the structures (or filter the list) and choose **Export ▾ > Work package for the field…**.
+   Final and Letter sent assessments, and ones already out, are left out.
+2. Type who takes it (**Checked out to**) and click **Save work package…**. SDE writes a `.sdework` file with the
+   assessments, their structures, photos and documents.
+3. Until the package comes back, those assessments are read-only here. The editor says where they are.
+
+**In the field**
+1. Click the database button at the bottom of the sidebar and choose **Open a work package…**. SDE opens the package
+   as its own database, with a banner across the top.
+2. Work as usual, without a connection.
+3. When you're done, click **Send back to the office…** in the banner and save the file.
+
+**Back at the office**
+1. On **Import & export**, under **Work packages**, click **Check in a work package…** and choose the file. The field's
+   work replaces the copies here, and History shows each change as the field made it.
+2. An assessment someone changed here meanwhile, or took back early, isn't checked in; SDE lists it.
+
+**Taking back early.** If the package won't come back, click **Take it back…** in the editor (or **Take back…** for a
+whole package on Import & export). The assessment can change here again, but the package can no longer bring it back.
+If the package does come back later, use **⋯ > Copy from a work package…** in the editor to tick the field's values to
+copy over.
+
+![A checked-out assessment](screenshots/116-editor-checked-out.png)
+
 ---
 
 ## 8. Looking up locations and flood data online
@@ -432,22 +550,195 @@ leaves your Mac. Nothing changes until you confirm it.
 **Check before you rely on it.** The NFHL is FEMA's online flood map. It can differ from the effective FIRM your
 community has adopted (for example while a map revision is pending), so confirm against the effective FIRM.
 
+### Elevation certificates
+SDE reads FEMA's fillable elevation certificate (FEMA Form FF-206-FY-22-152) once a surveyor has filled it in.
+
+1. Open the assessment, go to **Flood zone** and click **Elevation certificate…** (or choose it from the **⋯** menu).
+2. Choose the PDF. SDE lists each **FIELD** with its value **NOW** and the value on the **CERTIFICATE**: the location,
+   community ID, FIRM panel and suffix, base flood elevation, first floor elevation and datum. Values that already
+   match are left unticked.
+3. If the address on the certificate doesn't match the structure, SDE says so. Check you chose the right certificate.
+4. Tick the values to use and click **Save**, or click **Keep the PDF only** to keep the certificate without changing
+   any value.
+
+When SDE can't read the PDF (a scan, or a copy that was printed to PDF), it shows an entry sheet instead: type the
+values from the certificate and click **Save**. Either way the PDF is kept with the structure and the history lists
+the changes as an EC import.
+
+![Elevation certificate](screenshots/64b-elevation-certificate.png)
+
+### Flood depth from high-water marks
+SDE can estimate each structure's flood depth from where the water reached.
+
+1. On Structures, check the structures (or filter the list), then choose **Change ▾ > Flood depth from high-water
+   marks…**. For one structure, use the editor's **⋯** menu.
+2. Choose where the water surface comes from:
+   - **High-water marks file**: a CSV or GeoJSON file with each mark's latitude, longitude and elevation in feet
+     (USGS exports read as they are). Say which datum the marks use when the file doesn't.
+   - **USGS high-water marks**: click **Load USGS events**, choose the event and the states, then **Download marks**.
+     This needs an internet connection; SDE asks USGS's Short-Term Network for the marks.
+   - **Water-surface grid**: a GeoTIFF of water-surface elevations (not depths), in feet or metres.
+3. **Options for marks** sets how far to look (**Search radius**), how many of the **Nearest marks** to use and the
+   **Worst quality** of mark to trust.
+4. SDE proposes the flood elevation and the depth above the lowest floor for each structure, with a **CONFIDENCE** and
+   **HOW** it got there. Structures with no lowest floor elevation, or too far from any mark, say why.
+5. Tick the depths to use and click **Save the ticked depths**. The history lists them as the depth tool's.
+
+When an event's marks use a different datum from your elevation certificates, set the event's **datum offset** (see
+[Events](#26-events)).
+
+![Flood depth](screenshots/65b-flood-depth.png)
+
 ---
 
 ## 9. The map and the event dashboard
 
 ### The map
-**Map** (⌘4) shows every structure that has coordinates, coloured by its result.
+**Map** (⌘4) shows every structure that has coordinates, coloured by its result, over a background map and any layers
+you add.
 
-- Click a dot to open that structure's assessment.
-- **Select**, then drag a box around structures to check them in the Structures list (in the normal mode, hold ⌘
-  while dragging). Use it to print reports or set a field for one area.
-- **Set location**: pick a structure under **Structures without coordinates**, then click where it is on the map.
-- **Show all** zooms to every structure. **Basemap** picks the background map.
+What a click does depends on the mode above the map:
+- **Open**: click a dot to open that structure's assessment, or click a layer's shape to see its values. Hold ⌘ and
+  drag to select structures.
+- **Select**: click a dot or drag a box to select structures (hold ⌘ to add to the selection). **Select in** picks a
+  layer to select its shapes instead. **Draw an area** selects what is inside the corners you click (double-click or
+  press Return to finish). **By attribute…** selects by the values of fields, for example *flood_zone = AE* and
+  *land_value > 30000*.
+- **Set location**: pick the structure under **Structure to place**, then click where it is on the map.
+- **Measure**: click points to measure a distance, or choose **Area** for an area and its perimeter. Double-click or
+  press Return to finish. Distances are measured along the earth's surface, areas on an equal-area projection.
 
-The background map needs an internet connection; the dots work offline.
+Selected structures are the ones checked in the Structures list. The bar on the map acts on them: **Show in
+Structures**, **Set a field…**, **Assign to team…**, **Reports** and **Add to web map…**.
 
-![The map](screenshots/56-map.png)
+When the map has focus, the arrow keys move it and = and - zoom. **Bookmarks** saves the view and goes back to it.
+**Show all** zooms to every structure. The basemap menu next to **Bookmarks** picks the background map: USGS
+topographic map, USGS aerial imagery, OpenStreetMap or none.
+
+![The map with a parcel layer and FEMA flood zones](screenshots/56-map.png)
+
+#### Layers
+Click **Layers** beside the map:
+- **Add layer > From a file…** reads a Shapefile, GeoJSON, GeoPackage, or CSV with latitude and longitude (or WKT).
+  SDE copies the shapes into a GeoPackage next to the database (`sde.sqlite.layers.gpkg`), which QGIS and ArcGIS
+  open too.
+- **Add layer > From an ArcGIS web address…** downloads a FeatureServer or MapServer layer for the area in view.
+- **Add layer > FEMA flood zones** draws FEMA's National Flood Hazard Layer over the map.
+- Each layer's **⋯** menu has **Style…** (one colour, by category or by number range, labels, and the scales it shows
+  at), **Attribute table**, **Zoom to layer**, **Move up**, **Move down** and **Remove…**. **Opacity** fades it.
+- **Style…** under **Structures** colours the dots by result (the default), status, team, event or any field.
+
+The attribute table under the map sorts by a column, filters by text and can show only the selected shapes. Picking
+rows selects them on the map.
+
+![Measuring an area](screenshots/56c-map-measure.png)
+
+The background map, the flood zones and ArcGIS layers need an internet connection. The dots and layers from files work
+offline.
+
+#### Drawing and changing shapes
+Choose **Edit** above the map to draw on a layer or change its shapes. Layers from files and layers you make in SDE can
+be edited; ArcGIS layers and FEMA's flood zones can't.
+
+1. Pick the layer next to **Edit**. To start a layer of your own, click **New layer…**, give it a name and choose
+   whether it holds **Points**, **Lines** or **Areas**. Each shape has a name and notes.
+2. Choose a tool:
+   - **Change**: click a shape to pick it. Drag a corner to move it, or drag the small dot between two corners to add
+     one. Option-click a corner to take it away. Drag inside the shape to move all of it. Delete removes the picked
+     corner, or the whole shape. Esc lets go of it.
+   - **Add points**, **Add lines** or **Add areas**: click the corners, then double-click or press Return to finish.
+     Delete takes away the last corner while you draw.
+3. With **Snap** ticked, new corners and moved corners land exactly on nearby corners, edges and structures.
+4. ⌘Z and ⇧⌘Z (or the arrows in the Edit bar) undo and redo each change.
+5. Click **Save** to keep the edits in the map layers file next to the database. **Discard…** throws them away.
+
+Nothing is written until you click **Save**. If you leave the Map page, choose another layer or quit with edits not
+saved, SDE asks whether to save them. Opening another database saves them first.
+
+While a layer is being edited, its attribute table can be typed in. A value that doesn't fit the field, such as
+letters in a number field, isn't taken, and SDE says why.
+
+![Editing a parcel layer](screenshots/56f-map-edit.png)
+
+#### Moving a structure
+If a dot is in the wrong place, choose **Set location** and drag the dot to where the structure really is. SDE asks
+before saving, for example *Move 123 River Street about 40 ft north-east?*, and shows the old and new latitude and
+longitude. **Move** saves the new coordinates, and the change is listed in the assessment's history.
+
+A structure whose assessment is Final or Letter sent, or checked out in a work package, can't be moved or given a
+location. SDE says which, and why.
+
+![Moving a structure](screenshots/56g-map-move.png)
+
+#### Selecting by location
+In **Select** mode, **By location…** selects what lies in, near or around other shapes:
+1. **Select**: the structures, or the shapes of a layer.
+2. **That**: *touch or overlap*, *are completely inside*, *completely contain*, or *are within a distance of* (in feet,
+   miles or metres).
+3. **Of**: the selected shapes of another layer, or an area you draw on the map.
+4. **Selection**: **New selection**, **Add to it** (keep what is selected and add these), or **Select within it** (keep
+   only the selected ones that also match).
+
+The sheet counts what matches as you change it. Click **Select**. For a drawn area, click its corners on the map and
+double-click or press Return to finish.
+
+![Select by location](screenshots/56h-map-select-by-location.png)
+
+#### Copying values onto structures
+A layer of areas, such as parcels or flood zones, can fill in a field of the structures that sit inside each area.
+Choose **Copy values onto structures…** from the layer's **⋯** menu, or select structures and click **Copy values…** in
+the bar on the map.
+
+1. Choose **From the areas of** (the layer), **Their field**, and **Into the structure field**. SDE suggests the
+   structure field from the layer's field name: a FEMA *FLD_ZONE* goes into the FIRM zone, a parcel number into Parcel
+   number, an NFIP community ID or name into the community fields.
+2. Choose the selected structures, or all the structures in the event.
+3. Check the preview. Each structure shows its value **NOW**, the **NEW** value, and **HOW IT WAS MATCHED**: inside one
+   area, inside several (the smallest is used), or inside none. Untick any you don't want changed.
+4. Click **Copy** (the button counts the values, for example **Copy 12 values**).
+
+Each value goes in through the same checks as typing it in the editor. FIRM zones are matched to the choices on FEMA's
+form, and a zone the form has no choice for is listed and left alone. The copy is one change in each structure's
+history: **Undo** in the message that follows, or **Revert** in History, puts the old values back. Final, Letter sent
+and checked-out assessments are left as they are and counted.
+
+![Copy values preview](screenshots/56i-map-copy-values.png)
+
+#### Printing the map
+**Print…** at the top of the Map page makes a Letter-size PDF of the area the map shows now.
+
+1. Type a **Title** (it starts as the event's name, or *Structures*) and choose **Portrait** or **Landscape**.
+2. Click **Save as PDF…** and choose where to save it. SDE opens the PDF when it is done.
+
+The page has the map, a legend of the structures and every layer shown, a scale bar, a north arrow, the scale (for
+example *1:4,800 (1 inch = 400 feet)*), the sources the map uses, and the date. The map is drawn sharper than on
+screen, so SDE downloads the background at more detail. It waits up to 30 seconds for those pieces. Any that don't
+arrive are left blank, and the page says how many.
+
+![A printed map](screenshots/56j-map-print.png)
+
+#### Keeping an area for use offline
+Before going somewhere without a connection, keep the background map for the area on the Mac you take:
+
+1. Show the area on the map and click **Offline…** (or, on **Assignments**, choose a team and click **Offline…** for its
+   structures and about 400 m around them).
+2. Choose **USGS topographic map** or **USGS aerial imagery**. Only USGS maps can be kept: OpenStreetMap's rules don't
+   allow downloading areas.
+3. SDE says how many map pieces that is for zooms 12 to 16 (at most 5,000; for a large area the closest zooms are left
+   out). Click **Keep offline**.
+
+The map then shows the area with no connection. Kept pieces are used until SDE can fetch fresh ones.
+
+#### Map and GIS settings
+**Settings > Map & GIS** has:
+- **Background map**: the same choice as the basemap menu on the Map page.
+- **Start the map with FEMA flood zones on**: each time this database's map opens, the flood zones show.
+- **Saved map pieces**: how much room the background map pieces kept on this Mac take. **Clear** deletes them; the
+  map downloads them again as it needs them.
+- **Leave owner names out of GIS files**: on by default. Turn it off to have **Include owner names** on the dashboard
+  start ticked.
+
+![Map and GIS settings](screenshots/31g-settings-map-gis.png)
 
 ### The event dashboard
 **Event dashboard** shows the numbers for the whole database: how many structures, how many substantially damaged,
@@ -456,9 +747,28 @@ the total building value and repair cost, and bars by result, by street (top ten
 Under **Share this event**:
 - **Event summary PDF…**: the same numbers as a report (type an **Event name** to show on it).
 - **GeoPackage for GIS…** and **GeoJSON…**: one point per assessed structure, in latitude and longitude (WGS 84), with
-  a QGIS style beside it. Owner names are left out unless you tick **Include owner names**.
+  a QGIS style beside it. Owner names are left out unless you tick **Include owner names** (Settings > Map & GIS
+  can have it start ticked).
 
 ![The event dashboard](screenshots/57-dashboard.png)
+
+### Sharing a web map
+A web map is a folder with a web page of structures on a map. Open it in any browser, send the folder, or put it on
+any web server. The page works offline; only the background map needs the internet.
+
+1. On Structures, check the structures (or filter the list), then choose **Export ▾ > Web map…**. On the map, select
+   structures and click **Add to web map…**. With an event chosen in the sidebar, the title is the event's name.
+2. Choose **Who it is for**:
+   - **The office and partners**: a dot for each structure with its address, result and percent damaged. Tick the
+     other fields to show in each structure's popup, such as the inspection date or the depth above the lowest floor.
+   - **The public**: structures are counted in **Grid squares** (100, 200 or 500 metres) instead of dots, owners are
+     never shown, and **Addresses** are hidden or cut to the block ("100 block of River St").
+3. Choose the **Background map** (USGS topographic, OpenStreetMap or None) and whether to show the event's summary
+   beside the map.
+4. Click **Make web map…** and choose where to put the folder. SDE opens the page when it is done. Structures without
+   coordinates are left out and counted.
+
+![Web map](screenshots/56e-web-map-sheet.png)
 
 ---
 
@@ -475,7 +785,8 @@ percent damaged list** and the **Community report**. They print in the list's or
 ### Exporting for FEMA's SDE or your state
 1. On Structures, check the structures (or filter the list), then choose **Export ▾ > To FEMA SDE (export folder)…**.
    To export everything, choose **File > Export All to SDE…** (⌘E) instead.
-2. If some assessments aren't Final, SDE asks whether to export them anyway.
+2. If some assessments aren't Final, SDE asks whether to export them anyway. If some have quality errors (see
+   [The Review page](#the-review-page)), it says how many and offers to show them on the Review page instead.
 3. Choose where to save. SDE writes an `SDE_n` folder with `Export.json` and the photos, exactly as FEMA's SDE writes
    it. FEMA's SDE 3.0 opens it with *Import SDE data*.
 
@@ -489,7 +800,8 @@ One folder with everything a community usually sends after an event:
 2. Choose **Export ▾ > Submission folder (reports + FEMA package)…**.
 3. Choose the **Report for each assessment** (one-page Summary or Detailed), **With photos** or not, and whether to
    **Include incomplete assessments**.
-4. Click **Choose a folder and write…**. A progress bar shows each report; stopping removes the half-written folder.
+4. Click **Choose a folder and write…**. As with an export, SDE asks first about assessments that aren't Final or
+   have quality errors. A progress bar shows each report; stopping removes the half-written folder.
 
 ```
 SDE submission 2026-10-08 1430/
@@ -517,7 +829,7 @@ community's counsel before you send any letters**; the starter text is a plain-E
 advice. Every placeholder is listed in [Owner letters](LETTERS.md).
 
 ### Set up the templates (once)
-1. Open **Settings > Owner letters** and click **Create starter templates**. You get three: *Substantial damage
+1. Open **Settings > Reports & letters** and, under **Owner letters**, click **Create starter templates**. You get three: *Substantial damage
    notice*, *Not substantially damaged notice* and *Substantial improvement determination*.
 2. Click **Show folder** and edit them in Word or Pages (save as `.docx`): your letterhead, your ordinance's
    requirements, how to appeal and by when.
@@ -536,6 +848,35 @@ advice. Every placeholder is listed in [Owner letters](LETTERS.md).
 
 ![Owner letters](screenshots/66-letters.png)
 
+### Compliance and ICC (the Compliance page)
+A substantially damaged (or substantially improved) building must be brought into compliance. **Compliance** (⌘5)
+follows each one until it is: the way the owner chooses, the permit and deadline, the Increased Cost of Compliance
+(ICC) claim, the elevation certificate and the final inspection. It follows the event chosen in the sidebar, and its
+badge counts the open cases past their deadline.
+
+1. **Open a case.** On the Compliance page, **Open cases for every substantially damaged structure…** opens one for
+   each that has none yet. For one assessment, use **⋯ > Compliance case…** in the editor. For a substantial
+   improvement, click **Open compliance case…** beside the determination in **⋯ > Improvements and SI…**.
+2. **Fill it in.** Double-click a case. Choose the **Path** (elevate, relocate, demolish, floodproof for
+   non-residential buildings, or repair below the threshold after an appeal), then the permit, **Deadline**, ICC
+   claim and its status and amount, and the dates the elevation certificate, final inspection and certificate of
+   compliance came in. **Save** or **Done** keeps it.
+3. **Keep the timeline.** Changes to the path, deadline, ICC status and open or closed are added to the case's
+   timeline by themselves. Add calls, inspections and notes with **Add note**.
+4. **Write a letter.** Under **Letters**, choose *Options and deadline*, *ICC support* or *Deadline reminder*. The
+   first time, SDE offers to create the three starter compliance letters in your templates folder. The letter is
+   filled in from the case, opened in Word, and added to the timeline and the letter log. See
+   [Owner letters](LETTERS.md) for the fields.
+5. **Close it.** Set **Case** to **Closed** and say why (for example *Elevated and inspected*).
+
+Filter the list by **Open cases**, **Closed cases** or **Every case**, by path, by ICC status, or to **Overdue only**;
+the tiles at the top do the same. **Export ▾** saves the cases shown as a **Compliance report (PDF)** or a
+**Compliance list (CSV)**. The Dashboard shows the open and overdue cases and the ICC claims too.
+
+![The Compliance page](screenshots/113-compliance.png)
+
+![A compliance case](screenshots/114-compliance-case.png)
+
 ---
 
 ## 12. Substantial improvement
@@ -543,7 +884,7 @@ Substantial improvement (SI) tracking compares the cost of improvement projects 
 It is a separate finding: it never changes a damage assessment, its percent damaged or FEMA's result.
 
 ### Set the rules (once per database)
-In **Settings > Substantial improvement**:
+In **Settings > Reports & letters**, under **Substantial improvement**:
 - **Threshold**: percent of market value (the NFIP minimum is 50 percent; your ordinance may be stricter).
 - **Look-back period** in years. **0** counts each project on its own.
 - Tick **Add earlier projects in the look-back period to the new one** if your ordinance counts improvements
@@ -589,7 +930,8 @@ Some ordinances count damage from several events together. This is **off** unles
 separate finding: each assessment keeps FEMA's own percent damaged and result, and FEMA's reports and exports don't
 change.
 
-1. Open **Settings > Cumulative damage** and tick **Count damage cumulatively**.
+1. Open **Settings > Reports & letters** and, under **Cumulative damage**, turn on **Count damage from several events
+   together**.
 2. Choose the **Method**, the **Look-back period** in years (**0** counts every event on record) and the
    **threshold** your ordinance uses.
 3. An assessment's result panel now also shows the cumulative total over the look-back period. Each event is counted
@@ -625,14 +967,49 @@ Click **Stop phone form**. It also stops when you quit SDE, and by itself after 
 
 ---
 
-## 16. Backups, moving and sharing
+## 16. AI assistants
+An AI assistant such as Claude Desktop or Claude Code can work with an SDE database: find structures, read and explain
+assessments, run the quality checks, summarise an event, and make reports, GeoJSON files and web maps. SDE includes the
+server the assistant talks to (it uses the Model Context Protocol, MCP). The assistant runs SDE in the background; no
+window opens. The developer notes, with every tool, are [MCP.md](MCP.md).
+
+### Connecting an assistant
+1. Put SDE in the **Applications** folder, and open the database in SDE once.
+2. Open **Settings > AI assistants**.
+3. For **Claude Code**, click **Copy command**, paste it into Terminal and press Return. For **Claude Desktop**, click
+   **Copy setup**, then in Claude Desktop choose **Settings, Developer, Edit Config**, add it to the file and restart
+   Claude Desktop.
+
+The setup names this database. After switching to another database, copy it again.
+
+### What an assistant may do
+- **Always:** read the database, run the quality checks, list events, compliance cases and map layers, and write
+  reports, GeoJSON files and web maps into an **AI outputs** folder beside the database.
+- **Only after you turn on Let AI assistants change this database:** fill in fields, set Draft, Reviewed or Appeal,
+  add structures, events and review comments, and assign structures to teams.
+- **Never:** change a Final or Letter sent assessment, delete anything, import, export to FEMA, mark a letter sent, or
+  change settings.
+
+Every change is recorded in History under the assistant's name. Under **Recent changes by AI assistants**, **Revert**
+puts back what one request changed (hold the pointer over it to see exactly what it does); anything changed again
+since is left as it is.
+
+> Treat an assistant's work like a new colleague's: check its changes before an assessment is Final. SDE tells the
+> assistant that notes and other free text in the database are data, not instructions, but check its work all the
+> same.
+
+![Settings, AI assistants](screenshots/31f-settings-ai-changes.png)
+
+---
+
+## 17. Backups, moving and sharing
 
 ### Automatic backups
 SDE backs up the database and its photos into a `Backups` folder next to the database: once on the first opening each
 day, and when you quit if anything changed. It keeps the 14 newest. Photos in backups take no extra space.
 
 ### Restoring a backup
-1. Choose **File > Restore from Backup…** (or **Settings > Database > Restore from backup…**).
+1. Choose **File > Restore from Backup…** (or **Settings > Backups > Restore from backup…**).
 2. Pick the backup by its date and time.
 3. SDE backs up the current state first (labelled *before restore*), so a restore can itself be undone, then reopens
    the database.
@@ -671,7 +1048,7 @@ adds one.
 
 ---
 
-## 17. Troubleshooting
+## 18. Troubleshooting
 
 | Problem | What to do |
 |---|---|
@@ -689,7 +1066,7 @@ adds one.
 
 ---
 
-## 18. Keyboard shortcuts
+## 19. Keyboard shortcuts
 **Help > Keyboard Shortcuts** shows these in the app.
 
 | Shortcut | Action |
@@ -703,7 +1080,8 @@ adds one.
 | ⌘E | Export everything to an SDE folder |
 | ⌘F | Find (search the list) |
 | ⌘Z / ⇧⌘Z | Undo / redo |
-| ⌘1 / ⌘2 / ⌘3 / ⌘4 | Structures / Import & export / Settings / Map |
+| ⌘1 to ⌘9 | The pages in the sidebar, top to bottom |
+| ⌘K | Search structures, pages and commands |
 | ⌘[ / ⌘] | Previous / next step in the editor |
 | 0 to 4 | On a damage slider: 0, 25, 50, 75 or 100 percent |
 | Return | Open the selected structure |

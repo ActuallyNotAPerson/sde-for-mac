@@ -415,6 +415,31 @@ public class FieldServerTests
 	}
 
 	[Fact]
+	public async Task MyAssignments_ListATeamsRoute_AndAWorksheetCodeFindsItsStructure()
+	{
+		await using PhoneSession s = new PhoneSession();
+		await s.PairAsync();
+		Guid propertyId = s.Store.LoadAssessment(s.AssessmentId).Property.PropertyID;
+		TeamRecord team = s.Store.SaveTeam(new TeamRecord { Name = "Team 1", Members = "Pat Sample 555-0100" });
+		AssignmentRecord a = Assert.Single(s.Store.AssignToTeam(new[] { propertyId }, team.TeamID, dueDate: new DateTime(2026, 10, 30)));
+		s.Store.SaveRouteOrder(new[] { a.AssignmentID });
+
+		string teams = await s.Client.GetStringAsync("/api/teams", Ct);
+		Assert.Contains("Team 1", teams);
+		Assert.DoesNotContain("555-0100", teams);   // members' names and numbers stay on the Mac
+		JsonElement mine = Assert.Single((await PhoneSession.Json(await s.Client.GetAsync($"/api/teams/{team.TeamID}/assignments", Ct))).EnumerateArray());
+		Assert.Equal(a.ShortCode, mine.GetProperty("shortCode").GetString());
+		Assert.Equal(1, mine.GetProperty("routeOrder").GetInt32());
+		Assert.Equal("2026-10-30", mine.GetProperty("dueDate").GetString());
+		Assert.Equal(s.AssessmentId.ToString(), mine.GetProperty("structure").GetProperty("assessmentId").GetString());
+		Assert.Empty((await PhoneSession.Json(await s.Client.GetAsync($"/api/teams/{Guid.NewGuid()}/assignments", Ct))).EnumerateArray());
+
+		string typed = a.ShortCode.ToLowerInvariant().Insert(2, " ");
+		JsonElement found = await PhoneSession.Json(await s.Client.GetAsync("/api/structures?q=" + Uri.EscapeDataString(typed), Ct));
+		Assert.Equal(s.AssessmentId.ToString(), found.EnumerateArray().First().GetProperty("assessmentId").GetString());
+	}
+
+	[Fact]
 	public async Task Revoked_Phone_IsLockedOut()
 	{
 		await using PhoneSession s = new PhoneSession();

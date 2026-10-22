@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.DismissFindingSheetView"
+             x:DataType="sh:DismissFindingSheetViewModel">
+  <!-- Review, Set aside: the finding, then why it doesn't need fixing -->
+  <StackPanel Spacing="12">
+    <Border Classes="subtle">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="eyebrow" Text="{Binding RuleTitle}" />
+        <TextBlock Classes="semibold" Text="{Binding Address}" TextWrapping="Wrap" />
+        <TextBlock Classes="secondary" Text="{Binding Message}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Why it doesn't need fixing" />
+      <TextBox Text="{Binding Reason}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64"
+               PlaceholderText="For example: two units on one parcel, checked on site" AutomationProperties.Name="Why this check doesn't need fixing" />
+      <TextBlock Classes="danger" Text="{Binding Error}" IsVisible="{Binding HasError}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </StackPanel>
+    <TextBlock Classes="muted" Text="{Binding Note}" TextWrapping="Wrap" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Set aside" Command="{Binding DismissCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

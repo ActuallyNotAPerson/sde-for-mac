@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Sde.App.ViewModels;
 
@@ -48,12 +47,4 @@ public sealed class StackedBar : Control
 
 	private IBrush Brush(string key, IBrush fallback) =>
 		this.TryFindResource(key, ActualThemeVariant, out object value) && value is IBrush b ? b : fallback;
-}
-
-/// <summary>Converters for the map and dashboard pages.</summary>
-public static class MapConverters
-{
-	/// <summary>The brush with this resource name (for example "StatusCloseFg") in the current theme.</summary>
-	public static readonly IValueConverter ResourceBrush = new FuncValueConverter<string, IBrush>(key =>
-		key != null && Application.Current!.TryGetResource(key, Application.Current.ActualThemeVariant, out object value) && value is IBrush b ? b : Brushes.Gray);
 }

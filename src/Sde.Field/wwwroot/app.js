@@ -91,10 +91,66 @@
     $("who").hidden = false;
     message("");
     show("find");
+    teams();
     search("");
   }
 
+  // ───────── My assignments ─────────
+
+  var teamKey = "sde-team";
+
+  function savedTeam() {
+    try { return localStorage.getItem(teamKey) || ""; } catch (e) { return ""; }
+  }
+
+  function teams() {
+    api("GET", "/api/teams").then(function (r) {
+      if (!r.ok || r.data.length === 0) { $("mine").hidden = true; return; }
+      var select = $("team");
+      while (select.options.length > 1) { select.remove(1); }
+      r.data.forEach(function (t) { select.appendChild(el("option", { value: t.teamId, text: t.name })); });
+      var saved = savedTeam();
+      select.value = r.data.some(function (t) { return t.teamId === saved; }) ? saved : "";
+      $("mine").hidden = false;
+      assignments(select.value);
+    });
+  }
+
+  function assignments(teamId) {
+    var list = $("assignments");
+    list.textContent = "";
+    if (!teamId) { return; }
+    api("GET", "/api/teams/" + teamId + "/assignments").then(function (r) {
+      if (!r.ok) { message(r.data.error); return; }
+      if (r.data.length === 0) {
+        list.appendChild(el("li", { text: "Nothing assigned to this team yet." }));
+        return;
+      }
+      r.data.forEach(function (a) {
+        var prefix = a.routeOrder ? a.routeOrder + ". " : "";
+        var extra = [a.shortCode, a.status !== "Assigned" ? a.status : null, a.dueDate ? "Due " + a.dueDate : null];
+        list.appendChild(structureItem(a.structure, prefix, extra));
+      });
+    });
+  }
+
+  $("team").addEventListener("change", function () {
+    try { localStorage.setItem(teamKey, $("team").value); } catch (e) { }
+    assignments($("team").value);
+  });
+
   // ───────── Search and add ─────────
+
+  function structureItem(s, prefix, extra) {
+    var meta = [s.city, s.owner, s.parcel ? "Parcel " + s.parcel : null, s.recordId ? "Record " + s.recordId : null, s.result]
+      .concat(extra || []).filter(function (x) { return x; }).join(" · ");
+    var b = el("button", { type: "button" }, [
+      el("span", { className: "addr", text: (prefix || "") + s.address }),
+      el("span", { className: "meta", text: meta || s.structureType })
+    ]);
+    b.addEventListener("click", function () { openStructure(s); });
+    return el("li", null, [b]);
+  }
 
   function search(q) {
     api("GET", "/api/structures?q=" + encodeURIComponent(q)).then(function (r) {
@@ -105,16 +161,7 @@
         list.appendChild(el("li", { text: q ? "Nothing matches. Add the structure below." : "No structures yet." }));
         return;
       }
-      r.data.forEach(function (s) {
-        var meta = [s.city, s.owner, s.parcel ? "Parcel " + s.parcel : null, s.recordId ? "Record " + s.recordId : null, s.result]
-          .filter(function (x) { return x; }).join(" · ");
-        var b = el("button", { type: "button" }, [
-          el("span", { className: "addr", text: s.address }),
-          el("span", { className: "meta", text: meta || s.structureType })
-        ]);
-        b.addEventListener("click", function () { openStructure(s); });
-        list.appendChild(el("li", null, [b]));
-      });
+      r.data.forEach(function (s) { list.appendChild(structureItem(s)); });
     });
   }
 
