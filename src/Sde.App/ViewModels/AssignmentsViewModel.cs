@@ -1,12 +1,15 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using Avalonia.Media;
+using Avalonia.Media.Immutable;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Sde.App.Maps;
 using Sde.App.Services;
 using Sde.App.ViewModels.Sheets;
 using Sde.Core;
 using Sde.Core.Field;
+using Sde.Core.Records;
 using Sde.Data;
 using Sde.Reports;
 
@@ -149,7 +152,7 @@ public sealed partial class AssignmentsViewModel : ViewModelBase
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(HasTeam), nameof(TeamTitle), nameof(TeamDetail))]
-	[NotifyCanExecuteChangedFor(nameof(EditTeamCommand), nameof(RemoveTeamCommand), nameof(OrderRouteCommand), nameof(RouteSheetCommand), nameof(WorksheetsCommand))]
+	[NotifyCanExecuteChangedFor(nameof(EditTeamCommand), nameof(RemoveTeamCommand), nameof(OrderRouteCommand), nameof(RouteSheetCommand), nameof(WorksheetsCommand), nameof(KeepOfflineCommand))]
 	public partial TeamRowViewModel SelectedTeam { get; set; }
 
 	public bool HasTeams => Teams.Count > 0;
@@ -277,10 +280,81 @@ public sealed partial class AssignmentsViewModel : ViewModelBase
 	[RelayCommand(CanExecute = nameof(HasTeam))]
 	private Task RouteSheet() => WriteKitAsync("route sheet", (team, stops, options, path) => FieldKit.WriteRouteSheet(team, stops, _app.Store.Reference, options, path));
 
+	/// <summary>A page per structure, each with a small map around it (from the map's background, when it has one).</summary>
 	[RelayCommand(CanExecute = nameof(HasTeam))]
-	private Task Worksheets() => WriteKitAsync("worksheets", (team, stops, options, path) => FieldKit.WriteWorksheets(team, stops, _app.Store.Reference, options, path));
+	private Task Worksheets() => WriteKitAsync("worksheets", (team, stops, options, path) => FieldKit.WriteWorksheets(team, stops, _app.Store.Reference, options, path), withMaps: true);
 
-	private async Task WriteKitAsync(string what, Action<TeamRecord, IReadOnlyList<FieldKitStop>, FieldKitOptions, string> write)
+	/// <summary>How much ground a worksheet's map shows across, in metres (about 820 ft).</summary>
+	public const double WorksheetMapMetres = 250;
+
+	/// <summary>How long a worksheet's map waits for its background pieces.</summary>
+	public static TimeSpan WorksheetMapWait { get; set; } = TimeSpan.FromSeconds(5);
+
+	private static readonly IBrush WorksheetDot = new ImmutableSolidColorBrush(Color.Parse("#C62828"));
+
+	/// <summary>
+	/// A small map for each structure with coordinates, by assignment: the map's background around it with its dot.
+	/// When the first one gets none of its background (no connection), the rest are left without a map.
+	/// </summary>
+	private async Task<Dictionary<Guid, byte[]>> WorksheetMapsAsync(IReadOnlyList<FieldKitStop> stops)
+	{
+		Dictionary<Guid, byte[]> maps = new Dictionary<Guid, byte[]>();
+		Basemap basemap = _main.Map.Basemap;
+		if (basemap?.HasTiles != true)
+		{
+			return maps;
+		}
+		const double widthInches = 7.0;
+		foreach (FieldKitStop s in stops)
+		{
+			if (s.Property.Latitude is not decimal lat || s.Property.Longitude is not decimal lon || (lat == 0 && lon == 0))
+			{
+				continue;
+			}
+			(double x, double y) = WebMercator.ToMetres((double)lon, (double)lat);
+			MapPrintScene scene = new MapPrintScene
+			{
+				CenterX = x,
+				CenterY = y,
+				Resolution = WorksheetMapMetres / Math.Cos((double)lat * Math.PI / 180) / (widthInches * 96),
+				ScreenWidth = widthInches * 96,
+				ScreenHeight = FieldKit.MapHeight * 96,
+				Basemap = basemap,
+				Markers = new[] { new MapMarker(s.Property.PropertyID, (double)lat, (double)lon, WorksheetDot) },
+			};
+			MapPrintImage image = await MapPrinter.RenderAsync(scene, _main.Map.Tiles, widthInches, FieldKit.MapHeight, WorksheetMapWait, CancellationToken.None);
+			if (image.TilesWanted > 0 && image.TilesMissing == image.TilesWanted)
+			{
+				break;
+			}
+			maps[s.Assignment.AssignmentID] = image.Png;
+		}
+		return maps;
+	}
+
+	/// <summary>Keep offline: the USGS map around the team's structures, kept on this Mac for the field.</summary>
+	[RelayCommand(CanExecute = nameof(HasTeam))]
+	private async Task KeepOffline()
+	{
+		List<PropertyRecord> placed = Stops.Select(s => s.Stop.Property)
+			.Where(p => p.Latitude is decimal lat && p.Longitude is decimal lon && !(lat == 0 && lon == 0)).ToList();
+		if (placed.Count == 0)
+		{
+			_app.Dialogs.Notify("No area to keep", $"None of {SelectedTeam.Name}'s structures has coordinates yet.");
+			return;
+		}
+		const double margin = 0.004; // about 400 m
+		OfflineAreaSheetViewModel sheet = new OfflineAreaSheetViewModel(_main.Map.Tiles,
+			(double)placed.Min(p => p.Longitude!.Value) - margin, (double)placed.Min(p => p.Latitude!.Value) - margin,
+			(double)placed.Max(p => p.Longitude!.Value) + margin, (double)placed.Max(p => p.Latitude!.Value) + margin,
+			_main.Map.Basemap, $"{SelectedTeam.Name}'s structures, and about 400 m around them");
+		if (await _app.Sheets.ShowAsync(sheet) is string done)
+		{
+			Message = done;
+		}
+	}
+
+	private async Task WriteKitAsync(string what, Action<TeamRecord, IReadOnlyList<FieldKitStop>, FieldKitOptions, string> write, bool withMaps = false)
 	{
 		TeamRecord team = SelectedTeam.Team;
 		List<FieldKitStop> stops = Stops.Select(s => s.Stop).ToList();
@@ -294,10 +368,12 @@ public sealed partial class AssignmentsViewModel : ViewModelBase
 		{
 			return;
 		}
+		Dictionary<Guid, byte[]> maps = withMaps ? await WorksheetMapsAsync(stops) : new Dictionary<Guid, byte[]>();
 		FieldKitOptions options = new FieldKitOptions
 		{
 			CommunityName = _app.Store.GetDefaults()?.NFIPCommunityName,
 			EventName = _app.Scope.Event?.Label,
+			MapSnippet = s => maps.GetValueOrDefault(s.Assignment.AssignmentID),
 		};
 		try
 		{

@@ -13,6 +13,7 @@ public sealed class MapSheetTemplates : IDataTemplate
 	private static readonly Dictionary<Type, Func<Control>> Views = new Dictionary<Type, Func<Control>>
 	{
 		[typeof(OnlineLayerSheetViewModel)] = () => new OnlineLayerSheetView(),
+		[typeof(OfflineAreaSheetViewModel)] = () => new OfflineAreaSheetView(),
 		[typeof(LayerStyleSheetViewModel)] = () => new LayerStyleSheetView(),
 		[typeof(SelectByAttributeSheetViewModel)] = () => new SelectByAttributeSheetView(),
 		[typeof(AssignTeamSheetViewModel)] = () => new AssignTeamSheetView(),

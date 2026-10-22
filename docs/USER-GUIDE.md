@@ -484,7 +484,8 @@ sheet and worksheets. With an event chosen in the sidebar, it shows that event's
 3. On **Assignments**, choose the team. **Order the route** puts its structures in a short driving order
    (straight-line distance); structures without coordinates go at the end.
 4. **Route sheet…** saves a one-page list of the stops, and **Worksheets…** a page per structure with a short code the
-   phone form's search accepts. The pin beside a structure opens directions in Maps.
+   phone form's search accepts and a small map around it (from the map's background, when it has one). The pin beside
+   a structure opens directions in Maps. **Offline…** keeps the map of the team's area on this Mac for the field.
 5. As the team works, set each structure's **Status**: Assigned, Visited, Done or Skipped. The team's line shows how
    many are assigned, assessed and done, and the Dashboard has a **Field teams** chart with the same numbers.
 6. To take structures off a team, tick them and click **Take the ticked structures off the team…**.
@@ -713,6 +714,18 @@ screen, so SDE downloads the background at more detail. It waits up to 30 second
 arrive are left blank, and the page says how many.
 
 ![A printed map](screenshots/56j-map-print.png)
+
+#### Keeping an area for use offline
+Before going somewhere without a connection, keep the background map for the area on the Mac you take:
+
+1. Show the area on the map and click **Offline…** (or, on **Assignments**, choose a team and click **Offline…** for its
+   structures and about 400 m around them).
+2. Choose **USGS topographic map** or **USGS aerial imagery**. Only USGS maps can be kept: OpenStreetMap's rules don't
+   allow downloading areas.
+3. SDE says how many map pieces that is for zooms 12 to 16 (at most 5,000; for a large area the closest zooms are left
+   out). Click **Keep offline**.
+
+The map then shows the area with no connection. Kept pieces are used until SDE can fetch fresh ones.
 
 #### Map and GIS settings
 **Settings > Map & GIS** has:

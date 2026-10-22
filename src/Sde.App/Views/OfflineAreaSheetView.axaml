@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:maps="using:Sde.App.Maps"
+             x:Class="Sde.App.Views.OfflineAreaSheetView"
+             x:DataType="sh:OfflineAreaSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="Downloads the background map for this area onto this Mac, so the map still shows it with no connection. Do it on the Mac going to the field, while it is still online." />
+    <TextBlock Classes="medium" Text="{Binding AreaName}" TextWrapping="Wrap" />
+    <StackPanel Classes="field">
+      <TextBlock Classes="fieldLabel" Text="Background map" />
+      <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Basemap}" IsEnabled="{Binding !IsBusy}" HorizontalAlignment="Stretch"
+                AutomationProperties.Name="Background map to keep">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="maps:Basemap">
+            <TextBlock Text="{Binding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Classes="muted" TextWrapping="Wrap" Text="Only USGS maps can be kept: OpenStreetMap's rules don't allow downloading areas." />
+    </StackPanel>
+    <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" />
+    <StackPanel Spacing="4" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6" IsVisible="{Binding IsBusy}" AutomationProperties.Name="Download progress" />
+      <TextBlock Classes="muted" Text="{Binding Status}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Stop" Command="{Binding StopCommand}" IsVisible="{Binding IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding !IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Keep offline" IsDefault="True" Command="{Binding KeepCommand}" IsEnabled="{Binding CanKeep}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

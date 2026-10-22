@@ -8,7 +8,7 @@
              x:DataType="vm:MapViewModel">
   <DockPanel Margin="{StaticResource PagePadding}">
     <!-- What a click or drag does, the basemap and the zoom buttons -->
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,12">
       <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
         <RadioButton GroupName="MapMode" Content="Open" IsChecked="{Binding IsBrowse, Mode=OneWay}"
                      Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.Browse}"
@@ -26,7 +26,8 @@
                      Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.Edit}"
                      AutomationProperties.Name="Edit mode: draw and change the shapes of your own layers" />
       </StackPanel>
-      <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Hint}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="18,0" />
+      <!-- The hint has a line of its own under the tools, so the toolbar never squeezes it -->
+      <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Classes="muted" Text="{Binding Hint}" TextWrapping="Wrap" Margin="0,8,0,0" />
       <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
         <DropDownButton Name="BookmarksButton" Content="Bookmarks" AutomationProperties.Name="Bookmarks: saved views of the map">
           <DropDownButton.Flyout>
@@ -72,6 +73,13 @@
           <c:Icon Kind="ZoomOut" />
         </Button>
         <Button Content="Show all" Command="{Binding FitToStructuresCommand}" AutomationProperties.Name="Zoom to show all structures" />
+        <Button Command="{Binding KeepOfflineCommand}" ToolTip.Tip="Keep the background map of this area on this Mac, for working without a connection"
+                AutomationProperties.Name="Keep this area of the map offline">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="Download" />
+            <TextBlock Text="Offline…" />
+          </StackPanel>
+        </Button>
         <Button Command="{Binding PrintMapCommand}" ToolTip.Tip="Print the map to a PDF" AutomationProperties.Name="Print the map to a PDF">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <c:Icon Kind="Print" />

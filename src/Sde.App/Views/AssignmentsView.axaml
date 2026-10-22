@@ -61,6 +61,8 @@
                       ToolTip.Tip="A short driving order, by straight-line distance" />
               <Button Content="Route sheet…" Command="{Binding RouteSheetCommand}" IsEnabled="{Binding HasStops}" AutomationProperties.Name="Save the route sheet as a PDF" />
               <Button Content="Worksheets…" Command="{Binding WorksheetsCommand}" IsEnabled="{Binding HasStops}" AutomationProperties.Name="Save the field worksheets as a PDF" />
+              <Button Content="Offline…" Command="{Binding KeepOfflineCommand}" IsEnabled="{Binding HasStops}"
+                      AutomationProperties.Name="Keep the map around the team's structures on this Mac" ToolTip.Tip="Keep the background map around these structures on this Mac, for the field" />
               <Button Classes="icon" Command="{Binding EditTeamCommand}" AutomationProperties.Name="Edit the team" ToolTip.Tip="Edit the team">
                 <c:Icon Kind="Edit" Size="14" />
               </Button>
