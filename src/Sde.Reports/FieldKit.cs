@@ -5,6 +5,7 @@ using MigraDoc.Rendering;
 using QRCoder;
 using Sde.Core;
 using Sde.Core.Assessments;
+using Sde.Core.Field;
 using Sde.Core.Records;
 using Sde.Data;
 using Sde.Reports.Internal;
@@ -85,10 +86,20 @@ public static class FieldKit
 		return stops;
 	}
 
-	/// <summary>An Apple Maps link with directions to the structure, or null without coordinates.</summary>
-	public static string MapsLink(PropertyRecord p) => p?.Latitude is decimal lat && p.Longitude is decimal lon && (lat != 0 || lon != 0)
-		? "https://maps.apple.com/?daddr=" + lat.ToString("0.######", CultureInfo.InvariantCulture) + "," + lon.ToString("0.######", CultureInfo.InvariantCulture)
-		: null;
+	/// <summary>
+	/// An Apple Maps link with directions to the structure: to its position, or to its address when it has no
+	/// coordinates (see <see cref="RouteOrder.MapsLink"/>); null when it has neither.
+	/// </summary>
+	public static string MapsLink(PropertyRecord p, ReferenceData reference)
+	{
+		if (p == null)
+		{
+			return null;
+		}
+		AssessmentView v = View(p, reference);
+		string address = Fmt.Join(", ", v.StreetAddress, v.City?.Trim(), Fmt.Join(" ", reference.StateAbbreviation(p.StateID), v.Zip));
+		return RouteOrder.MapsLink(new RouteStop(p.PropertyID, (double?)p.Latitude, (double?)p.Longitude, address));
+	}
 
 	/// <summary>The route sheet: one line per stop. Writes the PDF only once it rendered.</summary>
 	public static void WriteRouteSheet(TeamRecord team, IReadOnlyList<FieldKitStop> stops, ReferenceData reference, FieldKitOptions options, string path)
@@ -125,7 +136,7 @@ public static class FieldKit
 		int first = t.Rows.Count - stops.Count;
 		for (int i = 0; i < stops.Count; i++)
 		{
-			if (MapsLink(stops[i].Property) is string link)
+			if (MapsLink(stops[i].Property, reference) is string link)
 			{
 				Cell cell = t.Rows[first + i].Cells[5];
 				Paragraph p = cell.Elements.LastObject as Paragraph ?? cell.AddParagraph();
@@ -175,7 +186,7 @@ public static class FieldKit
 		code.Format.Font.Size = 13;
 		code.Format.Font.Bold = true;
 		code.Format.SpaceBefore = 4;
-		if (MapsLink(s.Property) is string link)
+		if (MapsLink(s.Property, reference) is string link)
 		{
 			Paragraph dir = r.Cells[0].AddParagraph();
 			FormattedText text = dir.AddHyperlink(link, HyperlinkType.Url).AddFormattedText("Open in Maps");

@@ -31,8 +31,9 @@ public class FieldKitTests : IDisposable
 		Assert.Equal(new[] { second.Property.PropertyID, first.Property.PropertyID }, stops.Select(s => s.Property.PropertyID));
 		Assert.Equal(new[] { 1, 2 }, stops.Select(s => s.Number));
 		Assert.NotNull(stops[1].Latest);
-		Assert.Null(FieldKit.MapsLink(stops[0].Property));
-		Assert.Equal("https://maps.apple.com/?daddr=39.7589,-84.1916", FieldKit.MapsLink(stops[1].Property));
+		// Without coordinates the link goes to the address instead.
+		Assert.StartsWith("https://maps.apple.com/?daddr=123%20Second", FieldKit.MapsLink(stops[0].Property, _db.Store.Reference));
+		Assert.Equal("https://maps.apple.com/?daddr=39.7589,-84.1916", FieldKit.MapsLink(stops[1].Property, _db.Store.Reference));
 
 		string route = Path.Combine(_db.Folder, "kit", "route.pdf");
 		FieldKit.WriteRouteSheet(team, stops, _db.Store.Reference, new FieldKitOptions { CommunityName = "Sample Community" }, route);
