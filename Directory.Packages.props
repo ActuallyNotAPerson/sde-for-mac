@@ -71,7 +71,7 @@
     <PackageVersion Include="Svg.Skia" Version="3.2.1" />
     <PackageVersion Include="Svg.Custom" Version="3.2.1" />
     <PackageVersion Include="Svg.Model" Version="3.2.1" />
-    <PackageVersion Include="ShimSkiaSharp" Version="3.2.1" />
+    <PackageVersion Include="ShimSkiaSharp" Version="5.2.3" />
     <PackageVersion Include="ExCSS" Version="4.3.1" />
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
