@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.CommentThreadsView"
+             x:DataType="vm:CommentThreadsViewModel">
+  <!-- An assessment's review comments: the threads (open first), each with its replies, Reply and Resolve, then a new comment -->
+  <StackPanel Spacing="10">
+    <TextBlock Classes="muted" Text="No comments yet." IsVisible="{Binding IsEmpty}" />
+    <TextBlock Classes="muted" Text="Every comment is resolved." IsVisible="{Binding AllResolvedHidden}" />
+
+    <ItemsControl ItemsSource="{Binding Threads}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="8" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:CommentThreadItemViewModel">
+          <Border Classes="subtle">
+            <StackPanel Spacing="6">
+              <!-- The comment -->
+              <StackPanel Spacing="2">
+                <TextBlock Classes="muted xs" Text="{Binding Root.Byline}" TextWrapping="Wrap" />
+                <Button Classes="link" Content="{Binding FieldText}" IsVisible="{Binding CanGoToField}" HorizontalAlignment="Left"
+                        Command="{Binding GoToFieldCommand}" ToolTip.Tip="Go to this field" />
+                <TextBlock Classes="secondary sm" Text="{Binding FieldText}" IsVisible="{Binding ShowFieldText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Root.Body}" TextWrapping="Wrap" />
+              </StackPanel>
+
+              <!-- Replies -->
+              <ItemsControl ItemsSource="{Binding Replies}" IsVisible="{Binding HasReplies}" Margin="12,0,0,0">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:CommentViewModel">
+                    <Border Classes="rule" Padding="0,6,0,0" Margin="0,0,0,4">
+                      <StackPanel Spacing="2">
+                        <TextBlock Classes="muted xs" Text="{Binding Byline}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Body}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <TextBlock Classes="muted xs" Text="{Binding ResolvedText}" IsVisible="{Binding IsResolved}" TextWrapping="Wrap" />
+
+              <!-- Reply box -->
+              <StackPanel Spacing="6" IsVisible="{Binding IsReplying}">
+                <TextBox Text="{Binding ReplyText}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48" PlaceholderText="Write a reply"
+                         AutomationProperties.Name="{Binding AccessibleReplyBox}" />
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                  <Button Classes="sm" Content="Cancel" Command="{Binding CancelReplyCommand}" AutomationProperties.Name="Cancel the reply" />
+                  <Button Classes="sm primary" Content="Reply" Command="{Binding SendReplyCommand}" AutomationProperties.Name="Send the reply" />
+                </StackPanel>
+              </StackPanel>
+
+              <!-- Actions -->
+              <StackPanel Orientation="Horizontal" Spacing="14" IsVisible="{Binding !IsReplying}">
+                <Button Classes="link" Content="Reply" Command="{Binding StartReplyCommand}" IsVisible="{Binding IsOpen}" AutomationProperties.Name="{Binding AccessibleReply}" />
+                <Button Classes="link" Content="Resolve" Command="{Binding ResolveCommand}" IsVisible="{Binding IsOpen}" AutomationProperties.Name="{Binding AccessibleResolve}" />
+                <Button Classes="link" Content="Open again" Command="{Binding ReopenCommand}" IsVisible="{Binding IsResolved}" AutomationProperties.Name="{Binding AccessibleReopen}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <Button Classes="link" Content="{Binding ResolvedToggleText}" Command="{Binding ToggleResolvedCommand}" IsVisible="{Binding HasResolved}" HorizontalAlignment="Left"
+            AutomationProperties.Name="{Binding ResolvedToggleText}" />
+
+    <!-- A new comment -->
+    <StackPanel Spacing="6">
+      <TextBox Text="{Binding NewComment}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="56" PlaceholderText="Add a comment for the inspector or other reviewers"
+               AutomationProperties.Name="New comment" />
+      <Button Classes="primary" HorizontalAlignment="Right" Command="{Binding AddCommand}" AutomationProperties.Name="Add the comment">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <c:Icon Kind="Comment" Size="14" />
+          <TextBlock Text="Add comment" />
+        </StackPanel>
+      </Button>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

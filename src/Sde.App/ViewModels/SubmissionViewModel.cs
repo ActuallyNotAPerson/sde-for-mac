@@ -93,7 +93,8 @@ public sealed partial class SubmissionViewModel(AppServices app, MainViewModel m
 			return;
 		}
 		main.Editor?.Save(); // write what's on screen, not the last autosave
-		if (!await ExportWarnings.ConfirmNotFinalAsync(app, _ids.ToList()))
+		if (!await ExportWarnings.ConfirmNotFinalAsync(app, _ids.ToList())
+			|| !await ExportWarnings.ConfirmQaAsync(app, _ids.ToList(), main.Review.ShowErrorsFor))
 		{
 			return;
 		}

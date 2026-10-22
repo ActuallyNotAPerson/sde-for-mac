@@ -42,6 +42,9 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 {
 	private readonly AppServices _app;
 
+	/// <summary>The sidebar page the open assessment was opened from (Structures unless Review or Compliance opened it).</summary>
+	private Page _editorParent = Page.Structures;
+
 	public MainViewModel(AppServices app)
 	{
 		_app = app;
@@ -53,8 +56,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Trash = new TrashViewModel(app);
 		Map = new MapViewModel(app, this);
 		Dashboard = new DashboardViewModel(app);
-		Review = new PlaceholderPageViewModel("Review", "Check assessments before they are final.", "Review",
-			"No assessments to review", "Assessments waiting for review, and the checks that flag possible problems, appear here.");
+		Review = new ReviewViewModel(app, this);
 		Compliance = new PlaceholderPageViewModel("Compliance", "Follow up on substantially damaged structures.", "Compliance",
 			"No compliance cases", "Substantially damaged structures appear here with their permits, deadlines, ICC claims and final inspections.");
 		Assignments = new PlaceholderPageViewModel("Assignments", "Who inspects what, and in what order.", "Assignments",
@@ -71,6 +73,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			app.Scope.Refresh(app.Store);
 			RefreshEvents();
 			Structures.Reload();
+			ReloadOfficePages();
 			RefreshStatus();
 		};
 		app.Changes.Changed += OnExternalChanges;
@@ -117,7 +120,17 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		{
 			Dashboard.Reload();
 		}
+		ReloadOfficePages();
 		RefreshStatus();
+	}
+
+	/// <summary>Review catches up with the database while it is showing.</summary>
+	private void ReloadOfficePages()
+	{
+		if (Review.IsActive)
+		{
+			Review.Reload();
+		}
 	}
 
 	/// <summary>Adds an event and chooses it in the sidebar.</summary>
@@ -156,7 +169,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	/// <summary>The ⌘K command palette.</summary>
 	public CommandPaletteViewModel Palette { get; }
 
-	public PlaceholderPageViewModel Review { get; }
+	/// <summary>The review queue, the quality checks and reviewers' comments.</summary>
+	public ReviewViewModel Review { get; }
 
 	public PlaceholderPageViewModel Compliance { get; }
 
@@ -196,7 +210,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 
 	private void UpdateSidebar()
 	{
-		Page active = SidebarPage(ActivePage);
+		Page active = ActivePage == Page.Editor ? _editorParent : SidebarPage(ActivePage);
 		foreach (NavItemViewModel item in SidebarItems)
 		{
 			item.IsActive = item.Page == active;
@@ -246,7 +260,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	/// </summary>
 	public string PageParent => ActivePage switch
 	{
-		Page.Editor when Editor != null => "Structures",
+		Page.Editor when Editor != null => SidebarItems.FirstOrDefault(i => i.Page == _editorParent)?.Title ?? "Structures",
 		Page.SourceImport => "Import & export",
 		_ => null,
 	};
@@ -373,14 +387,35 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		}
 		// In an event, the count is the event's structures.
 		int structures = _app.Scope.IsAll ? p : Structures.StructureCount;
+		// Review counts the assessments waiting (Draft and Reviewed).
+		int waiting = Count("Couldn't count the assessments waiting for review", () => ReviewViewModel.CountWaiting(_app));
 		foreach (NavItemViewModel item in SidebarItems)
 		{
 			item.Count = item.Page switch
 			{
 				Page.Structures => structures,
 				Page.Trash => deleted,
+				Page.Review => waiting,
 				_ => 0,
 			};
+			item.CountTone = item.Page switch
+			{
+				Page.Review => Tone.Accent,
+				_ => Tone.Neutral,
+			};
+		}
+	}
+
+	private static int Count(string failure, Func<int> count)
+	{
+		try
+		{
+			return count();
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			AppLog.Write(failure, ex);
+			return 0;
 		}
 	}
 
@@ -408,6 +443,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		};
 		Map.IsActive = page == Page.Map;
 		Dashboard.IsActive = page == Page.Dashboard;
+		Review.IsActive = page == Page.Review;
 		RefreshStatus();
 		if (page == Page.Map)
 		{
@@ -421,6 +457,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (page == Page.Trash)
 		{
 			Trash.Reload();
+		}
+		if (page == Page.Review)
+		{
+			Review.Reload();
 		}
 		if (page == Page.Structures)
 		{
@@ -448,6 +488,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		{
 			Trash.Reload();
 		}
+		ReloadOfficePages();
 		if (Editor != null && (changes.Unversioned || changes.Assessments.Contains(Editor.Assessment.AssessmentID) || changes.Properties.Contains(Editor.Property.PropertyID)))
 		{
 			RefreshEditor();
@@ -540,7 +581,14 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	/// <summary>Recent databases for File, then Open Recent.</summary>
 	public IReadOnlyList<string> RecentDatabases => _app.RecentDatabases();
 
-	public void OpenAssessment(Guid assessmentId)
+	/// <summary>
+	/// Opens an assessment in the editor. From another assessment (the editor's own switcher, ⌘K while editing) the
+	/// editor keeps the page it was opened from; otherwise closing it leads back to Structures.
+	/// </summary>
+	public void OpenAssessment(Guid assessmentId) => OpenAssessmentFrom(assessmentId, ActivePage == Page.Editor ? _editorParent : Page.Structures);
+
+	/// <summary>Opens an assessment from a page (Review, Compliance), which the breadcrumb and closing the editor lead back to.</summary>
+	public void OpenAssessmentFrom(Guid assessmentId, Page parent)
 	{
 		Editor?.Save();
 		(AssessmentFile file, VersionStamp stamp) = _app.Store.LoadAssessmentWithStamp(assessmentId);
@@ -550,6 +598,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			ShowStructures(saveEditor: false);
 			return;
 		}
+		_editorParent = parent;
 		Editor = new AssessmentEditorViewModel(_app, this, file, stamp: stamp);
 		ActivePage = Page.Editor;
 		CurrentPage = Editor;
@@ -559,6 +608,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	/// <summary>Opens a new assessment that isn't saved yet (see <see cref="Sde.Data.SdeStore.NewDraft"/>).</summary>
 	public void OpenDraft(AssessmentFile draft)
 	{
+		if (ActivePage != Page.Editor)
+		{
+			_editorParent = Page.Structures;
+		}
 		Editor?.Save();
 		// A new assessment of an existing structure still expects that structure as it was loaded.
 		Guid propertyId = draft.Property.PropertyID;
@@ -579,14 +632,20 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Editor = null;
 	}
 
+	/// <summary>
+	/// Leaves the editor for the page it was opened from (Structures, unless Review or Compliance opened it), saving
+	/// the assessment first unless <paramref name="saveEditor"/> is false. From any other page, shows Structures.
+	/// </summary>
 	public void ShowStructures(bool saveEditor = true)
 	{
+		Page back = ActivePage == Page.Editor ? _editorParent : Page.Structures;
 		if (!saveEditor)
 		{
 			Editor = null;
 		}
-		Show(Page.Structures);
+		Show(back);
 		Editor = null;
+		_editorParent = Page.Structures;
 	}
 
 	Guid? IEditorHost.OpenAssessmentId => Editor?.Assessment.AssessmentID;

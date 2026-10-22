@@ -159,4 +159,57 @@ public class AccessibilityTests
 
 		Assert.True(problems.Count == 0, string.Join("\n", problems));
 	}
+
+	/// <summary>
+	/// The Review page (v2.5): its queue with an assessment's checks and comments beside it, its quality checks with
+	/// one set aside; and its sheets: set aside, comments and the question before an export.
+	/// </summary>
+	[AvaloniaFact]
+	public async Task TheOfficePagesAndTheirSheetsHaveAccessibleNames()
+	{
+		using UiSession ui = new UiSession();
+		ScreenTourTests.AddSamples(ui.Store);
+		ui.Services.RaiseDataChanged();
+		List<string> problems = new();
+		void Check(string part)
+		{
+			ui.Pump();
+			problems.AddRange(Unnamed(ui.Window).Distinct().Select(p => part + ": " + p));
+		}
+		Guid ranch = ui.Store.ListStructures().First(s => s.Address.StartsWith("123", StringComparison.Ordinal)).AssessmentID!.Value;
+		Sde.Data.ReviewCommentRecord question = ui.Store.AddReviewComment(ranch, "Can you confirm the HVAC damage?");
+		ui.Store.AddReviewComment(ranch, "Confirmed.", parentId: question.CommentID);
+		ui.Store.AddReviewComment(ranch, "Is this the right date?", "Assessment.DateofInspection");
+		ui.Store.Apply(ranch, f => f.Assessment.DateofInspection = new DateTime(2026, 9, 1));
+
+		ui.Main.ShowCommand.Execute(ViewModels.Page.Review);
+		ReviewViewModel review = ui.Main.Review;
+		review.Selected = review.Rows.Single(r => r.AssessmentID == ranch);
+		review.SelectedComments.Threads[0].StartReplyCommand.Execute(null);
+		Check("Review queue");
+		review.ShowAllFindingsCommand.Execute(null);
+		QaFindingViewModel finding = review.Groups.First(g => g.Rule.Id == Sde.Core.Quality.QaRuleIds.MissingPhotos).Findings[0];
+		Task dismissing = review.DismissFindingCommand.ExecuteAsync(finding);
+		Check("Set aside sheet");
+		((DismissFindingSheetViewModel)ui.Main.Sheets.Current).Reason = "Checked on site.";
+		((DismissFindingSheetViewModel)ui.Main.Sheets.Current).DismissCommand.Execute(null);
+		await dismissing;
+		review.ShowDismissed = true;
+		Check("Review checks");
+
+		ui.Main.OpenAssessment(ranch);
+		Task comments = ui.Main.Editor.ShowCommentsCommand.ExecuteAsync(null);
+		Check("Comments sheet");
+		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
+		await comments;
+
+		ui.Dialogs.Answers.Enqueue(ui.Folder);
+		Task exporting = ui.Main.ImportExport.ExportAllCommand.ExecuteAsync(null);
+		Check("Quality errors before an export");
+		Assert.IsType<QaBeforeExportSheetViewModel>(ui.Main.Sheets.Current);
+		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
+		await exporting;
+
+		Assert.True(problems.Count == 0, string.Join("\n", problems));
+	}
 }

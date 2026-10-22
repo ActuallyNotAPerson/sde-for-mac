@@ -496,6 +496,13 @@
         <TextBlock Classes="secondary" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,16,0" />
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
           <TextBlock Classes="muted" Text="{Binding SaveState}" VerticalAlignment="Center" Margin="0,0,6,0" />
+          <Button Classes="sm" Command="{Binding ShowCommentsCommand}" AutomationProperties.Name="{Binding CommentsAccessibleName}"
+                  ToolTip.Tip="Reviewers' comments on this assessment">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:Icon Kind="Comment" Size="12" Classes="tertiary" />
+              <TextBlock Text="{Binding CommentsText}" />
+            </StackPanel>
+          </Button>
           <DropDownButton Classes="sm" AutomationProperties.Name="{Binding StatusLabel, StringFormat='Status: {0}. Change status'}"
                   ToolTip.Tip="Where this assessment is in review. Final and Letter sent lock it.">
             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -555,6 +562,7 @@
                 <MenuItem Header="Undo" Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}" InputGesture="Cmd+Z" />
                 <MenuItem Header="Redo" Command="{Binding RedoCommand}" IsEnabled="{Binding CanRedo}" InputGesture="Cmd+Shift+Z" />
                 <MenuItem Header="History…" Command="{Binding ShowHistoryCommand}" />
+                <MenuItem Header="Comments…" Command="{Binding ShowCommentsCommand}" />
                 <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" IsEnabled="{Binding IsEditable}" />
                 <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
                 <Separator />

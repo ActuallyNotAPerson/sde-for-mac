@@ -371,6 +371,33 @@ such as **Draft ▾**):
 
 The Structures list has a **Status** column and a status filter, so you can list everything not yet Final.
 
+### The Review page
+**Review** (⌘4) is where a reviewer works through the assessments before they are made Final. It follows the event
+chosen in the sidebar. Its badge counts the assessments in review (Draft or Reviewed).
+
+- **Queue** lists the assessments in review, the ones with the most problems first. Each row shows the result, how
+  many quality checks found something (**Checks**) and how many comment threads are open (**Comments**). Choose
+  another status above the list, or **Every status**. Click a column's header to sort by it. Double-click a row to
+  open the assessment; closing it brings you back to Review.
+- **Quality checks** lists what the checks found, grouped by check, with what each check looks for. Errors, such as an
+  inspection dated before the damage, should be fixed before you export. Warnings and notes are worth a look.
+  - **Go to field** opens the assessment at the field to fix.
+  - When something doesn't need fixing (two units on one parcel, say), click **Set aside…** and say why.
+  - Tick **Show the ones set aside** to see them with their reasons. **Bring back** lists one again.
+  - Setting aside and bringing back are kept in the history.
+- Select an assessment in the queue to see its open checks and its **comments** beside the list. Write a comment for
+  the inspector or other reviewers, **Reply** to one, and **Resolve** it when it is settled. In the editor, the
+  **Comments** button (or **⋯ > Comments…**) shows the same threads. A comment about a field links to it.
+- **Mark reviewed** sets the ticked assessments (or the selected one) to Reviewed. Final and Letter sent assessments
+  are left alone.
+- The tiles at the top count the assessments in review, the open checks, the errors and the open comments. Click one
+  to see them.
+
+The flood map zone and high-water mark checks need an online look-up or a marks file, so the Review page doesn't run
+them.
+
+![The Review page](screenshots/110-review.png)
+
 ### Locks
 A **Final** or **Letter sent** assessment can't be changed: not in the editor, not by bulk changes, not by imports and
 not from the phone form. To change one, choose another status. SDE asks for a reason, which is kept in the history.
@@ -501,7 +528,8 @@ percent damaged list** and the **Community report**. They print in the list's or
 ### Exporting for FEMA's SDE or your state
 1. On Structures, check the structures (or filter the list), then choose **Export ▾ > To FEMA SDE (export folder)…**.
    To export everything, choose **File > Export All to SDE…** (⌘E) instead.
-2. If some assessments aren't Final, SDE asks whether to export them anyway.
+2. If some assessments aren't Final, SDE asks whether to export them anyway. If some have quality errors (see
+   [The Review page](#the-review-page)), it says how many and offers to show them on the Review page instead.
 3. Choose where to save. SDE writes an `SDE_n` folder with `Export.json` and the photos, exactly as FEMA's SDE writes
    it. FEMA's SDE 3.0 opens it with *Import SDE data*.
 
@@ -515,7 +543,8 @@ One folder with everything a community usually sends after an event:
 2. Choose **Export ▾ > Submission folder (reports + FEMA package)…**.
 3. Choose the **Report for each assessment** (one-page Summary or Detailed), **With photos** or not, and whether to
    **Include incomplete assessments**.
-4. Click **Choose a folder and write…**. A progress bar shows each report; stopping removes the half-written folder.
+4. Click **Choose a folder and write…**. As with an export, SDE asks first about assessments that aren't Final or
+   have quality errors. A progress bar shows each report; stopping removes the half-written folder.
 
 ```
 SDE submission 2026-10-08 1430/

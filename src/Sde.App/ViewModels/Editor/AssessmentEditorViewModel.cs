@@ -144,6 +144,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		LoadStatus();
 		InitFieldData();
 		RefreshEvent();
+		RefreshComments();
 	}
 
 	public AssessmentFile File { get; }
