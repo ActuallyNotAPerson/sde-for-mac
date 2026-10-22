@@ -1,3 +1,4 @@
+using Sde.Core.Addresses;
 using Sde.Core.Records;
 
 namespace Sde.Interop.Tests;
