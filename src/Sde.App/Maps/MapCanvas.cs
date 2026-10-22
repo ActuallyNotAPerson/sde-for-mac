@@ -38,7 +38,7 @@ namespace Sde.App.Maps;
 /// these files' problem. Clicks are handled here rather than by the engine (which waits 300 ms for a double click and
 /// only hits a dot's own pixels): a click within 11 px of a dot hits it, found through an STRtree.
 /// </remarks>
-public sealed class MapCanvas : Panel, IDisposable
+public sealed partial class MapCanvas : Panel, IDisposable
 {
 	public const double MinZoom = 2;
 	public const double MaxZoom = 19;
@@ -438,9 +438,17 @@ public sealed class MapCanvas : Panel, IDisposable
 						built = BuiltFeatureLayer.Build(spec, _theme, (float)PixelDensity);
 						_built[spec.Key] = built;
 					}
-					else if (built.Spec.SelectionRevision != spec.SelectionRevision || built.Spec.Visible != spec.Visible || !ReferenceEquals(built.Spec.Display, spec.Display))
+					else
 					{
-						built.ShowSelection(spec, _theme);
+						bool editsChanged = (spec.Edits?.Revision ?? 0) != built.EditRevision;
+						if (editsChanged)
+						{
+							built.ShowEdits(spec.Edits);
+						}
+						if (editsChanged || built.Spec.SelectionRevision != spec.SelectionRevision || built.Spec.Visible != spec.Visible || !ReferenceEquals(built.Spec.Display, spec.Display))
+						{
+							built.ShowSelection(spec, _theme);
+						}
 					}
 					built.Layer.Opacity = spec.Display?.ClampedOpacity ?? 1;
 					break;
@@ -497,6 +505,7 @@ public sealed class MapCanvas : Panel, IDisposable
 			if (layer is MapFeatureLayer spec && _built.TryGetValue(spec.Key, out BuiltFeatureLayer built))
 			{
 				order.Add(built.Layer);
+				order.Add(built.Edits);
 			}
 			else if (layer is MapTileLayer tiles && _overlays.TryGetValue(tiles.Key, out (TileLayer Layer, SdeTileSource Source) o))
 			{
@@ -523,6 +532,7 @@ public sealed class MapCanvas : Panel, IDisposable
 		{
 			order.Add(_structureLabels);
 		}
+		order.Add(Handles);
 		LayerCollection layers = _control.Map.Layers;
 		if (!layers.SequenceEqual(order))
 		{
@@ -548,6 +558,7 @@ public sealed class MapCanvas : Panel, IDisposable
 				bool on = spec.Visible && (spec.Display?.IsVisibleAt(scale) ?? true);
 				built.Layer.Enabled = on;
 				built.Selection.Enabled = on;
+				built.Edits.Enabled = on;
 				if (built.Labels != null)
 				{
 					built.Labels.Enabled = on && spec.Labels.IsVisibleAt(scale);
@@ -741,6 +752,7 @@ public sealed class MapCanvas : Panel, IDisposable
 			built.ShowSelection(built.Spec, _theme);
 		}
 		ShowMarkers();
+		ShowHandles();
 	}
 
 	private IBrush Resource(string key) =>
@@ -787,6 +799,7 @@ public sealed class MapCanvas : Panel, IDisposable
 		_structures = null;
 		_rings = null;
 		_structureLabels = null;
+		_handles = null;
 		ApplyTheme();
 		ShowBasemap();
 		ShowLayers(_layers);
@@ -916,6 +929,14 @@ public sealed class MapCanvas : Panel, IDisposable
 		}
 		_pressedAt = point.Position;
 		_moved = false;
+		if (BeginEditDrag(point.Position, e.KeyModifiers))
+		{
+			// A corner, a shape or a structure's dot is being dragged: the engine never sees it, so the map stays put.
+			_pressedAt = null;
+			e.Pointer.Capture(this);
+			e.Handled = true;
+			return;
+		}
 		if (_sketchKind != MapSketch.None && e.ClickCount >= 2)
 		{
 			// A double click finishes the line or polygon (its first click already added the last corner).
@@ -935,6 +956,12 @@ public sealed class MapCanvas : Panel, IDisposable
 
 	private void OnMoved(object sender, PointerEventArgs e)
 	{
+		if (_drag != null)
+		{
+			UpdateEditDrag(e.GetPosition(this));
+			e.Handled = true;
+			return;
+		}
 		if (_pressedAt is not Point start)
 		{
 			return;
@@ -964,6 +991,13 @@ public sealed class MapCanvas : Panel, IDisposable
 
 	private void OnReleased(object sender, PointerReleasedEventArgs e)
 	{
+		if (_drag != null)
+		{
+			e.Pointer.Capture(null);
+			e.Handled = true;
+			EndEditDrag(e.GetPosition(this));
+			return;
+		}
 		if (_pressedAt is not Point start)
 		{
 			return;
@@ -1009,6 +1043,11 @@ public sealed class MapCanvas : Panel, IDisposable
 	/// </summary>
 	public void Click(Point at, bool add = false)
 	{
+		if (_editLayer != null && _sketchKind == MapSketch.None)
+		{
+			EditClick(at);
+			return;
+		}
 		if (_sketchKind != MapSketch.None)
 		{
 			if (_sketchFinished)
@@ -1017,7 +1056,8 @@ public sealed class MapCanvas : Panel, IDisposable
 				_sketch.Clear();
 				_sketchFinished = false;
 			}
-			(double lat, double lon) = ToLatLon(at);
+			// While editing, corners snap to nearby corners and edges.
+			(double lat, double lon) = _editLayer != null ? SnappedLatLon(at) : ToLatLon(at);
 			_sketch.Add(new LatLon(lat, lon));
 			DrawSketch();
 			SketchChanged?.Invoke(_sketch.ToList(), false);
@@ -1095,6 +1135,11 @@ public sealed class MapCanvas : Panel, IDisposable
 		base.OnKeyDown(e);
 		if (_control == null)
 		{
+			return;
+		}
+		if (EditKey(e.Key))
+		{
+			e.Handled = true;
 			return;
 		}
 		Viewport v = Viewport;

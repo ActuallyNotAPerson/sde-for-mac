@@ -118,6 +118,8 @@ public class EditingTests
 		SnapResult toCorner = Snapping.Snap(new Coordinate(97, 101), new[] { parcel }, 5);
 		Assert.Equal(SnapKind.Vertex, toCorner.Kind);
 		Assert.Equal(new Coordinate(100, 100), toCorner.At);
+		Assert.Equal(0, toCorner.Candidate);
+		Assert.Equal(new VertexRef(0, 0, 2), toCorner.Vertex);
 
 		// Only the edge is within reach: onto the edge, straight across.
 		SnapResult toEdge = Snapping.Snap(new Coordinate(50, 103), new[] { parcel }, 5);
@@ -132,6 +134,7 @@ public class EditingTests
 		Point well = F.CreatePoint(new Coordinate(103, 98));
 		SnapResult nearest = Snapping.Snap(new Coordinate(102, 98.5), new Geometry[] { parcel, well }, 5);
 		Assert.Equal(new Coordinate(103, 98), nearest.At);
+		Assert.Equal(1, nearest.Candidate);
 		Assert.False(Snapping.Snap(new Coordinate(1, 1), new[] { parcel }, 0).Snapped);
 	}
 

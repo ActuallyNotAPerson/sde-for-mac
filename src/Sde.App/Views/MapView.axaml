@@ -22,6 +22,9 @@
         <RadioButton GroupName="MapMode" Content="Measure" IsChecked="{Binding IsMeasure, Mode=OneWay}"
                      Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.Measure}"
                      AutomationProperties.Name="Measure mode: click points to measure a distance or an area" />
+        <RadioButton GroupName="MapMode" Content="Edit" IsChecked="{Binding IsEdit, Mode=OneWay}"
+                     Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.Edit}"
+                     AutomationProperties.Name="Edit mode: draw and change the shapes of your own layers" />
       </StackPanel>
       <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Hint}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="18,0" />
       <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
@@ -90,7 +93,8 @@
                         AutomationProperties.Name="Try downloading the map tiles again" />
               </StackPanel>
             </Border>
-            <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20,14" IsVisible="{Binding OnMapCount, Converter={x:Static app:Converters.IsZero}}">
+            <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20,14" IsHitTestVisible="False"
+                    IsVisible="{Binding OnMapCount, Converter={x:Static app:Converters.IsZero}}">
               <StackPanel Spacing="4" MaxWidth="360">
                 <TextBlock Classes="h3" Text="No structures on the map yet" HorizontalAlignment="Center" />
                 <TextBlock Classes="secondary" TextWrapping="Wrap" TextAlignment="Center"
@@ -99,7 +103,7 @@
             </Border>
 
             <!-- Tools for the mode, and what is selected -->
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Spacing="8" MaxWidth="520">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Spacing="8" MaxWidth="600">
               <Border Classes="card compact" IsVisible="{Binding IsSelect}">
                 <WrapPanel ItemSpacing="8" LineSpacing="6">
                   <TextBlock Classes="secondary" Text="Select in" VerticalAlignment="Center" />
@@ -114,6 +118,40 @@
                   <ToggleButton Content="Draw an area" IsChecked="{Binding IsPolygonSelect}" AutomationProperties.Name="Select by drawing an area: click its corners" />
                   <Button Content="By attribute…" Command="{Binding SelectByAttributeCommand}" AutomationProperties.Name="Select by the values of a field" />
                 </WrapPanel>
+              </Border>
+              <Border Name="EditBar" Classes="card compact" IsVisible="{Binding IsEdit}" HorizontalAlignment="Left">
+                <StackPanel Spacing="8">
+                  <WrapPanel ItemSpacing="8" LineSpacing="6">
+                    <TextBlock Classes="secondary" Text="Edit" VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding EditableLayers}" SelectedItem="{Binding EditLayer}" PlaceholderText="No layer to edit" MinWidth="150"
+                              IsVisible="{Binding HasEditableLayers}" AutomationProperties.Name="Layer to edit">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:MapLayerViewModel">
+                          <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ListBox Classes="segmented" ItemsSource="{Binding EditTools}" SelectedItem="{Binding SelectedEditTool}"
+                             IsVisible="{Binding EditLayer, Converter={x:Static ObjectConverters.IsNotNull}}"
+                             AutomationProperties.Name="Edit tool: change shapes or add new ones" />
+                    <Button Content="New layer…" Command="{Binding NewLayerCommand}" AutomationProperties.Name="Make a new layer to draw on" />
+                  </WrapPanel>
+                  <WrapPanel ItemSpacing="6" LineSpacing="6" IsVisible="{Binding EditLayer, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <CheckBox Content="Snap" IsChecked="{Binding SnapToShapes}" ToolTip.Tip="New corners snap to nearby corners and edges, and to structures"
+                              AutomationProperties.Name="Snap new corners to nearby corners, edges and structures" />
+                    <Button Classes="icon" Command="{Binding UndoEditCommand}" ToolTip.Tip="{Binding UndoEditText}" AutomationProperties.Name="{Binding UndoEditText}">
+                      <c:Icon Kind="Undo" />
+                    </Button>
+                    <Button Classes="icon" Command="{Binding RedoEditCommand}" ToolTip.Tip="{Binding RedoEditText}" AutomationProperties.Name="{Binding RedoEditText}">
+                      <c:Icon Kind="Redo" />
+                    </Button>
+                    <Button Content="Delete shape" Command="{Binding DeleteEditFeatureCommand}" IsVisible="{Binding HasEditFeature}"
+                            AutomationProperties.Name="Delete the picked shape" />
+                    <TextBlock Classes="muted" Text="{Binding EditStatus}" VerticalAlignment="Center" Margin="4,0" AutomationProperties.LiveSetting="Polite" />
+                    <Button Classes="subtle" Content="Discard…" Command="{Binding DiscardEditsCommand}" AutomationProperties.Name="Discard the unsaved edits" />
+                    <Button Classes="primary" Content="Save" Command="{Binding SaveEditsCommand}" AutomationProperties.Name="Save the edits to the map layers file" />
+                  </WrapPanel>
+                </StackPanel>
               </Border>
               <Border Classes="card compact" IsVisible="{Binding IsMeasure}" Width="300" HorizontalAlignment="Left">
                 <StackPanel Spacing="6">
@@ -194,7 +232,7 @@
           </Grid>
         </Border>
 
-        <!-- The attribute table (read-only) -->
+        <!-- The attribute table (values can be typed in while its layer is being edited) -->
         <Border Grid.Row="1" Classes="card flush" Height="250" Margin="0,10,0,0" IsVisible="{Binding IsTableOpen}">
           <DockPanel>
             <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="10" Margin="12,8">
@@ -214,7 +252,7 @@
                 <c:Icon Kind="Close" />
               </Button>
             </Grid>
-            <DataGrid Name="TableGrid" ItemsSource="{Binding TableRows}" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Extended"
+            <DataGrid Name="TableGrid" ItemsSource="{Binding TableRows}" IsReadOnly="{Binding !TableEditable}" AutoGenerateColumns="False" SelectionMode="Extended"
                       CanUserSortColumns="True" CanUserResizeColumns="True" CanUserReorderColumns="False" GridLinesVisibility="Horizontal"
                       AutomationProperties.Name="Attribute table" />
           </DockPanel>
@@ -243,6 +281,8 @@
                   <MenuItem Header="From an ArcGIS web address…" Command="{Binding AddOnlineLayerCommand}" />
                   <Separator />
                   <MenuItem Header="FEMA flood zones" Command="{Binding AddFloodZonesCommand}" />
+                  <Separator />
+                  <MenuItem Header="New layer to draw on…" Command="{Binding NewLayerCommand}" />
                 </MenuFlyout>
               </DropDownButton.Flyout>
             </DropDownButton>
@@ -356,7 +396,7 @@
             <!-- Set location -->
             <StackPanel Spacing="6" IsVisible="{Binding IsSetLocation}">
               <TextBlock Classes="eyebrow" Text="STRUCTURE TO PLACE" />
-              <ComboBox ItemsSource="{Binding Unplaced}" SelectedItem="{Binding PlaceTarget}" HorizontalAlignment="Stretch"
+              <ComboBox ItemsSource="{Binding PlaceChoices}" SelectedItem="{Binding PlaceTarget}" HorizontalAlignment="Stretch"
                         PlaceholderText="Structures without coordinates" AutomationProperties.Name="Structure to place">
                 <ComboBox.ItemTemplate>
                   <DataTemplate x:DataType="vm:MapPointViewModel">

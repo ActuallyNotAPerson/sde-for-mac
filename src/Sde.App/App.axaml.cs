@@ -27,8 +27,23 @@ public partial class App : Application
 			window.DataContext = main;
 			_main = main;
 			window.Restore(services.Settings.Window);
-			window.Closing += (_, _) =>
+			bool mapEditsSettled = false;
+			window.Closing += (_, e) =>
 			{
+				if (main.Map.HasUnsavedEdits && !mapEditsSettled)
+				{
+					// Unsaved map edits: ask first (save, throw away, or keep the window open), then close again.
+					e.Cancel = true;
+					Dispatcher.UIThread.Post(async () =>
+					{
+						if (await main.Map.ConfirmLeaveEditsAsync())
+						{
+							mapEditsSettled = true;
+							window.Close();
+						}
+					});
+					return;
+				}
 				main.Editor?.Save();
 				services.Settings.Window = window.Placement();
 				services.Settings.Save();

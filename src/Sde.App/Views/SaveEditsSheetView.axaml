@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.SaveEditsSheetView"
+             x:DataType="sh:SaveEditsSheetViewModel">
+  <StackPanel Spacing="16">
+    <TextBlock Classes="secondary" Text="{Binding Message}" TextWrapping="Wrap" />
+    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+      <Button Classes="danger" Content="Don't save" Command="{Binding DiscardCommand}" MinWidth="90" HorizontalContentAlignment="Center"
+              AutomationProperties.Name="Don't save: throw the edits away" />
+      <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center"
+              AutomationProperties.Name="Cancel: keep editing" />
+      <Button Grid.Column="3" Classes="primary" Content="Save" Command="{Binding SaveCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center"
+              AutomationProperties.Name="Save the edits" />
+    </Grid>
+  </StackPanel>
+</UserControl>

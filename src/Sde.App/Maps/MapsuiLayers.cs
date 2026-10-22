@@ -27,6 +27,22 @@ internal sealed class BuiltFeatureLayer : IDisposable
 
 	private readonly STRtree<int> _index = new STRtree<int>();
 
+	/// <summary>One engine style per symbol and kind of geometry (a layer may mix points, lines and polygons).</summary>
+	private readonly Dictionary<Symbol, IStyle[]> _styles = new Dictionary<Symbol, IStyle[]>(ReferenceEqualityComparer.Instance);
+
+	/// <summary>Every drawn feature in drawing order, hidden ones included (<see cref="Source"/> leaves the hidden out).</summary>
+	private List<IFeature> _drawn = new List<IFeature>();
+
+	/// <summary>Ids of features not drawn from the layer itself because the editor draws their new versions.</summary>
+	private HashSet<long> _hidden = new HashSet<long>();
+
+	/// <summary>The label points, with the id of the feature each belongs to.</summary>
+	private List<(IFeature Label, long Id)> _labelPoints = new List<(IFeature, long)>();
+
+	/// <summary>The edited features drawn over the layer, in Web Mercator, and the features themselves.</summary>
+	private Geometry[] _editShapes = Array.Empty<Geometry>();
+	private Feature[] _editFeatures = Array.Empty<Feature>();
+
 	private BuiltFeatureLayer(MapFeatureLayer spec)
 	{
 		Spec = spec;
@@ -46,6 +62,12 @@ internal sealed class BuiltFeatureLayer : IDisposable
 	/// <summary>The selected features, outlined in the accent colour.</summary>
 	public MemoryLayer Selection { get; private set; }
 
+	/// <summary>Unsaved edits: the changed and new features as they are now, drawn in the layer's style over it.</summary>
+	public MemoryLayer Edits { get; private set; }
+
+	/// <summary>The <see cref="MapLayerEdits.Revision"/> drawn now (0 when there are no edits).</summary>
+	public int EditRevision { get; private set; }
+
 	public bool IsRasterized { get; private set; }
 
 	/// <summary>The drawn features' geometries in Web Mercator metres, in drawing order.</summary>
@@ -58,8 +80,6 @@ internal sealed class BuiltFeatureLayer : IDisposable
 	public static BuiltFeatureLayer Build(MapFeatureLayer spec, MapTheme theme, float pixelDensity)
 	{
 		BuiltFeatureLayer built = new BuiltFeatureLayer(spec);
-		// One engine style per symbol and kind of geometry (a layer may mix points, lines and polygons).
-		Dictionary<Symbol, IStyle[]> styles = new Dictionary<Symbol, IStyle[]>(ReferenceEqualityComparer.Instance);
 		List<IFeature> drawn = new List<IFeature>();
 		List<Geometry> shapes = new List<Geometry>();
 		List<Feature> features = new List<Feature>();
@@ -76,15 +96,8 @@ internal sealed class BuiltFeatureLayer : IDisposable
 				continue;
 			}
 			Geometry metres = ToMetres(f.Geometry);
-			GeometryKind kind = FeatureLayer.KindOf(f.Geometry);
-			if (!styles.TryGetValue(symbol, out IStyle[] byKind))
-			{
-				byKind = new IStyle[4];
-				styles[symbol] = byKind;
-			}
-			IStyle s = byKind[(int)kind] ??= SymbolStyleFor(symbol, kind);
 			GeometryFeature g = new GeometryFeature(metres);
-			g.Styles.Add(s);
+			g.Styles.Add(built.StyleFor(symbol, FeatureLayer.KindOf(f.Geometry)));
 			built._index.Insert(metres.EnvelopeInternal, shapes.Count);
 			drawn.Add(g);
 			shapes.Add(metres);
@@ -93,6 +106,7 @@ internal sealed class BuiltFeatureLayer : IDisposable
 		built._index.Build();
 		built.Shapes = shapes.ToArray();
 		built.Features = features.ToArray();
+		built._drawn = drawn;
 		built.Source = new MemoryLayer(spec.Name ?? spec.Key) { Features = drawn, Style = null };
 		built.IsRasterized = drawn.Count > RasterizeAbove;
 		built.Layer = built.IsRasterized
@@ -102,8 +116,89 @@ internal sealed class BuiltFeatureLayer : IDisposable
 		built.Layer.Opacity = spec.Display?.ClampedOpacity ?? 1;
 		built.Labels = BuildLabels(spec, built);
 		built.Selection = new MemoryLayer((spec.Name ?? spec.Key) + " selected") { Style = theme.SelectionStyle(spec.Data?.GeometryKind ?? GeometryKind.Unknown) };
+		built.Edits = new MemoryLayer((spec.Name ?? spec.Key) + " edits") { Style = null };
+		built.Edits.Attribution.Enabled = false;
+		built.ShowEdits(spec.Edits);
 		built.ShowSelection(spec, theme);
 		return built;
+	}
+
+	/// <summary>The engine style for a symbol on a kind of geometry, made once.</summary>
+	private IStyle StyleFor(Symbol symbol, GeometryKind kind)
+	{
+		if (!_styles.TryGetValue(symbol, out IStyle[] byKind))
+		{
+			byKind = new IStyle[4];
+			_styles[symbol] = byKind;
+		}
+		return byKind[(int)kind] ??= SymbolStyleFor(symbol, kind);
+	}
+
+	/// <summary>
+	/// Draws unsaved edits: the layer's own copies of <see cref="MapLayerEdits.Hidden"/> features are left out (a large
+	/// layer's raster tiles are drawn again for the view only), and the edited features are drawn over it.
+	/// </summary>
+	public void ShowEdits(MapLayerEdits edits)
+	{
+		HashSet<long> hidden = new HashSet<long>(edits?.Hidden ?? Array.Empty<long>());
+		if (!hidden.SetEquals(_hidden))
+		{
+			_hidden = hidden;
+			Source.Features = _hidden.Count == 0 ? _drawn : _drawn.Where((f, i) => !_hidden.Contains(Features[i].Id)).ToList();
+			Source.DataHasChanged();
+			if (Labels != null)
+			{
+				Labels.Features = _labelPoints.Where(l => !_hidden.Contains(l.Id)).Select(l => l.Label).ToList();
+				Labels.DataHasChanged();
+			}
+		}
+		LayerStyle style = Spec.Style ?? new LayerStyle();
+		List<IFeature> overlay = new List<IFeature>();
+		List<Geometry> shapes = new List<Geometry>();
+		List<Feature> features = new List<Feature>();
+		foreach (Feature f in edits?.Drawn ?? Array.Empty<Feature>())
+		{
+			if (f.Geometry == null || f.Geometry.IsEmpty || style.SymbolFor(f) is not Symbol symbol)
+			{
+				continue;
+			}
+			Geometry metres = ToMetres(f.Geometry);
+			GeometryFeature g = new GeometryFeature(metres);
+			g.Styles.Add(StyleFor(symbol, FeatureLayer.KindOf(f.Geometry)));
+			overlay.Add(g);
+			shapes.Add(metres);
+			features.Add(f);
+		}
+		_editShapes = shapes.ToArray();
+		_editFeatures = features.ToArray();
+		Edits.Features = overlay;
+		Edits.DataHasChanged();
+		EditRevision = edits?.Revision ?? 0;
+	}
+
+	/// <summary>True when the layer's own copy of a feature is hidden (the editor draws its new version).</summary>
+	public bool IsHidden(long id) => _hidden.Contains(id);
+
+	/// <summary>
+	/// The features drawn now whose bounding boxes meet a Web Mercator rectangle, with their shapes in metres: edited
+	/// ones first (they are on top), then the layer's own (not the hidden ones).
+	/// </summary>
+	public IEnumerable<(Feature Feature, Geometry Metres)> FeaturesNear(Envelope metres)
+	{
+		for (int i = _editShapes.Length - 1; i >= 0; i--)
+		{
+			if (_editShapes[i].EnvelopeInternal.Intersects(metres))
+			{
+				yield return (_editFeatures[i], _editShapes[i]);
+			}
+		}
+		foreach (int i in _index.Query(metres).OrderByDescending(i => i))
+		{
+			if (!_hidden.Contains(Features[i].Id))
+			{
+				yield return (Features[i], Shapes[i]);
+			}
+		}
 	}
 
 	/// <summary>Brings the selection highlight up to date (cheap: the features are not rebuilt).</summary>
@@ -114,9 +209,16 @@ internal sealed class BuiltFeatureLayer : IDisposable
 		List<IFeature> selected = new List<IFeature>();
 		for (int i = 0; i < Features.Length; i++)
 		{
-			if (ids.Contains(Features[i].Id))
+			if (ids.Contains(Features[i].Id) && !_hidden.Contains(Features[i].Id))
 			{
 				selected.Add(new GeometryFeature(Shapes[i]));
+			}
+		}
+		for (int i = 0; i < _editFeatures.Length; i++)
+		{
+			if (ids.Contains(_editFeatures[i].Id))
+			{
+				selected.Add(new GeometryFeature(_editShapes[i]));
 			}
 		}
 		Selection.Style = theme.SelectionStyle(spec.Data?.GeometryKind ?? GeometryKind.Unknown);
@@ -135,10 +237,22 @@ internal sealed class BuiltFeatureLayer : IDisposable
 	{
 		Envelope around = new Envelope(x - tolerance, x + tolerance, y - tolerance, y + tolerance);
 		Point p = new Point(x, y);
+		// Edited features are drawn on top, so they are hit first.
+		for (int i = _editShapes.Length - 1; i >= 0; i--)
+		{
+			if (_editShapes[i].EnvelopeInternal.Intersects(around) && DistanceOp.Distance(_editShapes[i], p) <= tolerance)
+			{
+				return _editFeatures[i];
+			}
+		}
 		int best = -1;
 		double bestDistance = double.MaxValue;
 		foreach (int i in _index.Query(around))
 		{
+			if (_hidden.Contains(Features[i].Id))
+			{
+				continue;
+			}
 			double d = DistanceOp.Distance(Shapes[i], p);
 			if (d > tolerance)
 			{
@@ -199,6 +313,15 @@ internal sealed class BuiltFeatureLayer : IDisposable
 		return copy;
 	}
 
+	/// <summary>A Web Mercator geometry in WGS 84 longitude and latitude (a copy, with the WGS 84 factory).</summary>
+	public static Geometry ToWgs84(Geometry metres)
+	{
+		Geometry copy = Sde.Gis.GisSetup.Factory.CreateGeometry(metres);
+		copy.Apply(new LatLonFilter());
+		copy.GeometryChanged();
+		return copy;
+	}
+
 	private static MemoryLayer BuildLabels(MapFeatureLayer spec, BuiltFeatureLayer built)
 	{
 		Sde.Gis.Styles.LabelStyle labels = spec.Labels;
@@ -219,6 +342,7 @@ internal sealed class BuiltFeatureLayer : IDisposable
 			PointFeature label = new PointFeature(anchor.X, anchor.Y);
 			label["text"] = text;
 			points.Add(label);
+			built._labelPoints.Add((label, built.Features[i].Id));
 		}
 		MemoryLayer layer = new MemoryLayer((spec.Name ?? spec.Key) + " labels")
 		{
@@ -246,6 +370,22 @@ internal sealed class BuiltFeatureLayer : IDisposable
 		}
 		Labels?.Dispose();
 		Selection?.Dispose();
+		Edits?.Dispose();
+	}
+
+	/// <summary>Turns Web Mercator metres into longitude and latitude, coordinate by coordinate.</summary>
+	private sealed class LatLonFilter : ICoordinateSequenceFilter
+	{
+		public bool Done => false;
+
+		public bool GeometryChanged => true;
+
+		public void Filter(CoordinateSequence seq, int i)
+		{
+			(double lon, double lat) = WebMercator.FromMetres(seq.GetX(i), seq.GetY(i));
+			seq.SetX(i, lon);
+			seq.SetY(i, lat);
+		}
 	}
 
 	/// <summary>Turns longitude and latitude into Web Mercator metres, coordinate by coordinate.</summary>

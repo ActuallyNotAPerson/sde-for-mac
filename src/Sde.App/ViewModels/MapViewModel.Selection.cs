@@ -43,6 +43,8 @@ public sealed partial class MapViewModel
 	{
 		MapMode.Select when IsPolygonSelect => MapSketch.Polygon,
 		MapMode.Measure => MeasureArea ? MapSketch.Polygon : MapSketch.Line,
+		MapMode.Edit when EditLayer != null && EditTool == MapEditTool.AddLine => MapSketch.Line,
+		MapMode.Edit when EditLayer != null && EditTool == MapEditTool.AddArea => MapSketch.Polygon,
 		_ => MapSketch.None,
 	};
 
@@ -176,6 +178,10 @@ public sealed partial class MapViewModel
 		if (Mode == MapMode.Measure)
 		{
 			UpdateMeasurement(points, finished);
+		}
+		else if (Mode == MapMode.Edit && finished)
+		{
+			AddSketchedShape(points);
 		}
 		else if (Mode == MapMode.Select && IsPolygonSelect && finished)
 		{

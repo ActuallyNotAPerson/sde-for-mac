@@ -15,8 +15,12 @@ public enum SnapKind
 	Edge,
 }
 
-/// <summary>Where a point ends up after snapping, and what it snapped to.</summary>
-public readonly record struct SnapResult(Coordinate At, SnapKind Kind)
+/// <summary>
+/// Where a point ends up after snapping, and what it snapped to: which candidate (its position in the list given) and,
+/// for a corner, which corner, so the caller can take that corner's exact coordinate from another copy of the shape
+/// (the map snaps in Web Mercator metres but keeps longitude and latitude).
+/// </summary>
+public readonly record struct SnapResult(Coordinate At, SnapKind Kind, int Candidate = -1, VertexRef? Vertex = null)
 {
 	public bool Snapped => Kind != SnapKind.None;
 }
@@ -42,10 +46,15 @@ public static class Snapping
 		}
 		Coordinate bestVertex = null;
 		double vertexDistance = double.MaxValue;
+		int vertexCandidate = -1;
+		VertexRef vertexRef = default;
 		Coordinate bestEdge = null;
 		double edgeDistance = double.MaxValue;
+		int edgeCandidate = -1;
+		int index = -1;
 		foreach (Geometry g in candidates)
 		{
+			index++;
 			if (g == null || g.IsEmpty)
 			{
 				continue;
@@ -55,13 +64,15 @@ public static class Snapping
 			{
 				continue;
 			}
-			foreach ((VertexRef _, Coordinate at) in GeometryEdit.Vertices(g))
+			foreach ((VertexRef v, Coordinate at) in GeometryEdit.Vertices(g))
 			{
 				double d = at.Distance(p);
 				if (d <= tolerance && d < vertexDistance)
 				{
 					bestVertex = at;
 					vertexDistance = d;
+					vertexCandidate = index;
+					vertexRef = v;
 				}
 			}
 			if (bestVertex != null)
@@ -77,15 +88,16 @@ public static class Snapping
 				{
 					bestEdge = on;
 					edgeDistance = d;
+					edgeCandidate = index;
 				}
 			}
 		}
 		if (bestVertex != null)
 		{
-			return new SnapResult(new Coordinate(bestVertex.X, bestVertex.Y), SnapKind.Vertex);
+			return new SnapResult(new Coordinate(bestVertex.X, bestVertex.Y), SnapKind.Vertex, vertexCandidate, vertexRef);
 		}
 		return bestEdge != null
-			? new SnapResult(new Coordinate(bestEdge.X, bestEdge.Y), SnapKind.Edge)
+			? new SnapResult(new Coordinate(bestEdge.X, bestEdge.Y), SnapKind.Edge, edgeCandidate)
 			: new SnapResult(p, SnapKind.None);
 	}
 }

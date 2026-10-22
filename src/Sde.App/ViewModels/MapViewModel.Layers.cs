@@ -118,6 +118,10 @@ public sealed partial class MapViewModel
 	/// <summary>Another database was opened: its own layers and basemap.</summary>
 	private void ResetLayers()
 	{
+		SaveEditsBeforeSwitching();
+		EndSession();
+		_editLayer = null;
+		EditFeature = null;
 		_layersRead = false;
 		_layersStore = null;
 		_basemapRow = null;
@@ -200,6 +204,8 @@ public sealed partial class MapViewModel
 		OnPropertyChanged(nameof(Attribution));
 		OnPropertyChanged(nameof(HasAttribution));
 		OnPropertyChanged(nameof(SelectableLayers));
+		OnPropertyChanged(nameof(EditableLayers));
+		OnPropertyChanged(nameof(HasEditableLayers));
 		LayersChanged?.Invoke();
 	}
 
@@ -424,6 +430,15 @@ public sealed partial class MapViewModel
 		{
 			_app.Errors.Show("Couldn't remove the layer", ex);
 			return;
+		}
+		if (ReferenceEquals(layer, _editLayer))
+		{
+			// Its edits went with it.
+			EndSession();
+			_editLayer = null;
+			EditFeature = null;
+			EditStateChanged();
+			OnPropertyChanged(nameof(EditLayer));
 		}
 		Layers.Remove(layer);
 		if (ReferenceEquals(SelectTarget, layer))

@@ -75,6 +75,15 @@ public sealed partial class MapLayerViewModel : ObservableObject
 	/// <summary>Structures and the flood zones stay; other layers can be removed.</summary>
 	public bool CanRemove => !IsStructures;
 
+	/// <summary>
+	/// True for a layer whose shapes can be drawn and changed on the map: one added from a file or made here. Layers
+	/// from ArcGIS services and FEMA's flood zones are read only (their owners keep them up to date).
+	/// </summary>
+	public bool CanEdit => Kind == MapLayerKinds.File && Data != null;
+
+	/// <summary>Unsaved edits the map draws over the layer while it is being edited, or null.</summary>
+	public MapLayerEdits Edits { get; set; }
+
 	[ObservableProperty]
 	public partial bool IsVisible { get; set; }
 
@@ -113,6 +122,7 @@ public sealed partial class MapLayerViewModel : ObservableObject
 			Revision++;
 			OnPropertyChanged();
 			OnPropertyChanged(nameof(Detail));
+			OnPropertyChanged(nameof(CanEdit));
 			UpdateLegend();
 		}
 	}
@@ -181,7 +191,7 @@ public sealed partial class MapLayerViewModel : ObservableObject
 				GeometryKind.Polygon => Data.Features.Count == 1 ? "area" : "areas",
 				_ => Data.Features.Count == 1 ? "feature" : "features",
 			};
-			string from = Kind == MapLayerKinds.ArcGisRest ? "from ArcGIS" : "from " + Path.GetFileName(Record.Source ?? "a file");
+			string from = Kind == MapLayerKinds.ArcGisRest ? "from ArcGIS" : string.IsNullOrEmpty(Record.Source) ? "drawn in SDE" : "from " + Path.GetFileName(Record.Source);
 			return $"{count} {what}, {from}";
 		}
 	}
@@ -255,6 +265,7 @@ public sealed partial class MapLayerViewModel : ObservableObject
 			Selected = Selected,
 			Revision = Revision,
 			SelectionRevision = SelectionRevision,
+			Edits = Edits,
 		};
 	}
 

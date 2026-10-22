@@ -26,6 +26,18 @@ public partial class MapView : UserControl
 		Surface.AreaSelected += (ids, add) => _vm?.SelectArea(ids.ToList(), add);
 		Surface.FeaturesSelected += (layer, features, add) => _vm?.SelectFeatures(layer, features, add);
 		Surface.SketchChanged += (points, finished) => _vm?.SketchChanged(points, finished);
+		Surface.EditFeaturePicked += feature => _vm?.PickEditFeature(feature);
+		Surface.EditShapeChanged += (shape, what) => _vm?.ChangeEditShape(shape, what);
+		Surface.EditPointAdded += point => _vm?.AddEditPoint(point);
+		Surface.EditDeleteRequested += () => _vm?.DeleteEditFeatureCommand.Execute(null);
+		Surface.EditRefused += reason =>
+		{
+			if (_vm != null)
+			{
+				_vm.Message = reason;
+			}
+		};
+		Surface.MarkerDragged += (id, to) => _ = _vm?.DragStructureAsync(id, to);
 		Surface.ViewChanged += OnViewChanged;
 		Surface.SizeChanged += OnCanvasSizeChanged;
 		ZoomInButton.Click += (_, _) => Surface.ZoomBy(1);
@@ -52,14 +64,17 @@ public partial class MapView : UserControl
 	{
 		_fillingTable = true;
 		TableGrid.Columns.Clear();
+		bool editable = _vm?.TableEditable == true;
 		foreach (AttributeColumn column in _vm?.TableColumns ?? Array.Empty<AttributeColumn>())
 		{
 			TableGrid.Columns.Add(new DataGridTextColumn
 			{
 				Header = column.Header,
-				Binding = new Avalonia.Data.Binding($"[{column.Index}]"),
+				// While the layer is being edited, a typed value goes back to the row, which checks it.
+				Binding = new Avalonia.Data.Binding($"[{column.Index}]") { Mode = editable ? Avalonia.Data.BindingMode.TwoWay : Avalonia.Data.BindingMode.OneWay },
 				CustomSortComparer = new AttributeComparer(column.Index),
 				CanUserSort = true,
+				IsReadOnly = !editable,
 				MaxWidth = 320,
 			});
 		}
@@ -106,6 +121,7 @@ public partial class MapView : UserControl
 		_vm.TableColumnsChanged += BuildTableColumns;
 		_vm.ClearSketchRequested += Surface.ClearSketch;
 		_vm.ShowViewRequested += ShowView;
+		_vm.MoveAnswered += Surface.ClearPendingMove;
 		_vm.PropertyChanged += VmChanged;
 		Surface.Tiles = _vm.Tiles;
 		Surface.Basemap = _vm.Basemap;
@@ -139,6 +155,7 @@ public partial class MapView : UserControl
 		_vm.TableColumnsChanged -= BuildTableColumns;
 		_vm.ClearSketchRequested -= Surface.ClearSketch;
 		_vm.ShowViewRequested -= ShowView;
+		_vm.MoveAnswered -= Surface.ClearPendingMove;
 		_vm.PropertyChanged -= VmChanged;
 		Surface.Tiles = null;
 		_vm = null;
@@ -154,7 +171,13 @@ public partial class MapView : UserControl
 			case nameof(MapViewModel.Mode):
 			case nameof(MapViewModel.Sketch):
 			case nameof(MapViewModel.SelectLayerKey):
+			case nameof(MapViewModel.EditLayer):
+			case nameof(MapViewModel.EditTool):
+			case nameof(MapViewModel.SnapToShapes):
 				ApplyMode();
+				break;
+			case nameof(MapViewModel.EditFeature):
+				Surface.EditFeature = _vm.EditFeature;
 				break;
 			case nameof(MapViewModel.Selected):
 				Surface.Highlighted = _vm.Selected?.Id;
@@ -167,11 +190,16 @@ public partial class MapView : UserControl
 	{
 		Surface.Drag = _vm.IsSelect ? MapDrag.Box : MapDrag.Pan;
 		Surface.SelectLayer = _vm.IsSelect ? _vm.SelectLayerKey : null;
+		Surface.EditLayer = _vm.IsEdit ? _vm.EditLayer?.Key : null;
+		Surface.EditTool = _vm.EditTool;
+		Surface.EditFeature = _vm.IsEdit ? _vm.EditFeature : null;
+		Surface.Snap = _vm.SnapToShapes;
+		Surface.MarkersDraggable = _vm.IsSetLocation;
 		if (Surface.Sketch != _vm.Sketch)
 		{
 			Surface.Sketch = _vm.Sketch;
 		}
-		bool cross = _vm.IsSetLocation || _vm.Sketch != MapSketch.None;
+		bool cross = _vm.IsSetLocation || _vm.Sketch != MapSketch.None || _vm.IsEdit && _vm.EditTool == MapEditTool.AddPoint;
 		Surface.Cursor = new Avalonia.Input.Cursor(cross ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
 	}
 

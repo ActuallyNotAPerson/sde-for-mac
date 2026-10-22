@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,21 +12,58 @@ namespace Sde.App.ViewModels;
 /// <summary>A column of the attribute table: the field's position, its header, and whether it sorts as a number.</summary>
 public sealed record AttributeColumn(int Index, string Header, bool IsNumber);
 
-/// <summary>One row of the attribute table: a feature, with its values as text for the cells.</summary>
-public sealed class AttributeRowViewModel(Feature feature, string[] texts)
+/// <summary>
+/// One row of the attribute table: a feature, with its values as text for the cells. While its layer is being edited,
+/// a typed value is handed to the page, which checks it against the field's type and shows the row again either way.
+/// </summary>
+public sealed class AttributeRowViewModel : INotifyPropertyChanged
 {
-	public Feature Feature { get; } = feature;
+	private readonly Action<AttributeRowViewModel, int, string> _edit;
+	private string[] _texts;
+
+	/// <param name="edit">Takes a value typed in a cell (null when the table is read only).</param>
+	public AttributeRowViewModel(Feature feature, string[] texts, Action<AttributeRowViewModel, int, string> edit = null)
+	{
+		Feature = feature;
+		_texts = texts;
+		_edit = edit;
+	}
+
+	public event PropertyChangedEventHandler PropertyChanged;
+
+	public Feature Feature { get; private set; }
 
 	public long Id => Feature.Id;
 
-	/// <summary>The cell text of a column (the table's columns bind to this).</summary>
-	public string this[int column] => column >= 0 && column < texts.Length ? texts[column] : "";
+	/// <summary>The cell text of a column (the table's columns bind to this). Setting it edits the value, when the table can be edited.</summary>
+	public string this[int column]
+	{
+		get => column >= 0 && column < _texts.Length ? _texts[column] : "";
+		set
+		{
+			if (_edit == null || column < 0 || column >= _texts.Length || (value ?? "") == (_texts[column] ?? ""))
+			{
+				return;
+			}
+			_edit(this, column, value);
+			// The cell shows the value as it was saved (or as it was, when the value was refused).
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+		}
+	}
 
 	/// <summary>Every cell's text, in column order.</summary>
-	public IReadOnlyList<string> Texts => texts;
+	public IReadOnlyList<string> Texts => _texts;
 
 	/// <summary>True when any cell contains the text (ignoring case).</summary>
-	public bool Contains(string text) => texts.Any(t => t != null && t.Contains(text, StringComparison.OrdinalIgnoreCase));
+	public bool Contains(string text) => _texts.Any(t => t != null && t.Contains(text, StringComparison.OrdinalIgnoreCase));
+
+	/// <summary>Shows a new version of the row's feature.</summary>
+	public void Show(Feature feature)
+	{
+		Feature = feature;
+		_texts = Enumerable.Range(0, _texts.Length).Select(i => FieldValues.Format(feature[i])).ToArray();
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+	}
 }
 
 /// <summary>Sorts table rows by one column's value: numbers as numbers, empty cells last, text without regard to case.</summary>
@@ -72,7 +110,7 @@ public sealed record IdentifyLine(string Field, string Value)
 	public string SpokenName => $"{Field}: {(string.IsNullOrEmpty(Value) ? "empty" : Value)}";
 }
 
-/// <summary>The attribute table under the map (read-only in this version) and the identify card.</summary>
+/// <summary>The attribute table under the map (its values can be typed while its layer is being edited) and the identify card.</summary>
 public sealed partial class MapViewModel
 {
 	/// <summary>True while the attribute table is shown under the map.</summary>
@@ -103,6 +141,10 @@ public sealed partial class MapViewModel
 	public event Action TableColumnsChanged;
 
 	private FeatureLayer _tableData;
+	private bool _tableEditable;
+
+	/// <summary>True while the table shows the layer being edited: its values can be typed in, checked against each field's type.</summary>
+	public bool TableEditable => IsEdit && _session != null && TableLayer != null && ReferenceEquals(TableLayer, EditLayer);
 
 	partial void OnIsTableOpenChanged(bool value) => RefreshTable();
 
@@ -136,19 +178,23 @@ public sealed partial class MapViewModel
 			}
 			return;
 		}
-		FeatureLayer data = TableLayer.IsStructures ? StructureFeatures : TableLayer.Data;
+		FeatureLayer data = TableLayer.IsStructures ? StructureFeatures : DataOf(TableLayer);
 		if (data == null)
 		{
 			TableRows.Clear();
 			TableCountText = "Reading…";
 			return;
 		}
-		if (!ReferenceEquals(data, _tableData) || TableColumns.Count != data.Fields.Count)
+		bool editable = TableEditable;
+		if (!ReferenceEquals(data, _tableData) || TableColumns.Count != data.Fields.Count || editable != _tableEditable)
 		{
 			_tableData = data;
+			_tableEditable = editable;
 			TableColumns = data.Fields.Select((f, i) => new AttributeColumn(i, f.DisplayName, f.Type is FieldType.Integer or FieldType.Real)).ToList();
+			OnPropertyChanged(nameof(TableEditable));
 			TableColumnsChanged?.Invoke();
 		}
+		Action<AttributeRowViewModel, int, string> edit = editable ? EditTableValue : null;
 		HashSet<long> selected = SelectedIds(TableLayer);
 		string filter = string.IsNullOrWhiteSpace(TableFilter) ? null : TableFilter.Trim();
 		List<AttributeRowViewModel> rows = new List<AttributeRowViewModel>();
@@ -163,7 +209,7 @@ public sealed partial class MapViewModel
 			{
 				texts[i] = FieldValues.Format(f[i]);
 			}
-			AttributeRowViewModel row = new AttributeRowViewModel(f, texts);
+			AttributeRowViewModel row = new AttributeRowViewModel(f, texts, edit);
 			if (filter == null || row.Contains(filter))
 			{
 				rows.Add(row);
