@@ -37,6 +37,9 @@
     <PackageVersion Include="QRCoder" Version="1.6.0" />
     <!-- Pinned where it comes in indirectly (through PDFsharp): 8.0.1 has known vulnerabilities (fixed in 8.0.2). -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
+    <!-- v2.5 Track B helpers: the elevation certificate reader (Sde.Interop) uses PDFsharp directly, the same MIT 6.2.x
+         release Sde.Reports already ships through PDFsharp-MigraDoc -->
+    <PackageVersion Include="PDFsharp" Version="6.2.4" />
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
