@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using Sde.Core;
 using Sde.Core.Records;
 
@@ -77,43 +76,7 @@ public static class FloodInfoMapper
 		return list;
 	}
 
-	private static readonly Regex AWithNumber = new Regex(@"^A\d{1,2}$", RegexOptions.Compiled);
-	private static readonly Regex VWithNumber = new Regex(@"^V\d{1,2}$", RegexOptions.Compiled);
-
-	private static LookupRecord FindZone(FloodInfo info, ReferenceData lookups)
-	{
-		string zone = (info.Zone ?? "").Trim().ToUpperInvariant();
-		string subtype = (info.ZoneSubtype ?? "").Trim().ToUpperInvariant();
-		if (zone.Length == 0)
-		{
-			return null;
-		}
-
-		string name;
-		if (zone == "A" || zone == "AE" || zone == "AH" || zone == "AO" || zone == "AR" || zone == "VE" || zone == "V" || zone == "D")
-		{
-			name = zone;
-		}
-		else if (zone == "A99" || AWithNumber.IsMatch(zone))
-		{
-			name = "A1 thru A99";
-		}
-		else if (VWithNumber.IsMatch(zone))
-		{
-			name = "V";
-		}
-		else if (zone == "X" || zone == "B" || zone == "C"
-			|| zone.Contains("0.2 PCT") || zone.Contains("MINIMAL FLOOD HAZARD")
-			|| subtype.Contains("0.2 PCT") || subtype.Contains("MINIMAL FLOOD HAZARD"))
-		{
-			name = "X";
-		}
-		else
-		{
-			return null;
-		}
-		return FindByName(lookups, LookupTypes.FirmZone, name);
-	}
+	private static LookupRecord FindZone(FloodInfo info, ReferenceData lookups) => FirmZones.Find(info.Zone, lookups, info.ZoneSubtype);
 
 	private static LookupRecord FindByName(ReferenceData lookups, int lookupTypeId, string name)
 	{

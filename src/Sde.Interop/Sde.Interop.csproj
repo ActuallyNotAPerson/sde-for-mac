@@ -15,6 +15,7 @@
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="ExcelDataReader" />
     <PackageReference Include="MetadataExtractor" />
+    <PackageReference Include="PDFsharp" />
   </ItemGroup>
 
   <ItemGroup>

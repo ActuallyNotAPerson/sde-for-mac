@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using Sde.Core;
 using Sde.Core.Records;
 
-namespace Sde.Interop;
+namespace Sde.Core.Addresses;
 
 /// <summary>
 /// An address reduced to what identifies a building: the house number, the street name (lower case, directions and

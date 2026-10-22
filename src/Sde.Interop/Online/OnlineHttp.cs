@@ -20,7 +20,10 @@ internal static class OnlineHttp
 			{
 				throw new OnlineServiceException(
 					$"The {serviceName} had a problem and couldn't answer (error {(int)response.StatusCode}). Try again in a few minutes.",
-					$"GET {url} returned {(int)response.StatusCode} {response.ReasonPhrase}: {Truncate(body)}");
+					$"GET {url} returned {(int)response.StatusCode} {response.ReasonPhrase}: {Truncate(body)}")
+				{
+					StatusCode = (int)response.StatusCode,
+				};
 			}
 		}
 		catch (OperationCanceledException ex) when (!ct.IsCancellationRequested)
@@ -45,6 +48,29 @@ internal static class OnlineHttp
 			throw new OnlineServiceException(
 				$"The {serviceName} sent back something SDE couldn't read. Try again later.",
 				$"GET {url} returned invalid JSON: {Truncate(body)}", ex);
+		}
+	}
+
+	/// <summary>
+	/// <see cref="GetJsonAsync(HttpClient, string, string, TimeSpan, CancellationToken)"/>, asking again up to
+	/// <paramref name="retries"/> more times, <paramref name="retryDelay"/> apart, when the service answers 502, 503 or
+	/// 504 (a busy or restarting gateway, which usually passes).
+	/// </summary>
+	public static async Task<JsonDocument> GetJsonAsync(HttpClient http, string url, string serviceName, TimeSpan timeout, CancellationToken ct, int retries, TimeSpan retryDelay)
+	{
+		for (int attempt = 0; ; attempt++)
+		{
+			try
+			{
+				return await GetJsonAsync(http, url, serviceName, timeout, ct).ConfigureAwait(false);
+			}
+			catch (OnlineServiceException ex) when (ex.StatusCode is 502 or 503 or 504 && attempt < retries)
+			{
+				if (retryDelay > TimeSpan.Zero)
+				{
+					await Task.Delay(retryDelay, ct).ConfigureAwait(false);
+				}
+			}
 		}
 	}
 

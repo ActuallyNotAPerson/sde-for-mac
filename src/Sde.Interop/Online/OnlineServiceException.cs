@@ -13,4 +13,7 @@ public sealed class OnlineServiceException : Exception
 
 	/// <summary>Technical detail for logs and support: what was asked and what came back.</summary>
 	public string Detail { get; }
+
+	/// <summary>The HTTP status code when the service answered with an error, otherwise null.</summary>
+	public int? StatusCode { get; init; }
 }
