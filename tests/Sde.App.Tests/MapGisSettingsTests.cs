@@ -52,6 +52,7 @@ public class MapGisSettingsTests
 	public void ThePanel_StartsWithTheDefaults_AndSavesEachChoiceInTheDatabase()
 	{
 		using UiSession ui = new UiSession();
+		BindingErrors.Instance.Messages.Clear();
 		MapGisSettingsViewModel vm = ShowPanel(ui);
 		MapGisPanel panel = ui.Window.GetVisualDescendants().OfType<MapGisPanel>().Single();
 		Assert.True(panel.IsEffectivelyVisible);
