@@ -172,6 +172,7 @@ public sealed class AppServices
 			IsSample = Store.GetSetting<bool>(SampleDatabase.SettingKey);
 			Tidy(Store);
 			Store.UserName = UserName;
+			Scope.Restore(Store);
 			// Keep everything a test or training session writes next to its database.
 			ImportProfiles = new ImportProfiles(Path.Combine(Path.GetDirectoryName(Store.Database.FilePath)!, ImportProfiles.FolderName));
 			DepthTables = new DepthTables(Path.Combine(Path.GetDirectoryName(Store.Database.FilePath)!, DepthTables.FolderName));
@@ -198,6 +199,9 @@ public sealed class AppServices
 
 	/// <summary>Undo and redo for assessments.</summary>
 	public UndoService Undo { get; } = new UndoService();
+
+	/// <summary>The event chosen in the sidebar, which scopes the pages to its assessments.</summary>
+	public EventScope Scope { get; } = new EventScope();
 
 	/// <summary>
 	/// This app's lease on the open database: shared while it is open, to itself during a restore or a move, which are
@@ -272,6 +276,7 @@ public sealed class AppServices
 		string previous = Store?.Database.FilePath;
 		bool previousWasSample = IsSample;
 		Store = store;
+		Scope.Restore(store);
 		StartWatching(store);
 		IsSample = store.GetSetting<bool>(SampleDatabase.SettingKey);
 		if (IsSample && !previousWasSample)

@@ -143,6 +143,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		_lastSaved = UndoService.Snapshot(File);
 		LoadStatus();
 		InitFieldData();
+		RefreshEvent();
 	}
 
 	public AssessmentFile File { get; }
@@ -562,13 +563,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		UpdateCumulative();
 		Validate();
 		Title = Address(Property, _app.Store.Reference);
-		Subtitle = string.Join(" · ", new[]
-		{
-			Property.StructureTypeID == 1 ? Reference.LookupName(Property.ResidenceTypeID) ?? "Residential" : Reference.LookupName(Property.StructureUseID) ?? "Non-residential",
-			Property.City,
-			Assessment.DateofInspection is DateTime d ? "inspected " + d.ToString("MMM d, yyyy") : null,
-			_source,
-		}.Where(s => !string.IsNullOrEmpty(s)));
+		Subtitle = ComposeSubtitle();
 		OnPropertyChanged(nameof(Cost));
 		OnPropertyChanged(nameof(IsResidential));
 		OnPropertyChanged(nameof(IsUndetermined));
@@ -969,10 +964,13 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 			if (IsDraft)
 			{
 				IsDraft = false;
+				JoinChosenEvent();
 				LoadOtherAssessments();
 				OnPropertyChanged(nameof(HasOtherAssessments));
 				_app.RaiseDataChanged();
 			}
+			// The damage date may now fall in an event.
+			RefreshEvent();
 		}
 		catch (ConcurrencyException)
 		{
@@ -1316,4 +1314,14 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		Save();
 		await _main.PrintAsync(kind, new[] { Assessment.AssessmentID });
 	}
+
+	/// <summary>"Single Family Residence · Exampleville · inspected Oct 21, 2026 · September flood · from Accela".</summary>
+	private string ComposeSubtitle() => string.Join(" · ", new[]
+	{
+		Property.StructureTypeID == 1 ? Reference.LookupName(Property.ResidenceTypeID) ?? "Residential" : Reference.LookupName(Property.StructureUseID) ?? "Non-residential",
+		Property.City,
+		Assessment.DateofInspection is DateTime d ? "inspected " + d.ToString("MMM d, yyyy") : null,
+		EventLabel,
+		_source,
+	}.Where(s => !string.IsNullOrEmpty(s)));
 }

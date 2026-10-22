@@ -133,6 +133,7 @@
                   <DropDownButton.Flyout>
                     <MenuFlyout>
                       <MenuItem Header="Set a field on these…" Command="{Binding BulkEditCommand}" />
+                      <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
                       <MenuItem Header="Search and replace…" Command="{Binding SearchReplaceCommand}" />
                       <Separator />
                       <MenuItem Header="Look up flood data online…" Command="{Binding LookUpFloodDataCommand}" ToolTip.Tip="Coordinates (Census geocoder) and flood zone (FEMA NFHL) for the checked structures, for you to review" />
@@ -227,6 +228,7 @@
                 <MenuItem Header="Open" Command="{Binding OpenCommand}" CommandParameter="{Binding Selected}" />
                 <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" CommandParameter="{Binding Selected}" />
                 <MenuItem Header="Set a field on the checked structures…" Command="{Binding BulkEditCommand}" />
+                <MenuItem Header="Set event for the checked structures…" Command="{Binding SetEventCommand}" />
                 <Separator />
                 <MenuItem Header="Move to Recently Deleted" Command="{Binding TrashCommand}" CommandParameter="{Binding Selected}" />
               </ContextMenu>
@@ -349,8 +351,7 @@
           </DataGrid>
 
           <!-- Empty states -->
-          <c:EmptyState IsVisible="{Binding IsEmpty}" Icon="Structures" Title="No structures yet"
-                        Text="Start a new residential or non-residential assessment, or bring in data from FEMA's SDE or another system on the Import &amp; export page.">
+          <c:EmptyState IsVisible="{Binding IsEmpty}" Icon="Structures" Title="{Binding EmptyTitle}" Text="{Binding EmptyText}">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Button Classes="primary" Content="New residential" Command="{Binding NewStructureCommand}" CommandParameter="1" />
               <Button Content="New non-residential" Command="{Binding NewStructureCommand}" CommandParameter="2" />

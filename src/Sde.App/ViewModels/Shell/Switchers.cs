@@ -54,6 +54,18 @@ public sealed partial class EventSwitcherViewModel : ObservableObject
 		SelectionChanged?.Invoke(choice);
 	}
 
+	/// <summary>The menu's "New event…" (set by the main window's view model).</summary>
+	public System.Windows.Input.ICommand NewEventCommand { get; set; }
+
+	/// <summary>The menu's "Manage events…".</summary>
+	public System.Windows.Input.ICommand ManageEventsCommand { get; set; }
+
+	/// <summary>Shows <paramref name="eventId"/> as chosen without raising <see cref="SelectionChanged"/> (a database was opened).</summary>
+	public void ShowChosen(Guid? eventId)
+	{
+		Selected = Events.FirstOrDefault(e => e.Id == eventId) ?? EventChoice.All;
+	}
+
 	/// <summary>Replaces the list with "All events" and <paramref name="events"/>, keeping the choice when it is still there.</summary>
 	public void SetEvents(IEnumerable<EventChoice> events)
 	{

@@ -147,6 +147,7 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 		if (words.Count > 0)
 		{
 			list.AddRange(SettingsPages().Where(p => p.Matches(words)));
+			list.AddRange(EventPages().Where(p => p.Matches(words)));
 		}
 		list.AddRange(Commands().Where(c => c.Matches(words)));
 		string group = null;
@@ -194,6 +195,10 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 			_main.Settings.Show(c.Category);
 		}, "settings preferences"));
 
+	/// <summary>Each event, to choose it in the sidebar ("september flood"); only once something is typed.</summary>
+	private IEnumerable<PaletteItem> EventPages() =>
+		_main.Events.Events.Select(e => new PaletteItem("Pages", e.Name, "Event", "Event", null, () => _main.Events.ChooseCommand.Execute(e), "event show only"));
+
 	private IEnumerable<PaletteItem> Commands()
 	{
 		PaletteItem Command(string title, string icon, string shortcut, ICommand command, object parameter = null, string keywords = null) =>
@@ -213,6 +218,9 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 		yield return Command("Export all to SDE…", "Export", "⌘E", _main.ImportExport.ExportAllCommand, keywords: "fema");
 		yield return Command("Search and replace…", "Search", null, _main.Structures.SearchReplaceCommand, keywords: "find");
 		yield return Command("Set a field on checked structures…", "Edit", null, _main.Structures.BulkEditCommand, keywords: "bulk");
+		yield return Command("Set event for checked structures…", "Event", null, _main.Structures.SetEventCommand, keywords: "disaster");
+		yield return Command("New event…", "Event", null, _main.NewEventCommand, keywords: "disaster flood dr");
+		yield return Command("Manage events…", "Event", null, _main.ManageEventsCommand, keywords: "disaster rename delete");
 		yield return Command("Open database…", "FolderOpen", "⌘O", settings.OpenDatabaseCommand);
 		yield return Command("New database…", "Database", null, settings.NewDatabaseCommand);
 		yield return Command("Move or copy database…", "Copy", null, _main.DatabaseSwitcher.MoveOrCopyCommand, keywords: "backup");

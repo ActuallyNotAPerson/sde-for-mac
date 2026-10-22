@@ -40,7 +40,8 @@ File menu and choose New Database. ⌘ is the Command key, ⇧ is Shift and ⌥ 
 | **Assessment** | One damage inspection of a structure: what was damaged, how much, and the result. A structure can have more than one (a second inspection, or damage from a later event). |
 | **Percent damaged** | The cost of repairs divided by the value of the building before the damage. |
 | **Result** (determination) | FEMA's finding for an assessment, such as *Substantially Damaged* (50 percent or more) or *Not Substantially Damaged*. |
-| **Database** | One file holding structures, assessments and photos. Keep one database per event. |
+| **Database** | One file holding structures, assessments and photos. Many offices keep one database per event. |
+| **Event** | A disaster (a flood, a storm) with its name, dates and FEMA disaster number. A database can hold several; each assessment belongs to one at most. |
 
 ### The window
 The sidebar on the left switches between pages:
@@ -119,6 +120,24 @@ These are in **Settings > General**.
 | Let inspectors use phones | Settings > Phone form | [Chapter 15](#15-the-phone-form) |
 
 **Sharing the setup with colleagues:** see [Share your setup](#share-your-setup) in chapter 16.
+
+### 2.6 Events
+When one database holds more than one disaster, give each an event, so you can see one at a time.
+
+1. Click the event switcher at the top of the sidebar and choose **New event…**. Give it a name, the kind, FEMA's
+   disaster number if there is one, and its dates. The **datum offset** is only needed when high-water marks use a
+   different vertical datum from the structures' elevations: it is added to the marks.
+2. SDE chooses the new event. While it is chosen, **Structures**, the **Map**, the **Dashboard** and the reports,
+   letters and exports you make from them cover only its assessments, and a new assessment you start joins it.
+3. To put existing assessments in it, choose **All events**, tick them on the Structures list, then **Change > Set
+   event…**. In the editor, **⋯ > Set event…** does the same for one assessment.
+4. When an assessment's damage date falls between an event's dates and it is in no event, the editor offers to add it.
+
+**Manage events…** in the switcher renames or deletes events. Deleting an event keeps its assessments; they just
+belong to no event. SDE remembers the chosen event for each database. Cumulative damage still counts every event
+together (chapter 14).
+
+![The event dashboard](screenshots/88-dashboard-event.png)
 
 ---
 

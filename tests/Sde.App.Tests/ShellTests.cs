@@ -188,16 +188,20 @@ public class ShellTests
 
 		EventChoice chosen = null;
 		events.SelectionChanged += c => chosen = c;
-		EventChoice storm = new EventChoice(Guid.NewGuid(), "Spring storm", "Apr 2026");
-		events.SetEvents(new[] { storm });
+		EventRecord storm = ui.Store.SaveEvent(new EventRecord { Name = "Spring storm", StartDate = new DateTime(2026, 4, 2) });
+		ui.Services.RaiseDataChanged();
 		Assert.Equal(2, events.Events.Count);
 		Assert.Null(chosen);                                              // still All events
-		events.ChooseCommand.Execute(storm);
-		Assert.Same(storm, chosen);
+		EventChoice choice = events.Events.Single(e => e.Id == storm.EventID);
+		events.ChooseCommand.Execute(choice);
+		Assert.Same(choice, chosen);
 		Assert.Equal("Spring storm", events.Label);
-		events.SetEvents(Array.Empty<EventChoice>());                      // its event is gone: back to All events
-		Assert.Same(EventChoice.All, events.Selected);
-		Assert.Same(EventChoice.All, chosen);
+		ui.Store.DeleteEvent(storm.EventID);                              // its event is gone: back to All events
+		ui.Services.RaiseDataChanged();
+		Assert.Equal(EventChoice.All, events.Selected);
+		Assert.True(ui.Services.Scope.IsAll);
+		ui.Store.SaveEvent(new EventRecord { Name = "Spring storm", StartDate = new DateTime(2026, 4, 2) });
+		ui.Services.RaiseDataChanged();
 
 		OpenFlyoutInWindow(ui, "EventSwitcher");
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));

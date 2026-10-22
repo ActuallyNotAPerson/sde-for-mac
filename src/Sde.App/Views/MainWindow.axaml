@@ -99,6 +99,9 @@
     <DataTemplate DataType="shell:PlaceholderPageViewModel"><v:PlaceholderPageView /></DataTemplate>
     <DataTemplate DataType="sh:ImprovementsSheetViewModel"><v:ImprovementsSheetView /></DataTemplate>
     <DataTemplate DataType="sh:AppealSheetViewModel"><v:AppealSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:EventSheetViewModel"><v:EventSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:ManageEventsSheetViewModel"><v:ManageEventsSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:SetEventSheetViewModel"><v:SetEventSheetView /></DataTemplate>
     <DataTemplate DataType="sh:OwnerLettersSheetViewModel"><v:OwnerLettersSheetView /></DataTemplate>
     <DataTemplate DataType="sh:FieldHelpSheetViewModel"><v:FieldHelpSheetView /></DataTemplate>
     <DataTemplate DataType="sh:HelpIndexSheetViewModel"><v:HelpIndexSheetView /></DataTemplate>
@@ -407,6 +410,19 @@
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
+                  <Border Classes="divider" Margin="0,4" />
+                  <Button Classes="menuItem" Click="OnFlyoutItemClick" Command="{Binding NewEventCommand}" AutomationProperties.Name="New event">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <c:Icon Kind="Plus" Size="14" />
+                      <TextBlock Text="New event…" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="menuItem" Click="OnFlyoutItemClick" Command="{Binding ManageEventsCommand}" AutomationProperties.Name="Manage events">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <c:Icon Kind="Edit" Size="14" />
+                      <TextBlock Text="Manage events…" />
+                    </StackPanel>
+                  </Button>
                 </StackPanel>
               </Flyout>
             </Button.Flyout>

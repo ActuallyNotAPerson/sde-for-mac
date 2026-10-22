@@ -556,6 +556,7 @@
                 <MenuItem Header="Redo" Command="{Binding RedoCommand}" IsEnabled="{Binding CanRedo}" InputGesture="Cmd+Shift+Z" />
                 <MenuItem Header="History…" Command="{Binding ShowHistoryCommand}" />
                 <MenuItem Header="Copy from another structure…" Command="{Binding CopyFromCommand}" IsEnabled="{Binding IsEditable}" />
+                <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
                 <Separator />
                 <MenuItem Header="Improvements and SI…" Command="{Binding ShowImprovementsCommand}" />
                 <MenuItem Header="Appeal…" Command="{Binding ShowAppealCommand}" />
@@ -610,6 +611,13 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Button Content="Use theirs" Command="{Binding UseTheirsCommand}" AutomationProperties.Name="Use their values" />
               <Button Content="Keep mine" Command="{Binding KeepMineCommand}" AutomationProperties.Name="Keep my values" />
+            </StackPanel>
+          </c:Banner>
+          <c:Banner Classes="stacked" Tone="Info" Icon="Event" Margin="0,0,0,14" IsVisible="{Binding HasEventSuggestion}" Text="{Binding EventSuggestionText}"
+                    AutomationProperties.Name="Event suggestion">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="primary" Content="Add to event" Command="{Binding AddToSuggestedEventCommand}" />
+              <Button Content="Not now" Command="{Binding DismissEventSuggestionCommand}" />
             </StackPanel>
           </c:Banner>
           <ContentControl Content="{Binding SelectedSection}" IsEnabled="{Binding IsEditable}" />

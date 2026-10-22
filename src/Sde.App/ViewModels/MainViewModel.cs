@@ -60,11 +60,16 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Assignments = new PlaceholderPageViewModel("Assignments", "Who inspects what, and in what order.", "Assignments",
 			"No assignments", "Teams and the structures assigned to them appear here, with route sheets for the field.");
 		SidebarGroups = BuildSidebar();
-		Events = new EventSwitcherViewModel();
+		Events = new EventSwitcherViewModel { NewEventCommand = NewEventCommand, ManageEventsCommand = ManageEventsCommand };
+		Events.SelectionChanged += choice => _app.Scope.Set(_app.Store, choice.Id);
+		app.Scope.Changed += OnScopeChanged;
 		DatabaseSwitcher = new DatabaseSwitcherViewModel(app, this);
 		Palette = new CommandPaletteViewModel(app, this);
 		app.DataChanged += () =>
 		{
+			// An assessment may have joined or left the chosen event, or the event itself changed.
+			app.Scope.Refresh(app.Store);
+			RefreshEvents();
 			Structures.Reload();
 			RefreshStatus();
 		};
@@ -78,13 +83,62 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			SourceImport.DatabaseChanged();
 			RefreshStatus();
 			DatabaseSwitcher.Refresh();
+			RefreshEvents();
 			OnPropertyChanged(nameof(RecentDatabases));
 			OnPropertyChanged(nameof(IsSampleDatabase));
 			Show(Page.Structures);
 		};
 		CurrentPage = Structures;
+		RefreshEvents();
 		RefreshStatus();
 		UpdateSidebar();
+	}
+
+	/// <summary>Fills the event switcher from the database and shows the chosen event (the scope's).</summary>
+	public void RefreshEvents()
+	{
+		Dictionary<Guid, int> counts = _app.Store.EventCounts();
+		List<EventChoice> choices = _app.Store.GetEvents().Select(e =>
+		{
+			int n = counts.GetValueOrDefault(e.EventID);
+			string detail = string.Join(" · ", new[] { e.ToDetails().DateRange, $"{n:N0} assessment{(n == 1 ? "" : "s")}" }.Where(x => !string.IsNullOrWhiteSpace(x)));
+			return new EventChoice(e.EventID, e.Label, detail);
+		}).ToList();
+		Events.SetEvents(choices);
+		Events.ShowChosen(_app.Scope.EventId);
+	}
+
+	/// <summary>Another event was chosen: the pages it scopes show only its assessments.</summary>
+	private void OnScopeChanged()
+	{
+		Events.ShowChosen(_app.Scope.EventId);
+		Structures.Reload();
+		if (Dashboard.IsActive)
+		{
+			Dashboard.Reload();
+		}
+		RefreshStatus();
+	}
+
+	/// <summary>Adds an event and chooses it in the sidebar.</summary>
+	[RelayCommand]
+	private async Task NewEvent()
+	{
+		if (await Sheets.ShowAsync(new EventSheetViewModel(_app)) is EventRecord added)
+		{
+			RefreshEvents();
+			_app.Scope.Set(_app.Store, added.EventID);
+		}
+	}
+
+	/// <summary>The list of events, to add, rename or delete them.</summary>
+	[RelayCommand]
+	private async Task ManageEvents()
+	{
+		if (await Sheets.ShowAsync(new ManageEventsSheetViewModel(_app)) is true)
+		{
+			_app.RaiseDataChanged();
+		}
 	}
 
 	/// <summary>The sidebar's pages, in order; View › ⌘1 to ⌘9 follow this order.</summary>
@@ -317,11 +371,13 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		{
 			AppLog.Write("Couldn't count Recently deleted", ex);
 		}
+		// In an event, the count is the event's structures.
+		int structures = _app.Scope.IsAll ? p : Structures.StructureCount;
 		foreach (NavItemViewModel item in SidebarItems)
 		{
 			item.Count = item.Page switch
 			{
-				Page.Structures => p,
+				Page.Structures => structures,
 				Page.Trash => deleted,
 				_ => 0,
 			};

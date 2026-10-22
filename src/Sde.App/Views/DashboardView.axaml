@@ -19,9 +19,8 @@
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="{StaticResource PagePadding}" Spacing="14">
       <!-- The title band says "Dashboard"; the header says what it covers and takes the event's name -->
-      <c:PageHeader Margin="0">
-        <c:PageHeader.Subtitle>The numbers for every structure in this database, in one place.</c:PageHeader.Subtitle>
-        <StackPanel Classes="field" Width="260" Margin="0">
+      <c:PageHeader Margin="0" Subtitle="{Binding Subtitle}">
+        <StackPanel Classes="field" Width="260" Margin="0" IsVisible="{Binding IsAllEvents}">
           <Panel Classes="fieldHead"><TextBlock Classes="fieldLabel" Text="Event name (optional)" /></Panel>
           <TextBox Text="{Binding EventName}" PlaceholderText="Shown on the summary" AutomationProperties.Name="Event name" />
         </StackPanel>
@@ -103,7 +102,7 @@
           </Border>
           <Border Grid.Column="1" Classes="card" Margin="7,0,0,0">
             <StackPanel Spacing="8">
-              <TextBlock Classes="h3" Text="Assessed and not yet assessed" />
+              <TextBlock Classes="h3" Text="{Binding ProgressTitle}" />
               <ItemsControl ItemsSource="{Binding Progress}" ItemTemplate="{StaticResource BarRow}" />
             </StackPanel>
           </Border>

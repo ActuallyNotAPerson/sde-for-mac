@@ -278,6 +278,16 @@ public sealed partial class StructuresViewModel : ViewModelBase
 
 	public bool IsEmpty => _all.Count == 0;
 
+	/// <summary>How many structures the list holds (a structure with two assessments is one).</summary>
+	public int StructureCount => _all.Select(r => r.Summary.PropertyID).Distinct().Count();
+
+	/// <summary>The empty state's title: there are no structures at all, or none in the chosen event.</summary>
+	public string EmptyTitle => _app.Scope.IsAll ? "No structures yet" : $"Nothing in {_app.Scope.Event.Name} yet";
+
+	public string EmptyText => _app.Scope.IsAll
+		? "Start a new residential or non-residential assessment, or bring in data from FEMA's SDE or another system on the Import & export page."
+		: "A new assessment started while this event is chosen joins it. To add existing ones, choose All events, tick them, then use Change, Set event.";
+
 	public bool HasRows => Rows.Count > 0;
 
 	public bool NoMatches => !IsEmpty && Rows.Count == 0;
@@ -351,7 +361,9 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		}
 		HashSet<Guid> checkedIds = _all.Where(r => r.IsChecked && r.AssessmentID != null).Select(r => r.AssessmentID!.Value).ToHashSet();
 		ReferenceData reference = _app.Store.Reference;
-		_all = _app.Store.ListStructures().Select(s => new StructureRowViewModel(s, reference) { IsChecked = s.AssessmentID is Guid id && checkedIds.Contains(id) }).ToList();
+		// The event chosen in the sidebar limits the list to its assessments.
+		_all = _app.Store.ListStructures().Where(s => _app.Scope.Includes(s.AssessmentID))
+			.Select(s => new StructureRowViewModel(s, reference) { IsChecked = s.AssessmentID is Guid id && checkedIds.Contains(id) }).ToList();
 		foreach (StructureRowViewModel r in _all)
 		{
 			r.PropertyChanged += RowChanged;
@@ -493,6 +505,8 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			Rows.Add(r);
 		}
 		OnPropertyChanged(nameof(IsEmpty));
+		OnPropertyChanged(nameof(EmptyTitle));
+		OnPropertyChanged(nameof(EmptyText));
 		OnPropertyChanged(nameof(HasRows));
 		OnPropertyChanged(nameof(NoMatches));
 		OnPropertyChanged(nameof(CountText));
@@ -793,6 +807,23 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			return;
 		}
 		await _app.Sheets.ShowAsync(new BulkEditSheetViewModel(_app, ids));
+	}
+
+	/// <summary>Change, then Set event: puts the checked assessments (or all shown) in an event, or takes them out.</summary>
+	[RelayCommand]
+	private async Task SetEvent()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to change", "Check some structures first, or clear the search.");
+			return;
+		}
+		if (await _app.Sheets.ShowAsync(new SetEventSheetViewModel(_app, ids)) is int changed)
+		{
+			_app.RaiseDataChanged();
+			_app.Dialogs.Notify("Event set", changed == 0 ? "They were already there." : $"{changed:N0} assessment{(changed == 1 ? "" : "s")} changed.");
+		}
 	}
 
 	/// <summary>Edit, then Search and Replace.</summary>
