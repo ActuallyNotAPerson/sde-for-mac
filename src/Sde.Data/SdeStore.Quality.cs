@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Sde.Core;
 using Sde.Core.Assessments;
@@ -77,14 +78,42 @@ public sealed partial class SdeStore
 			DismissedOn = Clock(),
 			DismissedBy = ctx.User ?? UserName,
 		};
-		Database.InTransaction((c, tx) => TableMap<QaDismissalRecord>.Upsert(c, record, tx));
+		Database.InTransaction((c, tx) =>
+		{
+			TableMap<QaDismissalRecord>.Upsert(c, record, tx);
+			QaHistory(c, tx, objectId, $"Quality check set aside: {rule.Title} ({record.Reason})", ctx);
+		});
 		return record;
 	}
 
-	/// <summary>Brings a dismissed finding back. Returns false when it wasn't dismissed.</summary>
-	public bool RemoveQaDismissal(string ruleId, Guid objectId, string detail) => Database.InTransaction((c, tx) =>
-		c.Execute("DELETE FROM QaDismissal WHERE RuleId = @ruleId AND ObjectID = @objectId AND Detail = @detail",
-			new { ruleId, objectId, detail = detail ?? "" }, tx) > 0);
+	/// <summary>Brings a dismissed finding back (recorded in edit history). Returns false when it wasn't dismissed.</summary>
+	public bool RemoveQaDismissal(string ruleId, Guid objectId, string detail, SaveContext context = null) => Database.InTransaction((c, tx) =>
+	{
+		bool removed = c.Execute("DELETE FROM QaDismissal WHERE RuleId = @ruleId AND ObjectID = @objectId AND Detail = @detail",
+			new { ruleId, objectId, detail = detail ?? "" }, tx) > 0;
+		if (removed)
+		{
+			QaHistory(c, tx, objectId, "Quality check brought back: " + (QaRules.Rule(ruleId)?.Title ?? ruleId), context ?? SaveContext.App);
+		}
+		return removed;
+	});
+
+	/// <summary>
+	/// Records a dismissal in the edit history of what the finding was about: an assessment, or a structure. Nothing is
+	/// written when it is neither (it was deleted).
+	/// </summary>
+	private void QaHistory(IDbConnection c, IDbTransaction tx, Guid objectId, string label, SaveContext ctx)
+	{
+		Guid? propertyOfAssessment = c.ExecuteScalar<Guid?>("SELECT PropertyID FROM Assessment WHERE AssessmentID = @objectId", new { objectId }, tx);
+		if (propertyOfAssessment is Guid p)
+		{
+			WriteEvent(c, tx, p, objectId, label, ctx);
+		}
+		else if (c.ExecuteScalar<int>("SELECT COUNT(*) FROM Property WHERE PropertyID = @objectId", new { objectId }, tx) > 0)
+		{
+			WriteEvent(c, tx, objectId, null, label, ctx);
+		}
+	}
 
 	private sealed class CountRow
 	{

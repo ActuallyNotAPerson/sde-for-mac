@@ -43,6 +43,9 @@ public class QualityStoreTests : IDisposable
 		Assert.Equal(eventId, all.EventOf[aid]);
 		Assert.Equal("September flood", all.Events[eventId].Name);
 		Assert.Single(all.Dismissals);
+		Assert.Contains(_db.Store.GetHistory(aid), h => h.IsEvent && h.Label == "Quality check set aside: " + QaRules.Rule(QaRuleIds.MissingPhotos).Title + " (Photos are on the county drive)");
+		Assert.True(_db.Store.RemoveQaDismissal(QaRuleIds.MissingPhotos, aid, ""));
+		Assert.Contains(_db.Store.GetHistory(aid), h => h.IsEvent && h.Label.StartsWith("Quality check brought back: ", StringComparison.Ordinal));
 		Assert.NotNull(all.Reference);
 
 		QaInput one = _db.Store.LoadQaInput(new[] { second.Assessment.AssessmentID, Guid.NewGuid() });
