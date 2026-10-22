@@ -38,8 +38,14 @@ quit SDE, and by itself after 12 hours (the card shows how long is left).
 2. Scan the QR code with the camera and open the link, or type the address into the browser and use the PIN.
 3. Type your name and tap **Pair**. The name goes into the Mac's edit history next to each change you make.
 4. If the office has made teams, choose yours under **My assignments**; the phone remembers it. Tap a structure on the
-   list, search for one (the code printed on a field worksheet works too), or tap **Add a structure**. Open a step and fill in the fields; each one is saved when you
-   leave it ("Saved on the Mac"). Use **Add photo** to take or choose a photo.
+   list, search for one (the code printed on a field worksheet works too), or tap **Add a structure**. Open a step and
+   fill in the fields; each one is saved when you leave it ("Saved on the Mac"). Use **Add photo** to take or choose a
+   photo.
+
+<p>
+  <img src="screenshots/90-phone-find.png" alt="My assignments on the phone" width="260">
+  <img src="screenshots/91-phone-edit.png" alt="An assessment open on the phone" width="260">
+</p>
 
 Several phones can be paired at once. The QR code and PIN work for one phone, for 10 minutes; a new code appears as soon
 as one is used. **New code** on the Mac makes a fresh one at any time. Each paired phone is listed on the Mac with
