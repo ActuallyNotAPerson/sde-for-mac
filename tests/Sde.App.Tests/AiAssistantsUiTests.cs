@@ -52,6 +52,7 @@ public class AiAssistantsUiTests
 		Assert.Contains("Inspector", row.Summary);
 		Assert.StartsWith("claude-code (AI)", row.Detail);
 		Assert.True(row.CanRevert);
+		Assert.StartsWith("Revert puts back the values", row.RevertNote);
 		Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
 		ui.Snapshot("31f-settings-ai-changes");
 

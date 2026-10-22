@@ -35,6 +35,9 @@ public sealed partial class AiChangeRowViewModel : ObservableObject
 
 	public string RevertName => "Revert " + Summary;
 
+	/// <summary>What Revert does with this kind of change ("Revert moves the new structure to Recently deleted, …").</summary>
+	public string RevertNote => Batch.RevertNote ?? AiChangeKinds.RevertNote(Batch.Kind);
+
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(CanRevert))]
 	public partial bool IsReverted { get; set; }

@@ -63,7 +63,7 @@
                     <TextBlock Classes="muted" Text="{Binding Detail}" />
                   </StackPanel>
                   <Button Grid.Column="1" Content="Revert" Command="{Binding RevertCommand}" IsVisible="{Binding CanRevert}" VerticalAlignment="Center"
-                          AutomationProperties.Name="{Binding RevertName}" />
+                          AutomationProperties.Name="{Binding RevertName}" ToolTip.Tip="{Binding RevertNote}" />
                   <c:Badge Grid.Column="1" Text="Reverted" IsVisible="{Binding IsReverted}" VerticalAlignment="Center" />
                 </Grid>
               </Border>
