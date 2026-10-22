@@ -5,10 +5,15 @@ using Avalonia.Threading;
 
 namespace Sde.App.Maps;
 
+/// <summary>A tile's bytes, and in plain English why it couldn't be downloaded (null when it could).</summary>
+public readonly record struct TileFetch(byte[] Bytes, string Problem);
+
 /// <summary>
-/// Map tiles for the Map page. A tile is looked up in memory, then in a folder on disk (so a place you looked at
-/// yesterday still shows with no internet), and only then downloaded. Downloads run a few at a time off the screen's
-/// thread, and the map is told to redraw as each tile arrives.
+/// Map tiles on disk and from the web. Every tile, whoever asks for it, goes through <see cref="FetchAsync"/>: it is
+/// read from a folder on disk (so a place you looked at yesterday still shows with no internet) while it is younger
+/// than <see cref="MaxAge"/>, and only otherwise downloaded, a few at a time, and kept. The map engine's tile source
+/// (<see cref="SdeTileSource"/>) uses that; <see cref="TryGet"/> also keeps decoded tiles in memory for code that draws
+/// tiles itself.
 /// </summary>
 public sealed class TileCache
 {
@@ -27,14 +32,30 @@ public sealed class TileCache
 	private readonly Dictionary<string, DateTime> _failed = new();
 	private readonly SemaphoreSlim _slots = new SemaphoreSlim(MaxDownloadsAtOnce);
 	private readonly CancellationTokenSource _stop = new CancellationTokenSource();
+	private int _downloads;
+	private int _diskReads;
 
 	/// <param name="folder">Where tiles are kept on disk (created when the first one is saved).</param>
-	/// <param name="download">Gets the bytes at a web address; null uses <see cref="DownloadAsync"/> with SDE's own HTTP client.</param>
+	/// <param name="download">
+	/// Gets the bytes at a web address; null uses <see cref="DefaultDownload"/>, or <see cref="DownloadAsync"/> with
+	/// SDE's own HTTP client when that isn't set.
+	/// </param>
 	public TileCache(string folder, Func<string, CancellationToken, Task<byte[]>> download = null)
 	{
 		_folder = folder;
-		_download = download ?? ((url, cancel) => DownloadAsync(Http.Client, url, cancel));
+		_download = download ?? DefaultDownload ?? ((url, cancel) => DownloadAsync(Http.Client, url, cancel));
+		// Made on the screen's thread; background downloads report back to this dispatcher, never to whatever
+		// Dispatcher.UIThread is when they finish (in the headless tests that can be the next test's).
+		_ui = Dispatcher.UIThread;
 	}
+
+	private readonly Dispatcher _ui;
+
+	/// <summary>
+	/// The downloader a cache made without one uses. Null (the app) means the network; the UI tests set one that
+	/// answers with made-up tiles, so no test goes online.
+	/// </summary>
+	public static Func<string, CancellationToken, Task<byte[]>> DefaultDownload { get; set; }
 
 	/// <summary>
 	/// How SDE names itself to the tile server, with the app's version: OpenStreetMap's tile rules ask every app to say
@@ -67,11 +88,92 @@ public sealed class TileCache
 	/// <summary>Raised on the screen's thread when a tile has arrived or could not be had, so the map should redraw.</summary>
 	public event Action Changed;
 
-	/// <summary>Raised (once per failed tile) with a plain-English reason when a tile could not be downloaded.</summary>
+	/// <summary>Raised on the screen's thread (once per failed tile) with a plain-English reason when a tile could not be downloaded.</summary>
 	public event Action<string> DownloadFailed;
 
 	/// <summary>Tiles that could not be downloaded since the last <see cref="ResetFailures"/>.</summary>
 	public int FailureCount { get; private set; }
+
+	/// <summary>Tiles downloaded so far (all callers).</summary>
+	public int Downloads => _downloads;
+
+	/// <summary>Tiles read from the folder on disk so far (all callers).</summary>
+	public int DiskReads => _diskReads;
+
+	/// <summary>Where the tiles are kept.</summary>
+	public string Folder => _folder;
+
+	/// <summary>
+	/// The disk-or-download step: tile z/x/y of <paramref name="basemap"/> from the folder while it is younger than
+	/// <see cref="MaxAge"/>, otherwise downloaded (at most four at a time) and kept. When a download fails, an older copy
+	/// is used if there is one, and the reason is given either way. <paramref name="scale"/> 2 asks for a Retina tile
+	/// where the service draws them (they are kept apart from the ordinary ones). Safe to call from any thread.
+	/// </summary>
+	public async Task<TileFetch> FetchAsync(Basemap basemap, int z, int x, int y, int scale, CancellationToken cancel)
+	{
+		int factor = basemap.HasRetinaTiles && scale > 1 ? 2 : 1;
+		string path = PathOf(Key(basemap, z, x, y) + (factor > 1 ? "@2x" : ""));
+		byte[] stale = null;
+		if (File.Exists(path))
+		{
+			try
+			{
+				byte[] onDisk = await File.ReadAllBytesAsync(path, cancel);
+				if (DateTime.UtcNow - File.GetLastWriteTimeUtc(path) < MaxAge)
+				{
+					Interlocked.Increment(ref _diskReads);
+					return new TileFetch(onDisk, null);
+				}
+				stale = onDisk;
+			}
+			catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+			{
+				// Unreadable on disk: download it again.
+			}
+		}
+		using CancellationTokenSource both = CancellationTokenSource.CreateLinkedTokenSource(cancel, _stop.Token);
+		try
+		{
+			await _slots.WaitAsync(both.Token);
+		}
+		catch (OperationCanceledException)
+		{
+			return new TileFetch(stale, null);
+		}
+		try
+		{
+			byte[] bytes = await _download(basemap.TileUrl(z, x, y, factor), both.Token);
+			Interlocked.Increment(ref _downloads);
+			Save(path, bytes);
+			return new TileFetch(bytes, null);
+		}
+		catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException && !both.IsCancellationRequested)
+		{
+			return new TileFetch(stale, DownloadProblem(ex));
+		}
+		catch (OperationCanceledException)
+		{
+			return new TileFetch(stale, null);
+		}
+		finally
+		{
+			_slots.Release();
+		}
+	}
+
+	/// <summary>Tells the page a tile couldn't be had (from any thread): counted, and <see cref="DownloadFailed"/> raised on the screen's thread.</summary>
+	public void ReportProblem(string problem)
+	{
+		if (problem == null)
+		{
+			return;
+		}
+		_ui.Post(() =>
+		{
+			FailureCount++;
+			DownloadFailed?.Invoke(problem);
+		});
+	}
 
 	/// <summary>The tile if it is in memory; otherwise null, and it is loaded in the background.</summary>
 	public Bitmap TryGet(Basemap basemap, int z, int x, int y)
@@ -110,49 +212,15 @@ public sealed class TileCache
 
 	private async Task LoadAsync(Basemap basemap, int z, int x, int y, string key)
 	{
-		byte[] bytes = null;
 		Bitmap bitmap = null;
-		string error = null;
+		string error;
 		try
 		{
-			string path = PathOf(key);
-			byte[] stale = null;
-			if (File.Exists(path))
+			TileFetch fetch = await FetchAsync(basemap, z, x, y, 1, _stop.Token);
+			error = fetch.Problem;
+			if (fetch.Bytes != null)
 			{
-				byte[] onDisk = await File.ReadAllBytesAsync(path, _stop.Token);
-				if (DateTime.UtcNow - File.GetLastWriteTimeUtc(path) < MaxAge)
-				{
-					bytes = onDisk;
-				}
-				else
-				{
-					stale = onDisk;
-				}
-			}
-			if (bytes == null)
-			{
-				await _slots.WaitAsync(_stop.Token);
-				try
-				{
-					bytes = await _download(basemap.TileUrl(z, x, y), _stop.Token);
-				}
-				catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException && !_stop.IsCancellationRequested)
-				{
-					bytes = stale;
-					error = DownloadProblem(ex);
-				}
-				finally
-				{
-					_slots.Release();
-				}
-				if (bytes != null && error == null)
-				{
-					Save(path, bytes);
-				}
-			}
-			if (bytes != null)
-			{
-				using MemoryStream stream = new MemoryStream(bytes);
+				using MemoryStream stream = new MemoryStream(fetch.Bytes);
 				bitmap = new Bitmap(stream);
 			}
 		}
@@ -165,7 +233,11 @@ public sealed class TileCache
 			bitmap = null;
 			error = "A map tile couldn't be read.";
 		}
-		await Dispatcher.UIThread.InvokeAsync(() =>
+		if (_stop.IsCancellationRequested)
+		{
+			return;
+		}
+		await _ui.InvokeAsync(() =>
 		{
 			_loading.Remove(key);
 			if (bitmap != null)
@@ -222,7 +294,7 @@ public sealed class TileCache
 		try
 		{
 			Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
-			string temp = path + ".part";
+			string temp = path + "." + Guid.NewGuid().ToString("N")[..8] + ".part";
 			File.WriteAllBytes(temp, bytes);
 			File.Move(temp, path, overwrite: true);
 		}

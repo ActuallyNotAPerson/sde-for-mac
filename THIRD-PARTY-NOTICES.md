@@ -42,6 +42,8 @@ AvaloniaUI.DiagnosticsSupport (developer tools) is referenced for Debug builds o
 | HarfBuzzSharp | 8.3.1.3 | MIT | https://github.com/mono/SkiaSharp |
 | HarfBuzzSharp.NativeAssets.macOS (also .Linux, .Win32, .WebAssembly) | 8.3.1.3 | MIT | https://github.com/mono/SkiaSharp |
 | SixLabors.Fonts | 1.0.0 | Apache-2.0 | https://github.com/SixLabors/Fonts |
+| SkiaSharp.HarfBuzz (pulled in by the map engine) | 3.119.2 | MIT | https://github.com/mono/SkiaSharp |
+| Topten.RichTextKit (pulled in by the map engine) | 0.4.167 | Apache-2.0 | https://github.com/toptensoftware/richtextkit |
 
 The SkiaSharp native library is a build of Google's Skia (BSD-3-Clause) and carries its own bundled components
 (FreeType, libpng, zlib, expat and others) under their respective permissive licenses; the HarfBuzzSharp native library
@@ -99,6 +101,21 @@ The MCP C# SDK ships no NOTICE file (none in the 2.3.0 packages or in its reposi
 says some older contributions remain under the MIT license, and its `THIRD-PARTY-NOTICES.txt` lists the MIT-licensed
 code it includes; both are in the repository linked above. In SDE.app the Microsoft.Extensions libraries are the copies
 in the ASP.NET Core shared framework (below), whose version they match.
+
+### Map engine (the Map page)
+
+| Package | Version | License | Project |
+| --- | --- | --- | --- |
+| Mapsui | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Avalonia12 | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Nts | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Rendering.Skia | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| Mapsui.Tiling | 5.1.0 | MIT | https://github.com/Mapsui/Mapsui |
+| BruTile (map tiles for Mapsui) | 6.0.0 | Apache-2.0 | https://github.com/BruTile/BruTile |
+
+Mapsui depends on Svg.Skia (and through it Svg.Custom, Svg.Model, ShimSkiaSharp and ExCSS) for SVG map symbols. SDE
+never draws SVG symbols and leaves those packages out of SDE.app (Svg.Custom is MS-PL), so they are not shipped and not
+listed here. BruTile's `.nuspec` names its license file rather than an expression; the file is the Apache License 2.0.
 
 ### Maps and GIS (Sde.Gis)
 

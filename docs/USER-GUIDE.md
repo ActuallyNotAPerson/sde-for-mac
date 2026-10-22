@@ -463,17 +463,47 @@ community has adopted (for example while a map revision is pending), so confirm 
 ## 9. The map and the event dashboard
 
 ### The map
-**Map** (⌘4) shows every structure that has coordinates, coloured by its result.
+**Map** (⌘4) shows every structure that has coordinates, coloured by its result, over a background map and any layers
+you add.
 
-- Click a dot to open that structure's assessment.
-- **Select**, then drag a box around structures to check them in the Structures list (in the normal mode, hold ⌘
-  while dragging). Use it to print reports or set a field for one area.
-- **Set location**: pick a structure under **Structures without coordinates**, then click where it is on the map.
-- **Show all** zooms to every structure. **Basemap** picks the background map.
+What a click does depends on the mode above the map:
+- **Open**: click a dot to open that structure's assessment, or click a layer's shape to see its values. Hold ⌘ and
+  drag to select structures.
+- **Select**: click a dot or drag a box to select structures (hold ⌘ to add to the selection). **Select in** picks a
+  layer to select its shapes instead. **Draw an area** selects what is inside the corners you click (double-click or
+  press Return to finish). **By attribute…** selects by the values of fields, for example *flood_zone = AE* and
+  *land_value > 30000*.
+- **Set location**: pick the structure under **Structure to place**, then click where it is on the map.
+- **Measure**: click points to measure a distance, or choose **Area** for an area and its perimeter. Double-click or
+  press Return to finish. Distances are measured along the earth's surface, areas on an equal-area projection.
 
-The background map needs an internet connection; the dots work offline.
+Selected structures are the ones checked in the Structures list. The bar on the map acts on them: **Show in
+Structures**, **Set a field…**, **Assign to team…**, **Reports** and **Add to web map…**.
 
-![The map](screenshots/56-map.png)
+When the map has focus, the arrow keys move it and = and - zoom. **Bookmarks** saves the view and goes back to it.
+**Show all** zooms to every structure. The basemap menu next to **Bookmarks** picks the background map: USGS
+topographic map, USGS aerial imagery, OpenStreetMap or none.
+
+![The map with a parcel layer and FEMA flood zones](screenshots/56-map.png)
+
+#### Layers
+Click **Layers** beside the map:
+- **Add layer > From a file…** reads a Shapefile, GeoJSON, GeoPackage, or CSV with latitude and longitude (or WKT).
+  SDE copies the shapes into a GeoPackage next to the database (`sde.sqlite.layers.gpkg`), which QGIS and ArcGIS
+  open too.
+- **Add layer > From an ArcGIS web address…** downloads a FeatureServer or MapServer layer for the area in view.
+- **Add layer > FEMA flood zones** draws FEMA's National Flood Hazard Layer over the map.
+- Each layer's **⋯** menu has **Style…** (one colour, by category or by number range, labels, and the scales it shows
+  at), **Attribute table**, **Zoom to layer**, **Move up**, **Move down** and **Remove…**. **Opacity** fades it.
+- **Style…** under **Structures** colours the dots by result (the default), status, team, event or any field.
+
+The attribute table under the map sorts by a column, filters by text and can show only the selected shapes. Picking
+rows selects them on the map.
+
+![Measuring an area](screenshots/56c-map-measure.png)
+
+The background map, the flood zones and ArcGIS layers need an internet connection. The dots and layers from files work
+offline.
 
 ### The event dashboard
 **Event dashboard** shows the numbers for the whole database: how many structures, how many substantially damaged,

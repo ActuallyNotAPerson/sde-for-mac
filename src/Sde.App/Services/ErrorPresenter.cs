@@ -107,8 +107,8 @@ public sealed class ErrorPresenter
 			TimeoutException => "That took too long and was stopped. Try again.",
 			OperationCanceledException => "It was stopped before it finished.",
 			OutOfMemoryException => "Your Mac ran out of memory. Close other apps and try again.",
-			// Our own InvalidOperation and Argument exceptions are written for people.
-			InvalidOperationException or ArgumentException or FormatException or NotSupportedException => e.Message,
+			// Our own InvalidOperation and Argument exceptions are written for people, and so are the GIS core's.
+			InvalidOperationException or ArgumentException or FormatException or NotSupportedException or Sde.Gis.GisException => e.Message,
 			_ when e.GetType().Name == "OnlineServiceException" => e.Message,
 			_ => "Something unexpected happened. Nothing was lost; anything already saved is still there.",
 		};
