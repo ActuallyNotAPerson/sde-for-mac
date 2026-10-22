@@ -112,6 +112,15 @@ public sealed class FeatureLayer
 	{
 		Name = name;
 		GeometryKind = kind;
+		Fields = new FieldList();
+	}
+
+	/// <summary>A layer that shares another layer's fields (an editing copy holds the same features' values by position).</summary>
+	public FeatureLayer(string name, GeometryKind kind, FieldList fields)
+	{
+		Name = name;
+		GeometryKind = kind;
+		Fields = fields ?? throw new ArgumentNullException(nameof(fields));
 	}
 
 	/// <summary>The layer's name (file name, table name or service layer name).</summary>
@@ -119,7 +128,7 @@ public sealed class FeatureLayer
 
 	public GeometryKind GeometryKind { get; set; }
 
-	public FieldList Fields { get; } = new FieldList();
+	public FieldList Fields { get; }
 
 	public List<Feature> Features { get; } = new List<Feature>();
 
