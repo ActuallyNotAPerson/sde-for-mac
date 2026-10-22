@@ -18,6 +18,9 @@ public sealed class ValueCopyRow
 	/// <summary>The polygon whose value is copied, or null.</summary>
 	public Feature Polygon { get; init; }
 
+	/// <summary>How many polygons the point is inside.</summary>
+	public int AreaCount { get; init; }
+
 	/// <summary>The polygon's value as a person reads it ("AE", "12-345-678"), or null when there is none.</summary>
 	public string NewText { get; init; }
 
@@ -68,6 +71,7 @@ public static class ValueCopy
 				Point = match.Point,
 				Outcome = match.Outcome,
 				Polygon = match.Polygon,
+				AreaCount = match.Matches.Count,
 				NewText = text,
 				InputValue = input,
 				Problem = problem,

@@ -81,6 +81,9 @@ public sealed partial class MapLayerViewModel : ObservableObject
 	/// </summary>
 	public bool CanEdit => Kind == MapLayerKinds.File && Data != null;
 
+	/// <summary>A layer of areas with its features read: its values can be copied onto the structures inside them.</summary>
+	public bool IsAreaLayer => IsFeatures && Data != null && GeometryKind == GeometryKind.Polygon;
+
 	/// <summary>Unsaved edits the map draws over the layer while it is being edited, or null.</summary>
 	public MapLayerEdits Edits { get; set; }
 
@@ -123,6 +126,7 @@ public sealed partial class MapLayerViewModel : ObservableObject
 			OnPropertyChanged();
 			OnPropertyChanged(nameof(Detail));
 			OnPropertyChanged(nameof(CanEdit));
+			OnPropertyChanged(nameof(IsAreaLayer));
 			UpdateLegend();
 		}
 	}

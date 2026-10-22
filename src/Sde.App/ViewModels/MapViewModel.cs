@@ -211,7 +211,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	/// <summary>One line of help for the current mode.</summary>
 	public string Hint => Mode switch
 	{
-		MapMode.Select when IsPolygonSelect => "Click the corners of an area; double-click or press Return to select what is inside it.",
+		MapMode.Select when IsPolygonSelect => PendingLocationHint ?? "Click the corners of an area; double-click or press Return to select what is inside it.",
 		MapMode.Select => SelectTarget?.IsStructures == false
 			? $"Click or drag a box to select in {SelectTarget.Name}. Hold Command to add to the selection."
 			: "Drag a box around the structures to check in the Structures list. Hold Command to add to what is already checked.",
@@ -364,6 +364,7 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	partial void OnModeChanged(MapMode oldValue, MapMode newValue)
 	{
+		_pendingLocation = null;
 		Message = null;
 		Measurement = null;
 		Identified = null;

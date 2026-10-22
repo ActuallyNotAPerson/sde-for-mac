@@ -38,6 +38,15 @@ public sealed partial class MapViewModel
 	[NotifyPropertyChangedFor(nameof(Hint), nameof(Sketch))]
 	public partial bool IsPolygonSelect { get; set; }
 
+	partial void OnIsPolygonSelectChanged(bool value)
+	{
+		if (!value)
+		{
+			// A select-by-location query waiting for its area is dropped with the drawing.
+			_pendingLocation = null;
+		}
+	}
+
 	/// <summary>What clicks on the map draw now: a polygon to select with, a line or area to measure, or nothing.</summary>
 	public MapSketch Sketch => Mode switch
 	{
@@ -157,6 +166,11 @@ public sealed partial class MapViewModel
 		if (!area.IsValid)
 		{
 			area = area.Buffer(0);
+		}
+		if (RunPendingLocation(area))
+		{
+			// The area was drawn for a select-by-location query.
+			return;
 		}
 		MapLayerViewModel target = SelectTarget ?? StructuresLayer;
 		if (target == null || target.IsStructures)

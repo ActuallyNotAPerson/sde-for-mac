@@ -117,6 +117,7 @@
                   </ComboBox>
                   <ToggleButton Content="Draw an area" IsChecked="{Binding IsPolygonSelect}" AutomationProperties.Name="Select by drawing an area: click its corners" />
                   <Button Content="By attribute…" Command="{Binding SelectByAttributeCommand}" AutomationProperties.Name="Select by the values of a field" />
+                  <Button Content="By location…" Command="{Binding SelectByLocationCommand}" AutomationProperties.Name="Select by where features are compared with other features" />
                 </WrapPanel>
               </Border>
               <Border Name="EditBar" Classes="card compact" IsVisible="{Binding IsEdit}" HorizontalAlignment="Left">
@@ -186,6 +187,7 @@
                       </DropDownButton.Flyout>
                     </DropDownButton>
                     <Button Content="Add to web map…" Command="{Binding WebMapOfSelectionCommand}" AutomationProperties.Name="Make a web map of the selected structures" />
+                    <Button Content="Copy values…" Command="{Binding CopyValuesCommand}" AutomationProperties.Name="Copy values from a layer of areas onto the selected structures" />
                     <Button Classes="subtle" Content="Clear" Command="{Binding ClearCheckedCommand}" AutomationProperties.Name="Clear the selected structures" />
                   </WrapPanel>
                 </StackPanel>
@@ -313,6 +315,8 @@
                                         IsVisible="{Binding !IsTiles}" />
                               <MenuItem Header="Zoom to layer" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).ZoomToLayerCommand}" CommandParameter="{Binding}"
                                         IsVisible="{Binding IsFeatures}" />
+                              <MenuItem Header="Copy values onto structures…" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).CopyValuesCommand}" CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsAreaLayer}" />
                               <MenuItem Header="Move up" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).MoveLayerUpCommand}" CommandParameter="{Binding}"
                                         IsVisible="{Binding !IsStructures}" />
                               <MenuItem Header="Move down" Command="{Binding $parent[UserControl].((vm:MapViewModel)DataContext).MoveLayerDownCommand}" CommandParameter="{Binding}"
