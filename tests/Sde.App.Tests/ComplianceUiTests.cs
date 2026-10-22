@@ -8,6 +8,7 @@ using Sde.App.ViewModels.Sheets;
 using Sde.Core.Improvements;
 using Sde.Core.Records;
 using Sde.Data;
+using Sde.Reports;
 using Sde.Reports.Letters;
 using Page = Sde.App.ViewModels.Page;
 
@@ -15,7 +16,8 @@ namespace Sde.App.Tests;
 
 /// <summary>
 /// The Compliance page (v2.5, M8): cases opened from the editor, in bulk and from an SI determination; the case sheet
-/// with its fields, timeline and letters; the filters and sidebar badge. Also writes the Compliance screenshots.
+/// with its fields, timeline and letters; the filters, sidebar badge and Dashboard tiles; the PDF and CSV. Also writes
+/// the Compliance screenshots.
 /// </summary>
 public class ComplianceUiTests
 {
@@ -222,7 +224,7 @@ public class ComplianceUiTests
 	}
 
 	[AvaloniaFact]
-	public void Filters_AndTheBadge_FollowTheCasesAndTheEvent()
+	public void Filters_TheBadge_AndTheDashboard_FollowTheCasesAndTheEvent()
 	{
 		BindingErrors.Instance.Messages.Clear();
 		using UiSession ui = WithSamples();
@@ -254,12 +256,25 @@ public class ComplianceUiTests
 		page.ClearFiltersCommand.Execute(null);
 		Assert.Equal(2, page.Rows.Count);
 
-		// In an event: only its assessments' cases, in the list and the badge.
+		// The dashboard counts them.
+		ui.Main.ShowCommand.Execute(Page.Dashboard);
+		ui.Pump();
+		DashboardViewModel d = ui.Main.Dashboard;
+		Assert.True(d.HasCompliance);
+		Assert.Equal("2", d.ComplianceOpen);
+		Assert.Equal("1", d.ComplianceOverdue);
+		Assert.True(d.HasOverdue);
+		Assert.Equal("1", d.IccInProgress);
+		Assert.Equal("$12,000", d.IccPaid);
+
+		// In an event: only its assessments' cases, in the list, the badge and the dashboard.
 		EventRecord e = ui.Store.SaveEvent(new EventRecord { Name = "September flood", StartDate = new DateTime(2026, 9, 1), EndDate = new DateTime(2026, 9, 30) });
 		ui.Store.SetEvent(new[] { Row(ui, "48") }, e.EventID);
 		ui.Services.RaiseDataChanged();
 		ui.Main.Events.ChooseCommand.Execute(ui.Main.Events.Events.Single(c => c.Id == e.EventID));
 		ui.Pump();
+		Assert.Equal("1", d.ComplianceOpen);
+		Assert.Equal("0", d.ComplianceOverdue);
 		Assert.Equal(0, Sidebar(ui, Page.Compliance).Count);
 		page = ShowCompliance(ui);
 		Assert.Equal("48 Mill Creek Street", Assert.Single(page.Rows).Address);
@@ -313,6 +328,35 @@ public class ComplianceUiTests
 		Assert.Equal(2, ui.Store.GetLetters(ranch).Count);
 		sheet.DoneCommand.Execute(null);
 		await open;
+	}
+
+	[AvaloniaFact]
+	public async Task Exports_WriteThePdfAndCsvOfTheCasesShown()
+	{
+		using UiSession ui = WithSamples();
+		TwoCases(ui);
+		ComplianceViewModel page = ShowCompliance(ui);
+		string pdf = Path.Combine(ui.Folder, "compliance.pdf");
+		ui.Dialogs.Answers.Enqueue(pdf);
+		await page.ExportPdfCommand.ExecuteAsync(null);
+		Assert.True(File.Exists(pdf));
+		Assert.Equal("%PDF", System.Text.Encoding.ASCII.GetString(File.ReadAllBytes(pdf), 0, 4));
+		Assert.Contains(pdf, ui.Dialogs.Opened);
+		Assert.Equal("Saved compliance.pdf (2 cases).", page.LastResult);
+
+		page.OverdueOnly = true;
+		string csv = Path.Combine(ui.Folder, "compliance.csv");
+		ui.Dialogs.Answers.Enqueue(csv);
+		await page.ExportCsvCommand.ExecuteAsync(null);
+		string[] lines = File.ReadAllLines(csv);
+		Assert.Equal(2, lines.Length);
+		Assert.StartsWith(string.Join(",", ComplianceReport.CsvHeaders.Take(3)), lines[0], StringComparison.Ordinal);
+		Assert.StartsWith("123 River Street,", lines[1]);
+		Assert.Contains("reveal:" + csv, ui.Dialogs.Opened);
+
+		page.PathFilter = ComplianceViewModel.PathChoices.ToList().IndexOf(CompliancePaths.Label(CompliancePaths.Demolish));
+		await page.ExportCsvCommand.ExecuteAsync(null);
+		Assert.Contains(ui.Dialogs.Notifications, n => n == "Nothing to export: No cases match the filters.");
 	}
 
 	/// <summary>The Compliance screenshots, in light and dark: the page and a case with its timeline.</summary>

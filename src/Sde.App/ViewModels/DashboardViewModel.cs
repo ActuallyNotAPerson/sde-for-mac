@@ -159,6 +159,7 @@ public sealed partial class DashboardViewModel : ViewModelBase
 			StructuresNote = "With an assessment in this event";
 			ShowStatuses(inEvent);
 		}
+		LoadCompliance();
 		OnPropertyChanged(nameof(IsAllEvents));
 		OnPropertyChanged(nameof(Subtitle));
 		OnPropertyChanged(nameof(ProgressTitle));

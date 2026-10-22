@@ -591,6 +591,35 @@ advice. Every placeholder is listed in [Owner letters](LETTERS.md).
 
 ![Owner letters](screenshots/66-letters.png)
 
+### Compliance and ICC (the Compliance page)
+A substantially damaged (or substantially improved) building must be brought into compliance. **Compliance** (⌘5)
+follows each one until it is: the way the owner chooses, the permit and deadline, the Increased Cost of Compliance
+(ICC) claim, the elevation certificate and the final inspection. It follows the event chosen in the sidebar, and its
+badge counts the open cases past their deadline.
+
+1. **Open a case.** On the Compliance page, **Open cases for every substantially damaged structure…** opens one for
+   each that has none yet. For one assessment, use **⋯ > Compliance case…** in the editor. For a substantial
+   improvement, click **Open compliance case…** beside the determination in **⋯ > Improvements and SI…**.
+2. **Fill it in.** Double-click a case. Choose the **Path** (elevate, relocate, demolish, floodproof for
+   non-residential buildings, or repair below the threshold after an appeal), then the permit, **Deadline**, ICC
+   claim and its status and amount, and the dates the elevation certificate, final inspection and certificate of
+   compliance came in. **Save** or **Done** keeps it.
+3. **Keep the timeline.** Changes to the path, deadline, ICC status and open or closed are added to the case's
+   timeline by themselves. Add calls, inspections and notes with **Add note**.
+4. **Write a letter.** Under **Letters**, choose *Options and deadline*, *ICC support* or *Deadline reminder*. The
+   first time, SDE offers to create the three starter compliance letters in your templates folder. The letter is
+   filled in from the case, opened in Word, and added to the timeline and the letter log. See
+   [Owner letters](LETTERS.md) for the fields.
+5. **Close it.** Set **Case** to **Closed** and say why (for example *Elevated and inspected*).
+
+Filter the list by **Open cases**, **Closed cases** or **Every case**, by path, by ICC status, or to **Overdue only**;
+the tiles at the top do the same. **Export ▾** saves the cases shown as a **Compliance report (PDF)** or a
+**Compliance list (CSV)**. The Dashboard shows the open and overdue cases and the ICC claims too.
+
+![The Compliance page](screenshots/113-compliance.png)
+
+![A compliance case](screenshots/114-compliance-case.png)
+
 ---
 
 ## 12. Substantial improvement

@@ -5,7 +5,7 @@
              x:Class="Sde.App.Views.ComplianceView"
              x:DataType="vm:ComplianceViewModel">
 
-  <!-- The title band says "Compliance"; the header says what it covers -->
+  <!-- The title band says "Compliance"; the header says what it covers and holds the exports -->
   <DockPanel Margin="{StaticResource PagePadding}">
     <c:PageHeader DockPanel.Dock="Top" Subtitle="{Binding Subtitle}">
       <StackPanel Orientation="Horizontal" Spacing="8">
@@ -15,6 +15,22 @@
             <TextBlock Text="Open case…" />
           </StackPanel>
         </Button>
+        <DropDownButton AutomationProperties.Name="Export the compliance list" ToolTip.Tip="The cases shown, as a PDF or a CSV">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="Export" Size="14" />
+            <TextBlock Text="Export" />
+          </StackPanel>
+          <DropDownButton.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+              <MenuItem Header="Compliance report (PDF)…" Command="{Binding ExportPdfCommand}">
+                <MenuItem.Icon><c:Icon Kind="Pdf" /></MenuItem.Icon>
+              </MenuItem>
+              <MenuItem Header="Compliance list (CSV)…" Command="{Binding ExportCsvCommand}">
+                <MenuItem.Icon><c:Icon Kind="Table" /></MenuItem.Icon>
+              </MenuItem>
+            </MenuFlyout>
+          </DropDownButton.Flyout>
+        </DropDownButton>
       </StackPanel>
     </c:PageHeader>
 

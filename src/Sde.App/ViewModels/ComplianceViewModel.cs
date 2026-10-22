@@ -65,8 +65,8 @@ public sealed class ComplianceRowViewModel(ComplianceRow row)
 
 /// <summary>
 /// The Compliance page: the compliance cases of the substantially damaged (and substantially improved) structures in
-/// the chosen event, with overdue, path, ICC and open or closed filters, opening cases one by one or in bulk, and the
-/// case sheet. Its sidebar badge counts open cases past their deadline.
+/// the chosen event, with overdue, path, ICC and open or closed filters, opening cases one by one or in bulk, the case
+/// sheet, and the PDF and CSV. Its sidebar badge counts open cases past their deadline.
 /// </summary>
 public sealed partial class ComplianceViewModel : ViewModelBase
 {
@@ -154,7 +154,7 @@ public sealed partial class ComplianceViewModel : ViewModelBase
 		? "1 substantially damaged structure has no compliance case yet."
 		: $"{_missing.Count:N0} substantially damaged structures have no compliance case yet.";
 
-	/// <summary>What the last bulk action did.</summary>
+	/// <summary>What the last export or bulk action did.</summary>
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(HasResult))]
 	public partial string LastResult { get; private set; }
@@ -390,5 +390,70 @@ public sealed partial class ComplianceViewModel : ViewModelBase
 		{
 			Reload();
 		}
+	}
+
+	// ───────────── Exports ─────────────
+
+	/// <summary>The cases shown, as the compliance PDF (headline numbers, then open and closed cases), opened in Preview.</summary>
+	[RelayCommand]
+	private async Task ExportPdf()
+	{
+		if (Rows.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to export", "No cases match the filters.");
+			return;
+		}
+		string path = await _app.Dialogs.SaveFileAsync("Save the compliance report", FileName(".pdf"), "PDF document", "pdf");
+		if (string.IsNullOrEmpty(path))
+		{
+			return;
+		}
+		List<ComplianceRow> rows = Rows.Select(r => r.Row).ToList();
+		LetterSender sender = _app.Store.GetSetting<LetterSender>(LetterSender.SettingKey);
+		ComplianceReportOptions options = new ComplianceReportOptions { CommunityName = sender?.CommunityName, EventName = _app.Scope.Event?.Label };
+		JobOutcome<bool> result = await _app.Jobs.RunAsync("Writing the compliance report", (progress, ct) =>
+		{
+			ComplianceReport.RenderToFile(rows, options, path);
+			return true;
+		}, "Couldn't write the compliance report");
+		if (result.Completed)
+		{
+			LastResult = $"Saved {Path.GetFileName(path)} ({CountText}).";
+			_app.Dialogs.Open(path);
+		}
+	}
+
+	/// <summary>The cases shown, as a CSV for a spreadsheet.</summary>
+	[RelayCommand]
+	private async Task ExportCsv()
+	{
+		if (Rows.Count == 0)
+		{
+			_app.Dialogs.Notify("Nothing to export", "No cases match the filters.");
+			return;
+		}
+		string path = await _app.Dialogs.SaveFileAsync("Save the compliance list", FileName(".csv"), "CSV file", "csv");
+		if (string.IsNullOrEmpty(path))
+		{
+			return;
+		}
+		try
+		{
+			ComplianceReport.WriteCsv(Rows.Select(r => r.Row).ToList(), path);
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			_app.Errors.Show("Couldn't write the compliance list", ex);
+			return;
+		}
+		LastResult = $"Saved {Path.GetFileName(path)} ({CountText}).";
+		_app.Dialogs.Reveal(path);
+	}
+
+	/// <summary>"Compliance (September flood).pdf", or "Compliance.pdf" for all events.</summary>
+	private string FileName(string extension)
+	{
+		string name = _app.Scope.IsAll ? "Compliance" : "Compliance (" + _app.Scope.Event.Label + ")";
+		return string.Concat((name + extension).Split(Path.GetInvalidFileNameChars())).Replace(':', '-');
 	}
 }
