@@ -103,6 +103,30 @@
         </c:CardHeader>
       </Border>
 
+      <!-- Work packages -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <c:CardHeader Icon="Upload" Title="Work packages"
+                        Text="Assessments taken to a Mac in the field (Structures, Export, Work package for the field). When the package comes back, check it in: the field's work replaces the copies here, with its history.">
+            <Button Content="Check in a work package…" Command="{Binding CheckInCommand}" />
+          </c:CardHeader>
+          <ItemsControl ItemsSource="{Binding CheckedOut}" IsVisible="{Binding HasCheckedOut}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CheckedOutPackage">
+                <Border Classes="rule" Padding="0,6">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding Text}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <Button Grid.Column="1" Classes="link" Content="Take back…" VerticalAlignment="Center"
+                            Command="{Binding $parent[UserControl].((vm:ImportExportViewModel)DataContext).TakeBackPackageCommand}" CommandParameter="{Binding}"
+                            AutomationProperties.Name="{Binding TakeBackName}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
       <!-- Spreadsheets and maps -->
       <Border Classes="card">
         <StackPanel Spacing="12">

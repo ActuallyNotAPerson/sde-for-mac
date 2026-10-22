@@ -1191,7 +1191,8 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 	/// <summary>Final and Letter sent: the editor is read-only until reopened.</summary>
 	public bool IsLocked => Status?.IsLocked == true;
 
-	public bool IsEditable => !IsLocked;
+	/// <summary>False while locked (Final, Letter sent) or checked out to a field Mac in a work package.</summary>
+	public bool IsEditable => !IsLocked && !IsCheckedOut;
 
 	public string LockText => !IsLocked ? null
 		: $"{StatusLabel}" + (Status.ChangedOn is DateTime d ? $" since {d:MMM d, yyyy}" : "") + (string.IsNullOrEmpty(Status.ChangedBy) ? "" : $" ({Status.ChangedBy})")
@@ -1210,6 +1211,7 @@ public sealed partial class AssessmentEditorViewModel : ViewModelBase
 		}
 		Status = _app.Store.GetStatus(Assessment.AssessmentID);
 		ChangedInOlderVersion = _app.Store.ChangedSinceLocked(Assessment.AssessmentID);
+		LoadCheckOut();
 	}
 
 	/// <summary>The status menu: Draft, Reviewed, Final, Letter sent, Appeal. Leaving Final or Letter sent asks why.</summary>

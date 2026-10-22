@@ -250,6 +250,9 @@ public sealed class AppServices
 	/// <summary>Where the sample database is made (a fresh copy each time it is opened).</summary>
 	public string SampleFolder { get; set; } = Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, SampleDatabase.FolderName);
 
+	/// <summary>Where work packages are unpacked when opened on a field Mac (one folder per package). Tests use their own.</summary>
+	public string WorkPackagesFolder { get; set; } = Path.Combine(Path.GetDirectoryName(SdeDatabase.DefaultPath)!, "Work packages");
+
 	/// <summary>
 	/// The first-run walkthrough opens on the first launch, but never when SDE_DATABASE is set (tests and training
 	/// sessions), so nothing unexpected covers the window.

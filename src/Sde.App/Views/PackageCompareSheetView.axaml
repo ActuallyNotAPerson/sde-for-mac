@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.PackageCompareSheetView"
+             x:DataType="sh:PackageCompareSheetViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="secondary" Text="{Binding Message}" TextWrapping="Wrap" />
+    <Border Classes="card flush" IsVisible="{Binding HasRows}">
+      <StackPanel>
+        <Grid ColumnDefinitions="36,2*,2*,2*" Margin="14,8">
+          <TextBlock Grid.Column="1" Classes="eyebrow" Text="FIELD" />
+          <TextBlock Grid.Column="2" Classes="eyebrow" Text="HERE" />
+          <TextBlock Grid.Column="3" Classes="eyebrow" Text="IN THE PACKAGE" />
+        </Grid>
+        <ScrollViewer MaxHeight="400" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="sh:PackageDiffRowViewModel">
+                <Border Classes="rule" Padding="14,6">
+                  <Grid ColumnDefinitions="36,2*,2*,2*">
+                    <CheckBox IsChecked="{Binding IsChecked}" AutomationProperties.Name="{Binding CheckName}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Classes="medium" Text="{Binding Label}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding Here}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="3" Text="{Binding Field}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+    </Border>
+    <TextBlock Classes="danger" Text="{Binding Error}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Copy the ticked values" IsDefault="True" Command="{Binding CopyCommand}" IsVisible="{Binding HasRows}" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

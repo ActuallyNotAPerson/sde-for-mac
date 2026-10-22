@@ -86,6 +86,7 @@ public sealed class UiSession : IDisposable
 		// never reach a screenshot in the docs.
 		Services.SetYourName("Reviewer A");
 		Services.ProgramPath = "/Applications/SDE.app/Contents/MacOS/SDE";
+		Services.WorkPackagesFolder = Path.Combine(_db.Folder, "Work packages");
 		Main = new MainViewModel(Services);
 		Window = new MainWindow { DataContext = Main, Width = width, Height = height };
 		Window.Show();

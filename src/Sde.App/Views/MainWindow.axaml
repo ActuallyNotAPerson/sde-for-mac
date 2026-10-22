@@ -112,6 +112,8 @@
     <DataTemplate DataType="sh:EcImportSheetViewModel"><v:EcImportSheetView /></DataTemplate>
     <DataTemplate DataType="sh:PhotoMarkupSheetViewModel"><v:PhotoMarkupSheetView /></DataTemplate>
     <DataTemplate DataType="sh:TeamSheetViewModel"><v:TeamSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:PackageCompareSheetViewModel"><v:PackageCompareSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:CheckOutSheetViewModel"><v:CheckOutSheetView /></DataTemplate>
     <DataTemplate DataType="sh:DepthSheetViewModel"><v:DepthSheetView /></DataTemplate>
     <DataTemplate DataType="sh:OwnerLettersSheetViewModel"><v:OwnerLettersSheetView /></DataTemplate>
     <DataTemplate DataType="sh:FieldHelpSheetViewModel"><v:FieldHelpSheetView /></DataTemplate>
@@ -489,6 +491,13 @@
                       <TextBlock Text="New database…" />
                     </StackPanel>
                   </Button>
+                  <Button Classes="menuItem" Click="OnFlyoutItemClick" Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).OpenWorkPackageCommand}"
+                          AutomationProperties.Name="Open a work package">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <c:Icon Kind="Download" Size="14" />
+                      <TextBlock Text="Open a work package…" />
+                    </StackPanel>
+                  </Button>
                   <Button Classes="menuItem" Click="OnFlyoutItemClick" Command="{Binding MoveOrCopyCommand}" AutomationProperties.Name="Move or copy database">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                       <c:Icon Kind="Copy" Size="14" />
@@ -603,6 +612,11 @@
         <c:Banner DockPanel.Dock="Top" Tone="Warning" CornerRadius="0" Padding="20,8" IsVisible="{Binding IsSampleDatabase}"
                   Text="This is the sample database. Changes here are practice only." AutomationProperties.Name="Sample database notice">
           <Button Classes="link semibold" Content="Back to my database" Command="{Binding LeaveSampleDatabaseCommand}" />
+        </c:Banner>
+        <!-- A work package opened on a field Mac: said on every page, with the way back. -->
+        <c:Banner DockPanel.Dock="Top" Tone="Accent" Icon="Upload" CornerRadius="0" Padding="20,8" IsVisible="{Binding IsWorkPackage}"
+                  Text="{Binding WorkPackageText}" AutomationProperties.Name="Work package notice">
+          <Button Classes="link semibold" Content="Send back to the office…" Command="{Binding SendBackCommand}" />
         </c:Banner>
         <ContentControl Content="{Binding CurrentPage}" />
       </DockPanel>

@@ -87,6 +87,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 			RefreshEvents();
 			OnPropertyChanged(nameof(RecentDatabases));
 			OnPropertyChanged(nameof(IsSampleDatabase));
+			OnPropertyChanged(nameof(IsWorkPackage));
+			OnPropertyChanged(nameof(WorkPackageText));
 			Show(Page.Structures);
 		};
 		CurrentPage = Structures;

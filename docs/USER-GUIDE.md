@@ -491,6 +491,34 @@ sheet and worksheets. With an event chosen in the sidebar, it shows that event's
 
 ![Assignments](screenshots/115-assignments.png)
 
+### Work packages: assessing on another Mac without a connection
+A work package takes assessments to a Mac in the field and brings the work back.
+
+**At the office**
+1. On Structures, check the structures (or filter the list) and choose **Export ▾ > Work package for the field…**.
+   Final and Letter sent assessments, and ones already out, are left out.
+2. Type who takes it (**Checked out to**) and click **Save work package…**. SDE writes a `.sdework` file with the
+   assessments, their structures, photos and documents.
+3. Until the package comes back, those assessments are read-only here. The editor says where they are.
+
+**In the field**
+1. Click the database button at the bottom of the sidebar and choose **Open a work package…**. SDE opens the package
+   as its own database, with a banner across the top.
+2. Work as usual, without a connection.
+3. When you're done, click **Send back to the office…** in the banner and save the file.
+
+**Back at the office**
+1. On **Import & export**, under **Work packages**, click **Check in a work package…** and choose the file. The field's
+   work replaces the copies here, and History shows each change as the field made it.
+2. An assessment someone changed here meanwhile, or took back early, isn't checked in; SDE lists it.
+
+**Taking back early.** If the package won't come back, click **Take it back…** in the editor (or **Take back…** for a
+whole package on Import & export). The assessment can change here again, but the package can no longer bring it back.
+If the package does come back later, use **⋯ > Copy from a work package…** in the editor to tick the field's values to
+copy over.
+
+![A checked-out assessment](screenshots/116-editor-checked-out.png)
+
 ---
 
 ## 8. Looking up locations and flood data online

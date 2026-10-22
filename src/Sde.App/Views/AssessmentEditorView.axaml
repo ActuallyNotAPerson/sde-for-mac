@@ -580,6 +580,7 @@
                 <MenuItem Header="Set event…" Command="{Binding SetEventCommand}" />
                 <MenuItem Header="Elevation certificate…" Command="{Binding ImportElevationCertificateCommand}" IsEnabled="{Binding IsEditable}" />
                 <MenuItem Header="Flood depth from high-water marks…" Command="{Binding FloodDepthCommand}" IsEnabled="{Binding IsEditable}" />
+                <MenuItem Header="Copy from a work package…" Command="{Binding CopyFromPackageCommand}" IsEnabled="{Binding IsEditable}" />
                 <Separator />
                 <MenuItem Header="Improvements and SI…" Command="{Binding ShowImprovementsCommand}" />
                 <MenuItem Header="Appeal…" Command="{Binding ShowAppealCommand}" />
@@ -629,6 +630,11 @@
                     AutomationProperties.Name="Locked">
             <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding ChangedInOlderVersion}"
                        Text="It was changed in an older version of SDE after it was locked. Check it, then reopen and lock it again." />
+          </c:Banner>
+          <c:Banner Classes="stacked" Tone="Accent" Icon="Lock" Margin="0,0,0,14" IsVisible="{Binding IsCheckedOut}" Text="{Binding CheckOutText}"
+                    AutomationProperties.Name="Checked out">
+            <Button Content="Take it back…" Command="{Binding TakeBackCommand}" HorizontalAlignment="Left"
+                    AutomationProperties.Name="Take it back from the work package early" />
           </c:Banner>
           <c:Banner Classes="stacked" Tone="Warning" Margin="0,0,0,14" IsVisible="{Binding HasConflict}" Text="{Binding ConflictText}"
                     AutomationProperties.Name="Changed elsewhere">

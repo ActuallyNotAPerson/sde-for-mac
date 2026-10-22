@@ -163,6 +163,7 @@
                       <MenuItem Header="Web map…" Command="{Binding WebMapCommand}" ToolTip.Tip="A web page of these structures on a map, for the office or the public" />
                       <Separator />
                       <MenuItem Header="Submission folder (reports + FEMA package)…" Command="{Binding OpenSubmissionCommand}" />
+                      <MenuItem Header="Work package for the field…" Command="{Binding WorkPackageCommand}" ToolTip.Tip="Take these assessments to a Mac in the field and bring them back" />
                       <Separator />
                       <MenuItem Header="Owner letters…" Command="{Binding OwnerLettersCommand}" />
                     </MenuFlyout>

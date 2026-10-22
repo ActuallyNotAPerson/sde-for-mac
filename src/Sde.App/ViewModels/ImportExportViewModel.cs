@@ -54,6 +54,9 @@ public sealed partial class ImportExportViewModel : ViewModelBase
 			OnPropertyChanged(nameof(ScopeNote));
 			OnPropertyChanged(nameof(HasScopeNote));
 		};
+		app.DataChanged += RefreshWorkPackages;
+		app.DatabaseChanged += RefreshWorkPackages;
+		RefreshWorkPackages();
 	}
 
 	public EnterpriseImportViewModel Enterprise { get; }

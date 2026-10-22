@@ -381,6 +381,8 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>Another database was opened: its own remembered view and saved views.</summary>
 	public void DatabaseChanged()
 	{
+		// Ticks belong to the database they were made in (a work package holds the same assessments as the office).
+		ClearChecked();
 		RestoreState(_app.Store.GetSetting<ListViewState>(ViewSettingKey));
 		ReloadSavedViews();
 		Reload();
@@ -807,6 +809,22 @@ public sealed partial class StructuresViewModel : ViewModelBase
 		if (await _app.Sheets.ShowAsync(new AssignTeamSheetViewModel(_app, structures)) is string done)
 		{
 			_app.Dialogs.Notify("Assigned", done);
+		}
+	}
+
+	/// <summary>Export ▾, then Work package for the field: checks the checked assessments (or the list) out to a field Mac.</summary>
+	[RelayCommand]
+	private async Task WorkPackage()
+	{
+		IReadOnlyList<Guid> ids = TargetIds();
+		if (ids.Count == 0)
+		{
+			return;
+		}
+		_main.Editor?.Save();
+		if (await _app.Sheets.ShowAsync(new CheckOutSheetViewModel(_app, ids)) is string done)
+		{
+			_app.Dialogs.Notify("Work package saved", done);
 		}
 	}
 
