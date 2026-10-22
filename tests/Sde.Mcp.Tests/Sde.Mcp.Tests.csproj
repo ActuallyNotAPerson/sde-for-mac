@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- make_report draws with SkiaSharp, whose own package carries only the macOS and Windows natives. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
   </ItemGroup>
 
   <ItemGroup>
