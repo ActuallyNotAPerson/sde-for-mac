@@ -133,7 +133,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	}
 
 	/// <summary>Where downloaded tiles are kept: next to the app's other files (or the test database's folder).</summary>
-	private static string TileFolder(AppServices app)
+	internal static string TileFolder(AppServices app)
 	{
 		string forced = Environment.GetEnvironmentVariable("SDE_DATABASE");
 		string root = string.IsNullOrEmpty(forced) ? Path.GetDirectoryName(SdeDatabase.DefaultPath)! : Path.GetDirectoryName(app.Store.Database.FilePath)!;
@@ -305,6 +305,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	public void Reload()
 	{
 		ReadLayers();
+		FollowSettings();
 		Guid? selected = Selected?.Id;
 		Guid? target = PlaceTarget?.Id;
 		// The event chosen in the sidebar limits the dots to its assessments.

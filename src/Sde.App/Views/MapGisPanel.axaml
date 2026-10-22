@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:maps="using:Sde.App.Maps"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.MapGisPanel"
+             x:DataType="vm:MapGisSettingsViewModel">
+  <StackPanel Spacing="14">
+    <!-- The map -->
+    <Border Classes="card flush">
+      <StackPanel Classes="settingsGroup">
+        <Border Classes="settingsRow">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Border Classes="rowIcon"><c:Icon Kind="Map" Size="16" /></Border>
+            <StackPanel Grid.Column="1" Margin="12,0,16,0" Spacing="1" VerticalAlignment="Center">
+              <TextBlock Classes="medium" Text="Background map" />
+              <TextBlock Classes="muted" TextWrapping="Wrap" Text="What the Map page shows under the structures and layers. You can also change it on the Map page." />
+            </StackPanel>
+            <ComboBox Grid.Column="2" ItemsSource="{Binding BasemapChoices}" SelectedItem="{Binding Basemap}" MinWidth="220" VerticalAlignment="Center"
+                      AutomationProperties.Name="Background map">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="maps:Basemap">
+                  <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+        </Border>
+        <Border Classes="settingsRow">
+          <ToggleSwitch IsChecked="{Binding FloodZonesAtStart}" OnContent="" OffContent="" AutomationProperties.Name="Start the map with FEMA flood zones on">
+            <ToggleSwitch.Content>
+              <StackPanel Spacing="1">
+                <TextBlock Classes="medium" Text="Start the map with FEMA flood zones on" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Each time SDE opens this database's map, FEMA's flood zones show over the background. They need the internet." />
+              </StackPanel>
+            </ToggleSwitch.Content>
+          </ToggleSwitch>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <!-- Map pieces kept on this Mac -->
+    <Border Classes="card flush">
+      <StackPanel Classes="settingsGroup">
+        <Border Classes="settingsRow">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Border Classes="rowIcon"><c:Icon Kind="Download" Size="16" /></Border>
+            <StackPanel Grid.Column="1" Margin="12,0,16,0" Spacing="1" VerticalAlignment="Center">
+              <TextBlock Classes="medium" Text="Saved map pieces" />
+              <TextBlock Classes="muted" TextWrapping="Wrap" Text="Pieces of the background map kept on this Mac, so places you've looked at show without the internet. Every database shares them." />
+              <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding TileMessage}" IsVisible="{Binding TileMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            </StackPanel>
+            <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding TileCacheText}" VerticalAlignment="Center" Margin="0,0,12,0" />
+            <Button Grid.Column="3" Content="Clear" Command="{Binding ClearTilesCommand}" VerticalAlignment="Center"
+                    AutomationProperties.Name="Clear the saved map pieces" />
+          </Grid>
+        </Border>
+      </StackPanel>
+    </Border>
+
+    <!-- Files for GIS -->
+    <Border Classes="card flush">
+      <StackPanel Classes="settingsGroup">
+        <Border Classes="settingsRow">
+          <ToggleSwitch IsChecked="{Binding LeaveOutOwnerNames}" OnContent="" OffContent="" AutomationProperties.Name="Leave owner names out of GIS files">
+            <ToggleSwitch.Content>
+              <StackPanel Spacing="1">
+                <TextBlock Classes="medium" Text="Leave owner names out of GIS files" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="The GeoPackage and GeoJSON files made on the Dashboard start without owners' names, which are personal information. You can still include them for one file there." />
+              </StackPanel>
+            </ToggleSwitch.Content>
+          </ToggleSwitch>
+        </Border>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

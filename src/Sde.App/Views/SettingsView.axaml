@@ -210,11 +210,8 @@
         <!-- AI assistants -->
         <Panel IsVisible="{Binding IsAiAssistants}"><v:AiAssistantsPanel DataContext="{Binding AiAssistants}" /></Panel>
 
-        <!-- Map & GIS (to come with the new map) -->
-        <Border Classes="card" IsVisible="{Binding IsMapAndGis}">
-          <c:EmptyState Icon="Map" Title="Map &amp; GIS"
-                        Text="Here you'll choose the map's background and layers, and how files for GIS are made. Until then, GIS files are on the Dashboard." />
-        </Border>
+        <!-- Map & GIS -->
+        <Panel IsVisible="{Binding IsMapAndGis}"><v:MapGisPanel DataContext="{Binding MapGis}" /></Panel>
 
         <!-- Depth tables -->
         <Panel IsVisible="{Binding IsDepthTables}"><v:DepthTablesPanel DataContext="{Binding DepthTables}" /></Panel>
