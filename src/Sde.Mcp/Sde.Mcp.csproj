@@ -27,6 +27,10 @@
   <ItemGroup>
     <ProjectReference Include="../Sde.Core/Sde.Core.csproj" />
     <ProjectReference Include="../Sde.Data/Sde.Data.csproj" />
+    <!-- Outputs and map layers: PDF reports, GeoJSON and web maps, and the layers GeoPackage. SDE.app already ships all three. -->
+    <ProjectReference Include="../Sde.Reports/Sde.Reports.csproj" />
+    <ProjectReference Include="../Sde.Interop/Sde.Interop.csproj" />
+    <ProjectReference Include="../Sde.Gis/Sde.Gis.csproj" />
   </ItemGroup>
 
   <ItemGroup>

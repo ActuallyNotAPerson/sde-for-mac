@@ -99,7 +99,9 @@ public sealed class ServerTests
 			"""{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"process-test","version":"1.0"}}}""",
 			"""{"jsonrpc":"2.0","method":"notifications/initialized"}""",
 			"""{"jsonrpc":"2.0","id":2,"method":"tools/list"}""",
-			"""{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"find_structures","arguments":{"query":"river"}}}""");
+			"""{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"find_structures","arguments":{"query":"river"}}}""",
+			"""{"jsonrpc":"2.0","id":4,"method":"prompts/list"}""",
+			"""{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"qa_check","arguments":{}}}""");
 
 		Assert.Equal(0, run.ExitCode);
 		Assert.NotEmpty(run.StdoutLines);
@@ -111,9 +113,12 @@ public sealed class ServerTests
 		JsonElement init = run.Response(1);
 		Assert.Equal("sde", init.GetProperty("result").GetProperty("serverInfo").GetProperty("name").GetString());
 		Assert.Contains(db.Database.FilePath, init.GetProperty("result").GetProperty("instructions").GetString());
-		Assert.Equal(8, run.Response(2).GetProperty("result").GetProperty("tools").GetArrayLength());
+		Assert.Equal(ReadToolTests.ReadOnlyTools.Length + ReadToolTests.OutputTools.Length + ReadToolTests.EditTools.Length,
+			run.Response(2).GetProperty("result").GetProperty("tools").GetArrayLength());
 		JsonElement found = run.Response(3).GetProperty("result").GetProperty("structuredContent");
 		Assert.Equal(1, found.GetProperty("total").GetInt32());
+		Assert.Equal(3, run.Response(4).GetProperty("result").GetProperty("prompts").GetArrayLength());
+		Assert.True(run.Response(5).GetProperty("result").GetProperty("structuredContent").GetProperty("total").GetInt32() > 0);
 
 		// The logs went to stderr and to SDE's log folder, and the app never loaded its windows (no Dock icon).
 		Assert.Contains("AI assistant server (MCP)", run.Stderr);
@@ -121,6 +126,31 @@ public sealed class ServerTests
 		Assert.DoesNotContain("Avalonia", run.Stderr.Split('\n').Single(l => l.Contains("Loaded assemblies:")));
 		string log = Assert.Single(Directory.GetFiles(Path.Combine(db.Folder, "Logs"), "sde-mcp-*.log"));
 		Assert.Contains("AI assistant server (MCP)", File.ReadAllText(log));
+	}
+
+	[Fact]
+	public async Task The_real_process_keeps_stdout_pure_while_it_makes_outputs()
+	{
+		using TempDatabase db = new TempDatabase();
+		Guid id = SampleCases.RanchFlood(db.Store).Assessment.AssessmentID;
+		ProcessRun run = await RunServerAsync(db.Database.FilePath,
+			"""{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"process-test","version":"1.0"}}}""",
+			"""{"jsonrpc":"2.0","method":"notifications/initialized"}""",
+			"""{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"make_report","arguments":{"assessmentIds":["ID"],"kind":"detailed"}}}""".Replace("ID", id.ToString()),
+			"""{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"make_web_map","arguments":{"privacy":"public"}}}""",
+			"""{"jsonrpc":"2.0","id":4,"method":"prompts/get","params":{"name":"owner_letter_draft","arguments":{"assessmentId":"ID"}}}""".Replace("ID", id.ToString()));
+
+		Assert.Equal(0, run.ExitCode);
+		foreach (string line in run.StdoutLines)
+		{
+			using JsonDocument doc = JsonDocument.Parse(line);
+			Assert.Equal("2.0", doc.RootElement.GetProperty("jsonrpc").GetString());
+		}
+		string pdf = run.Response(2).GetProperty("result").GetProperty("structuredContent").GetProperty("path").GetString();
+		Assert.Equal(Path.Combine(db.Folder, "AI outputs"), Path.GetDirectoryName(pdf));
+		Assert.Equal("%PDF", Encoding.ASCII.GetString(File.ReadAllBytes(pdf), 0, 4));
+		Assert.True(File.Exists(run.Response(3).GetProperty("result").GetProperty("structuredContent").GetProperty("indexPath").GetString()));
+		Assert.Contains("123 River Street", run.Response(4).GetProperty("result").GetProperty("messages")[0].GetProperty("content").GetProperty("text").GetString());
 	}
 
 	[Fact]

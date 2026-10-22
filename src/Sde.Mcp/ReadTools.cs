@@ -13,7 +13,7 @@ namespace Sde.Mcp;
 /// tokens).
 /// </summary>
 [McpServerToolType]
-public sealed class ReadTools(SdeMcpContext sde)
+public sealed partial class ReadTools(SdeMcpContext sde)
 {
 	/// <summary>The most rows one page of find_structures returns.</summary>
 	public const int MaxStructurePage = 100;
@@ -33,11 +33,13 @@ public sealed class ReadTools(SdeMcpContext sde)
 		[Description("Only structures at least this percent damaged.")] decimal? minPercent = null,
 		[Description("Only structures at most this percent damaged.")] decimal? maxPercent = null,
 		[Description("\"has\" for structures with a latitude and longitude, \"missing\" for those without.")] string coordinates = null,
+		[Description("Only structures whose assessment is in this event: its name or ID (list_events lists them).")] string @event = null,
 		[Description("The page to return, starting at 1.")] int page = 1,
 		[Description("Rows per page, 1 to 100 (default 25).")] int pageSize = 25)
 	{
 		sde.RequireDatabase();
 		SdeStore store = sde.Reader;
+		HashSet<Guid> inEvent = Lookups.OptionalEvent(store, @event) is EventRecord chosen ? store.AssessmentsInEvent(chosen.EventID) : null;
 		AssessmentStatus? wantStatus = null;
 		if (!string.IsNullOrWhiteSpace(status))
 		{
@@ -77,6 +79,10 @@ public sealed class ReadTools(SdeMcpContext sde)
 				return false;
 			}
 			if (wantType != null && s.StructureTypeID != wantType)
+			{
+				return false;
+			}
+			if (inEvent != null && !(s.AssessmentID is Guid inside && inEvent.Contains(inside)))
 			{
 				return false;
 			}

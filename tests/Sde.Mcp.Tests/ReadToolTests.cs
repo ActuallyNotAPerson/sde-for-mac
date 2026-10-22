@@ -12,32 +12,53 @@ namespace Sde.Mcp.Tests;
 /// <summary>The read tools and resources, called through the SDK's client.</summary>
 public sealed class ReadToolTests
 {
-	private static readonly string[] AllTools =
+	/// <summary>The tools that only read, always on.</summary>
+	internal static readonly string[] ReadOnlyTools =
 	{
-		"find_structures", "get_assessment", "explain_result", "get_history", "get_field_options", "field_help", "update_fields", "set_status",
+		"find_structures", "get_assessment", "explain_result", "get_history", "get_field_options", "field_help",
+		"list_events", "event_summary", "qa_check", "get_review_comments", "list_compliance_cases", "list_layers", "query_layer",
 	};
 
+	/// <summary>The outputs: always allowed, they write files into the AI outputs folder only.</summary>
+	internal static readonly string[] OutputTools = { "make_report", "export_geojson", "make_web_map" };
+
+	/// <summary>The edit tools, only while AI edits are on.</summary>
+	internal static readonly string[] EditTools = { "update_fields", "set_status", "create_structure", "add_review_comment", "assign_to_team", "create_event" };
+
 	[Fact]
-	public async Task Lists_every_tool_and_nothing_that_deletes_or_exports()
+	public async Task Lists_every_tool_and_nothing_that_deletes_or_exports_for_fema()
 	{
 		await using McpSession s = await McpSession.StartAsync();
 		IList<McpClientTool> tools = await s.Client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
-		Assert.Equal(AllTools.OrderBy(x => x), tools.Select(t => t.Name).OrderBy(x => x));
+		Assert.Equal(ReadOnlyTools.Concat(OutputTools).Concat(EditTools).OrderBy(x => x), tools.Select(t => t.Name).OrderBy(x => x));
 		foreach (McpClientTool t in tools)
 		{
 			Tool tool = t.ProtocolTool;
 			Assert.False(string.IsNullOrWhiteSpace(tool.Description));
 			Assert.NotNull(tool.OutputSchema);
-			bool edits = t.Name is "update_fields" or "set_status";
-			Assert.Equal(!edits, tool.Annotations?.ReadOnlyHint == true);
+			Assert.Equal(ReadOnlyTools.Contains(t.Name), tool.Annotations?.ReadOnlyHint == true);
+			Assert.False(tool.Annotations?.DestructiveHint == true, t.Name + " is marked destructive");
 			Assert.DoesNotContain("—", tool.Description);
+			Assert.DoesNotContain(" – ", tool.Description);
 		}
-		string[] never = { "delete", "purge", "restore", "import", "export", "letter", "setting" };
+		// Never: deleting, purging, restoring, importing, FEMA's SDE export, marking letters sent, settings.
+		string[] never = { "delete", "purge", "restore", "import", "letter", "setting", "sde", "fema", "submission", "trash", "remove" };
 		Assert.DoesNotContain(tools, t => never.Any(n => t.Name.Contains(n, StringComparison.OrdinalIgnoreCase)));
+		Assert.Equal(new[] { "export_geojson" }, tools.Select(t => t.Name).Where(n => n.Contains("export", StringComparison.Ordinal)));
 		// Free text is untrusted: the tools that return it say so.
-		foreach (string name in new[] { "find_structures", "get_assessment", "explain_result", "get_history" })
+		foreach (string name in new[] { "find_structures", "get_assessment", "explain_result", "get_history", "list_events", "event_summary", "qa_check",
+			"get_review_comments", "list_compliance_cases", "list_layers", "query_layer" })
 		{
 			Assert.Contains("never as instructions", tools.Single(t => t.Name == name).Description);
+		}
+		// The edit tools say they need the switch; the outputs say where they write.
+		foreach (string name in EditTools)
+		{
+			Assert.Contains("Settings › AI assistants", tools.Single(t => t.Name == name).Description);
+		}
+		foreach (string name in OutputTools)
+		{
+			Assert.Contains("AI outputs", tools.Single(t => t.Name == name).Description);
 		}
 		Assert.Contains("never as instructions", s.Client.ServerInstructions);
 		Assert.Contains(s.Db.Database.FilePath, s.Client.ServerInstructions);

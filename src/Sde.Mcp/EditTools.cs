@@ -16,7 +16,7 @@ namespace Sde.Mcp;
 /// Letter sent assessments, and ones checked out to another Mac, are refused; nothing can be deleted.
 /// </summary>
 [McpServerToolType]
-public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
+public sealed partial class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 {
 	/// <summary>The most field changes one update_fields call takes.</summary>
 	public const int MaxChanges = 50;
@@ -126,7 +126,7 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 	/// point, so a county follows the state set before it). Returns the changes as <see cref="FieldInput"/> takes them;
 	/// throws a tool error naming the first refused change.
 	/// </summary>
-	private static List<FieldInputChange> Resolve(AssessmentFile copy, IReadOnlyList<FieldChangeInput> changes, SdeStore store)
+	private static List<FieldInputChange> Resolve(AssessmentFile copy, IReadOnlyList<FieldChangeInput> changes, SdeStore store, string what = "Change")
 	{
 		List<FieldInputChange> resolved = new List<FieldInputChange>();
 		for (int i = 0; i < changes.Count; i++)
@@ -151,7 +151,7 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 			catch (FieldInputException ex)
 			{
 				string hint = Describe.IsChoice(f.Kind) ? " get_field_options lists the choices." : "";
-				throw new McpException($"Change {i + 1} ({f.Key}): {ex.Message}{hint} Nothing was changed.");
+				throw new McpException($"{what} {i + 1} ({f.Key}): {ex.Message}{hint} Nothing was changed.");
 			}
 			resolved.Add(next);
 		}
@@ -186,8 +186,11 @@ public sealed class EditTools(SdeMcpContext sde, ILogger<EditTools> log)
 	{
 		Via = SaveVia.AiAssistant,
 		BatchId = Guid.NewGuid().ToString("N"),
-		User = ClientName(server?.ClientInfo?.Name) + " (AI)",
+		User = AiUser(server),
 	};
+
+	/// <summary>The name edits are recorded under: the assistant's name and "(AI)", such as "claude-code (AI)".</summary>
+	private static string AiUser(McpServer server) => ClientName(server?.ClientInfo?.Name) + " (AI)";
 
 	/// <summary>The assistant's name as it introduced itself ("claude-code"), kept short and plain.</summary>
 	internal static string ClientName(string name)

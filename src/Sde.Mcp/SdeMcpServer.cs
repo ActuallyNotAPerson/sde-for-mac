@@ -196,7 +196,7 @@ public static class SdeMcpServer
 			mcp.WithStdioServerTransport();
 		}
 		Assembly tools = typeof(SdeMcpServer).Assembly;
-		mcp.WithToolsFromAssembly(tools, Json).WithResourcesFromAssembly(tools);
+		mcp.WithToolsFromAssembly(tools, Json).WithResourcesFromAssembly(tools).WithPromptsFromAssembly(tools, Json);
 		mcp.WithRequestFilters(filters => filters.AddCallToolFilter(next => async (request, cancellationToken) =>
 		{
 			try
