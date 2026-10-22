@@ -219,6 +219,12 @@ public sealed partial class CommandPaletteViewModel : ObservableObject
 		yield return Command("Search and replace…", "Search", null, _main.Structures.SearchReplaceCommand, keywords: "find");
 		yield return Command("Set a field on checked structures…", "Edit", null, _main.Structures.BulkEditCommand, keywords: "bulk");
 		yield return Command("Set event for checked structures…", "Event", null, _main.Structures.SetEventCommand, keywords: "disaster");
+		yield return Command("Assign checked structures to a team…", "Assignments", null, _main.Structures.AssignToTeamCommand, keywords: "field route crew");
+		yield return Command("New team…", "Assignments", null, _main.Assignments.NewTeamCommand, keywords: "field crew");
+		yield return Command("Make a web map…", "Globe", null, _main.Structures.WebMapCommand, keywords: "share public leaflet html");
+		yield return Command("Check in a work package…", "Download", null, _main.ImportExport.CheckInCommand, keywords: "sdework field back");
+		yield return Command("Open a work package…", "Download", null, _main.OpenWorkPackageCommand, keywords: "sdework field offline");
+		yield return Command("Work package for the field…", "Upload", null, _main.Structures.WorkPackageCommand, keywords: "check out offline sdework");
 		yield return Command("New event…", "Event", null, _main.NewEventCommand, keywords: "disaster flood dr");
 		yield return Command("Manage events…", "Event", null, _main.ManageEventsCommand, keywords: "disaster rename delete");
 		yield return Command("Open database…", "FolderOpen", "⌘O", settings.OpenDatabaseCommand);

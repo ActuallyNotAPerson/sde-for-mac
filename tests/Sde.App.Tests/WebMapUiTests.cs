@@ -73,4 +73,35 @@ public class WebMapUiTests
 		Assert.DoesNotContain("Example", publicGeo);
 		Assert.DoesNotContain("Inspector A", publicGeo);
 	}
+
+	[AvaloniaFact]
+	public void Palette_FindsTheV25Commands()
+	{
+		using UiSession ui = new UiSession();
+		MapTestSupport.SetUpPlaces(ui);
+		ui.Pump();
+		CommandPaletteViewModel palette = ui.Main.Palette;
+		foreach ((string query, string title) in new[]
+		{
+			("web map", "Make a web map…"),
+			("work package for", "Work package for the field…"),
+			("check in a", "Check in a work package…"),
+			("open a work", "Open a work package…"),
+			("new team", "New team…"),
+			("assign checked", "Assign checked structures to a team…"),
+		})
+		{
+			palette.Open();
+			palette.Query = query;
+			ui.Pump();
+			Assert.Equal(title, palette.Selected.Title);
+			palette.Close();
+		}
+		palette.Open();
+		palette.Query = "web map";
+		ui.Pump();
+		palette.Run(null);
+		ui.Pump();
+		Assert.IsType<WebMapSheetViewModel>(ui.Main.Sheets.Current);
+	}
 }
