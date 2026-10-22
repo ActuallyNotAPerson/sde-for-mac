@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Sde.App.Controls;
@@ -249,6 +250,8 @@ public partial class MainWindow : Window, IDialogs
 	public void Open(string path) => Process.Start(new ProcessStartInfo("open") { ArgumentList = { path }, UseShellExecute = false });
 
 	public void Reveal(string path) => Process.Start(new ProcessStartInfo("open") { ArgumentList = { "-R", path }, UseShellExecute = false });
+
+	public Task CopyTextAsync(string text) => Clipboard?.SetTextAsync(text) ?? Task.CompletedTask;
 }
 
 /// <summary>Small converters for the window's sheets and switchers.</summary>

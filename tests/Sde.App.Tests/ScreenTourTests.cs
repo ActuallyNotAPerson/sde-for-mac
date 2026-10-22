@@ -54,7 +54,7 @@ public class ScreenTourTests
 		ui.Main.Settings.Show(SettingsCategory.PhoneForm);
 		ui.Snapshot("31d-settings-phone-form");
 		ui.Main.Settings.Show(SettingsCategory.AiAssistants);
-		ui.Snapshot("31e-settings-placeholder");
+		ui.Snapshot("31e-settings-ai-assistants");
 		ui.Main.Settings.Show(SettingsCategory.General);
 
 		// Empty states

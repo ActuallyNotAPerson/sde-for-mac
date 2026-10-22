@@ -71,5 +71,9 @@ public sealed partial class SettingsViewModel
 		{
 			SelectedCategory = Categories[0];
 		}
+		else if (value.Category == SettingsCategory.AiAssistants)
+		{
+			AiAssistants.Refresh(); // an assistant may have changed something since the panel was last shown
+		}
 	}
 }

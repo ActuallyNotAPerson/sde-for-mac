@@ -207,11 +207,8 @@
         <!-- Phone form -->
         <Panel IsVisible="{Binding IsPhoneForm}"><v:PhoneFormPanel DataContext="{Binding PhoneForm}" /></Panel>
 
-        <!-- AI assistants (to come: src/Sde.Mcp/AiAssistantSettings.cs) -->
-        <Border Classes="card" IsVisible="{Binding IsAiAssistants}">
-          <c:EmptyState Icon="Assistant" Title="AI assistants"
-                        Text="Here you'll choose whether AI assistants such as Claude may change this database, and see and undo what they changed. They can't change anything until you allow it." />
-        </Border>
+        <!-- AI assistants -->
+        <Panel IsVisible="{Binding IsAiAssistants}"><v:AiAssistantsPanel DataContext="{Binding AiAssistants}" /></Panel>
 
         <!-- Map & GIS (to come with the new map) -->
         <Border Classes="card" IsVisible="{Binding IsMapAndGis}">

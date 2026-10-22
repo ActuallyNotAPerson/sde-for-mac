@@ -28,6 +28,9 @@ public interface IDialogs
 
 	/// <summary>Shows a file or folder in Finder.</summary>
 	void Reveal(string path);
+
+	/// <summary>Puts text on the clipboard (for setup commands to paste elsewhere). The tests' dialogs keep it instead.</summary>
+	Task CopyTextAsync(string text) => Task.CompletedTask;
 }
 
 /// <summary>Remembered between launches (~/Library/Application Support/SDE/app-settings.json).</summary>
@@ -187,6 +190,12 @@ public sealed class AppServices
 	}
 
 	public IDialogs Dialogs { get; }
+
+	/// <summary>
+	/// SDE's program inside the app, which AI assistants run to reach the database (Settings › AI assistants). Tests set
+	/// the installed path, so screenshots never show where the test runner lives.
+	/// </summary>
+	public string ProgramPath { get; set; } = Environment.ProcessPath;
 
 	/// <summary>Panels shown over the window (see <see cref="SheetHost"/>).</summary>
 	public SheetHost Sheets { get; }
