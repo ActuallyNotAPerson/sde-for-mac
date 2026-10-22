@@ -29,7 +29,8 @@ public sealed record StructureSummary(
 	string ZipCode = null,
 	string ParcelNumber = null,
 	int? FIRMZone = null,
-	string Status = null);
+	string Status = null,
+	bool CheckedOut = false);
 
 /// <summary>
 /// Everything the app reads and writes. Replaces FEMA's 25 DAL services and the parts of the BLL that called them.
@@ -348,7 +349,8 @@ public sealed partial class SdeStore
 			       a.PercentDamage, a.DamageMessage, COALESCE(a.LastUpdate, p.LastUpdate) AS LastUpdate,
 			       COALESCE(x.Source, (SELECT l.Source FROM StructureLink l WHERE l.PropertyID = p.PropertyID ORDER BY l.ImportedOn DESC LIMIT 1)) AS ExternalSource,
 			       COALESCE(x.RecordId, (SELECT l.RecordId FROM StructureLink l WHERE l.PropertyID = p.PropertyID ORDER BY l.ImportedOn DESC LIMIT 1)) AS ExternalId,
-			       p.StreetName, p.ZipCode, p.ParcelNumber, p.FIRMZone, st.Status
+			       p.StreetName, p.ZipCode, p.ParcelNumber, p.FIRMZone, st.Status,
+			       EXISTS (SELECT 1 FROM CheckOut co WHERE co.AssessmentID = a.AssessmentID) AS CheckedOut
 			FROM Property p
 			LEFT JOIN Assessment a ON a.PropertyID = p.PropertyID AND a.Active = 1
 			LEFT JOIN Lookup s ON s.LookupID = p.StreetSuffixID
@@ -360,7 +362,7 @@ public sealed partial class SdeStore
 		return Database.Read(c => c.Query<SummaryRow>(sql).Select(r => new StructureSummary(
 			r.PropertyID, r.AssessmentID, r.StructureTypeID, r.Owner, r.Address, r.City, r.NFIPCID, r.NFIPCommunityName,
 			r.DateofInspection, r.InspectorName, r.PercentDamage is decimal pd ? JetScaling.WithScale(pd, 1) : null,
-			r.DamageMessage, r.LastUpdate, r.ExternalSource, r.ExternalId, r.StreetName, r.ZipCode, r.ParcelNumber, r.FIRMZone, r.Status)).ToList());
+			r.DamageMessage, r.LastUpdate, r.ExternalSource, r.ExternalId, r.StreetName, r.ZipCode, r.ParcelNumber, r.FIRMZone, r.Status, r.CheckedOut)).ToList());
 	}
 
 	private sealed class SummaryRow
@@ -385,6 +387,7 @@ public sealed partial class SdeStore
 		public string ParcelNumber { get; set; }
 		public int? FIRMZone { get; set; }
 		public string Status { get; set; }
+		public bool CheckedOut { get; set; }
 	}
 
 	public List<RecentAssessmentRecord> RecentAssessments(int count = 5) =>

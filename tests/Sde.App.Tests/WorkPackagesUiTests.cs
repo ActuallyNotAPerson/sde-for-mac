@@ -70,7 +70,8 @@ public class WorkPackagesUiTests
 		string package = await CheckOutTwo(ui);
 		Assert.Contains(ui.Dialogs.Notifications, n => n.StartsWith("Work package saved: Checked out 2 assessments"));
 
-		// At the office: listed on Import & export, and read-only in the editor.
+		// At the office: marked in the list, listed on Import & export, and read-only in the editor.
+		Assert.Equal("Draft, checked out", ui.Main.Structures.Rows.Single(r => r.AssessmentID == river).Status);
 		Assert.Contains("checked out to Team North", Assert.Single(ui.Main.ImportExport.CheckedOut).Text);
 		ui.Main.OpenAssessment(river);
 		ui.Pump();

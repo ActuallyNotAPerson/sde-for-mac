@@ -45,7 +45,9 @@ public sealed partial class StructureRowViewModel(StructureSummary s, ReferenceD
 
 	public string FirmZone => reference?.LookupName(Summary.FIRMZone) ?? "";
 
-	public string Status => Summary.AssessmentID == null ? "" : AssessmentStatuses.Label(AssessmentStatuses.Parse(Summary.Status));
+	/// <summary>"Draft", or "Draft, checked out" while the assessment is in a work package.</summary>
+	public string Status => Summary.AssessmentID == null ? ""
+		: AssessmentStatuses.Label(AssessmentStatuses.Parse(Summary.Status)) + (Summary.CheckedOut ? ", checked out" : "");
 
 	public string Updated => Summary.LastUpdate?.ToString("MMM d, yyyy") ?? "";
 
