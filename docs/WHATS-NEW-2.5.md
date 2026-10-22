@@ -28,6 +28,21 @@ works on databases from 1.0, 1.5 and 2.0, and a 2.0 app can still open a 2.5 dat
   field, assign it to a team, print reports or make a web map.
 - **Measure** distances and areas, and save **bookmarks**.
 
+## In the field
+- **Field teams**: make teams, assign structures from Structures or the map, put each team's structures in a driving
+  order, and print a route sheet and a worksheet per structure with a short code the phone form's search accepts. The
+  Assignments page and a Dashboard chart show each team's progress.
+- **Work packages**: take assessments to a Mac in the field on a file, work there without a connection, and check the
+  work back in at the office with its history. While out, the assessments are read-only at the office.
+
+## In the office
+- **Review**: a queue of assessments waiting for review, quality checks that flag likely mistakes (set one aside with
+  a reason, or bring it back), reviewers' comments with replies, and Mark reviewed. Before an export or a submission
+  folder, SDE asks about open errors.
+- **Compliance and ICC**: a case for each substantially damaged structure (or substantial improvement) with its path,
+  permit, deadline, ICC claim, elevation certificate and final inspection, a timeline of notes, three starter letters,
+  and PDF and CSV lists. The Dashboard shows open and overdue cases.
+
 ## Field data in
 - **Flood depth from high-water marks**: from a file of marks, USGS's marks for an event, or a water-surface grid,
   with a confidence and a reason for every structure, for you to review.
@@ -43,9 +58,11 @@ works on databases from 1.0, 1.5 and 2.0, and a 2.0 app can still open a 2.5 dat
 
 ## AI assistants
 - **Claude and other AI assistants can work with an SDE database** through SDE's built-in MCP server: find structures,
-  read and explain assessments, check them, and make reports and maps.
-- **Changes only when you allow them**, in Settings, AI assistants. Every change is recorded in History as the
-  assistant's and can be reverted there; Final and Letter sent assessments stay locked; nothing can be deleted.
+  read and explain assessments, run the quality checks, summarise an event, list compliance cases and map layers, and
+  make reports, GeoJSON files and web maps (into an "AI outputs" folder beside the database).
+- **Changes only when you allow them**, in Settings, AI assistants: fill in fields, set Draft, Reviewed or Appeal, add
+  structures, events and review comments, and assign teams. Every change is recorded in History as the assistant's
+  and can be reverted from Settings; Final and Letter sent assessments stay locked; nothing can be deleted.
 - Settings, AI assistants has the setup to paste into Claude Code or Claude Desktop.
 
 ## Unchanged on purpose
