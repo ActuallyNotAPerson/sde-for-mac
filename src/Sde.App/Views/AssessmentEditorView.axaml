@@ -568,6 +568,7 @@
                 <Separator />
                 <MenuItem Header="Improvements and SI…" Command="{Binding ShowImprovementsCommand}" />
                 <MenuItem Header="Appeal…" Command="{Binding ShowAppealCommand}" />
+                <MenuItem Header="Compliance case…" Command="{Binding ComplianceCaseCommand}" />
                 <MenuItem Header="Mark letter as sent…" Command="{Binding MarkLetterSentCommand}" />
                 <Separator />
                 <MenuItem Header="Move to Recently Deleted" Command="{Binding DeleteAssessmentCommand}" />

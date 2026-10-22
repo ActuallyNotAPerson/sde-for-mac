@@ -9,8 +9,8 @@ using Sde.Data;
 namespace Sde.App.ViewModels.Editor;
 
 /// <summary>
-/// The editor's part in the office workflow: the Comments button and sheet, and going to a field named by a quality
-/// finding or a comment.
+/// The editor's part in the office workflow: the Comments button and sheet, ⋯ Compliance case, and going to a field
+/// named by a quality finding or a comment.
 /// </summary>
 public sealed partial class AssessmentEditorViewModel
 {
@@ -52,6 +52,49 @@ public sealed partial class AssessmentEditorViewModel
 		await _app.Sheets.ShowAsync(new CommentsSheetViewModel(threads, Title));
 		threads.Changed -= RefreshComments;
 		RefreshComments();
+	}
+
+	/// <summary>
+	/// ⋯ › Compliance case: the compliance case for this substantially damaged assessment, opening one (after asking)
+	/// when it has none yet.
+	/// </summary>
+	[RelayCommand]
+	private async Task ComplianceCase()
+	{
+		Save();
+		if (IsDraft)
+		{
+			_app.Dialogs.Notify("Not started yet", "Enter something in this assessment first.");
+			return;
+		}
+		Guid id = Assessment.AssessmentID;
+		ComplianceCaseRecord existing = _app.Store.GetComplianceCaseFor(id);
+		if (existing == null)
+		{
+			if (!(Assessment.PercentDamage >= 50m) || Assessment.PhysicalDamage)
+			{
+				_app.Dialogs.Notify("No compliance case needed", "Only a substantially damaged building (50% or more) needs a compliance case.");
+				return;
+			}
+			if (!await _app.Dialogs.ConfirmAsync("Open a compliance case?",
+				"A compliance case follows this structure until it is brought into compliance: the way the owner chooses, the permit and deadline, the ICC claim, the elevation certificate and the final inspection.",
+				"Open case"))
+			{
+				return;
+			}
+			try
+			{
+				existing = _app.Store.OpenComplianceCase(id);
+			}
+			catch (Exception ex) when (ex is not OutOfMemoryException)
+			{
+				_app.Errors.Show("Couldn't open a compliance case", ex);
+				return;
+			}
+			_app.RaiseDataChanged();
+		}
+		await _app.Sheets.ShowAsync(new ComplianceCaseSheetViewModel(_app, existing.CaseID));
+		_app.RaiseDataChanged();
 	}
 
 	/// <summary>

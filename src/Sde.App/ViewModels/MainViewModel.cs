@@ -57,8 +57,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Map = new MapViewModel(app, this);
 		Dashboard = new DashboardViewModel(app);
 		Review = new ReviewViewModel(app, this);
-		Compliance = new PlaceholderPageViewModel("Compliance", "Follow up on substantially damaged structures.", "Compliance",
-			"No compliance cases", "Substantially damaged structures appear here with their permits, deadlines, ICC claims and final inspections.");
+		Compliance = new ComplianceViewModel(app, this);
 		Assignments = new PlaceholderPageViewModel("Assignments", "Who inspects what, and in what order.", "Assignments",
 			"No assignments", "Teams and the structures assigned to them appear here, with route sheets for the field.");
 		SidebarGroups = BuildSidebar();
@@ -124,12 +123,16 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		RefreshStatus();
 	}
 
-	/// <summary>Review catches up with the database while it is showing.</summary>
+	/// <summary>Review and Compliance catch up with the database while one of them is showing.</summary>
 	private void ReloadOfficePages()
 	{
 		if (Review.IsActive)
 		{
 			Review.Reload();
+		}
+		if (Compliance.IsActive)
+		{
+			Compliance.Reload();
 		}
 	}
 
@@ -172,7 +175,8 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	/// <summary>The review queue, the quality checks and reviewers' comments.</summary>
 	public ReviewViewModel Review { get; }
 
-	public PlaceholderPageViewModel Compliance { get; }
+	/// <summary>The compliance and ICC tracker.</summary>
+	public ComplianceViewModel Compliance { get; }
 
 	public PlaceholderPageViewModel Assignments { get; }
 
@@ -387,8 +391,9 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		}
 		// In an event, the count is the event's structures.
 		int structures = _app.Scope.IsAll ? p : Structures.StructureCount;
-		// Review counts the assessments waiting (Draft and Reviewed).
+		// Review counts the assessments waiting (Draft and Reviewed); Compliance, the open cases past their deadline.
 		int waiting = Count("Couldn't count the assessments waiting for review", () => ReviewViewModel.CountWaiting(_app));
+		int overdue = Count("Couldn't count the overdue compliance cases", () => ComplianceViewModel.CountOverdue(_app));
 		foreach (NavItemViewModel item in SidebarItems)
 		{
 			item.Count = item.Page switch
@@ -396,11 +401,13 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 				Page.Structures => structures,
 				Page.Trash => deleted,
 				Page.Review => waiting,
+				Page.Compliance => overdue,
 				_ => 0,
 			};
 			item.CountTone = item.Page switch
 			{
 				Page.Review => Tone.Accent,
+				Page.Compliance => Tone.Danger,
 				_ => Tone.Neutral,
 			};
 		}
@@ -444,6 +451,7 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		Map.IsActive = page == Page.Map;
 		Dashboard.IsActive = page == Page.Dashboard;
 		Review.IsActive = page == Page.Review;
+		Compliance.IsActive = page == Page.Compliance;
 		RefreshStatus();
 		if (page == Page.Map)
 		{
@@ -461,6 +469,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (page == Page.Review)
 		{
 			Review.Reload();
+		}
+		if (page == Page.Compliance)
+		{
+			Compliance.Reload();
 		}
 		if (page == Page.Structures)
 		{

@@ -161,8 +161,9 @@ public class AccessibilityTests
 	}
 
 	/// <summary>
-	/// The Review page (v2.5): its queue with an assessment's checks and comments beside it, its quality checks with
-	/// one set aside; and its sheets: set aside, comments and the question before an export.
+	/// The office pages (v2.5): Review's queue with an assessment's checks and comments beside it, its quality checks
+	/// with one set aside, and Compliance with cases; and their sheets: set aside, comments, the question before an
+	/// export, and a compliance case.
 	/// </summary>
 	[AvaloniaFact]
 	public async Task TheOfficePagesAndTheirSheetsHaveAccessibleNames()
@@ -209,6 +210,15 @@ public class AccessibilityTests
 		Assert.IsType<QaBeforeExportSheetViewModel>(ui.Main.Sheets.Current);
 		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
 		await exporting;
+
+		ui.Store.OpenComplianceCase(ranch);
+		ui.Main.ShowCommand.Execute(ViewModels.Page.Compliance);
+		Check("Compliance");
+		Task open = ui.Main.Compliance.OpenCaseCommand.ExecuteAsync(ui.Main.Compliance.Rows[0]);
+		Check("Compliance case sheet");
+		Assert.IsType<ComplianceCaseSheetViewModel>(ui.Main.Sheets.Current);
+		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
+		await open;
 
 		Assert.True(problems.Count == 0, string.Join("\n", problems));
 	}

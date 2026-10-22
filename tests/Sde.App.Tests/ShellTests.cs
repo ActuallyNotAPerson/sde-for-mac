@@ -74,7 +74,7 @@ public class ShellTests
 		ui.Main.OpenAssessment(ui.Main.Structures.Rows.First(r => r.AssessmentID != null).AssessmentID!.Value);
 		List<string> kinds = ui.Main.Editor.Sections.Select(s => s.Icon)
 			.Concat(ui.Main.SidebarItems.Select(i => i.Icon))
-			.Concat(new[] { ui.Main.Compliance.Icon, ui.Main.Assignments.Icon })
+			.Concat(new[] { ui.Main.Assignments.Icon })
 			.ToList();
 		Assert.All(ui.Main.Editor.Sections, s => Assert.False(string.IsNullOrEmpty(s.Icon), s.Title));
 		Assert.All(kinds, k => Assert.True(ui.Window.TryFindResource(Icon.ResourceKey(k), out object g) && g is Avalonia.Media.Geometry, k));
@@ -84,7 +84,7 @@ public class ShellTests
 	public void PlaceholderPages_SayWhatTheyWillHold()
 	{
 		using UiSession ui = new UiSession();
-		foreach (Page page in new[] { Page.Compliance, Page.Assignments })
+		foreach (Page page in new[] { Page.Assignments })
 		{
 			ui.Main.ShowCommand.Execute(page);
 			ui.Pump();
