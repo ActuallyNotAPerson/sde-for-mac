@@ -1,4 +1,3 @@
-<!-- Draft written during v2.5 development. Check every line against what shipped before the release (M10). -->
 # What's new in SDE for Mac 2.5
 
 SDE for Mac 2.5 has a new look and adds the work around an event: a map you can edit, events, field assignments,
@@ -27,11 +26,18 @@ works on databases from 1.0, 1.5 and 2.0, and a 2.0 app can still open a 2.5 dat
 - **Select** by clicking, dragging a box, drawing an area or by attribute, then show the selection in Structures, set a
   field, assign it to a team, print reports or make a web map.
 - **Measure** distances and areas, and save **bookmarks**.
+- **Edit your own layers**: draw points, lines and areas, move and delete corners with snapping, undo and redo, and
+  type values in the attribute table. **Drag a structure's dot** to fix its location, with a question first.
+- **Select by location** (touching, inside, containing or within a distance of other features) and **copy values
+  onto structures** from a layer, such as the parcel number or FEMA flood zone, with a preview to tick.
+- **Print the map** to a Letter-size PDF with a legend, scale bar, north arrow and sources.
+- **Keep an area offline**: download the USGS map for an area before going where there is no connection.
 
 ## In the field
 - **Field teams**: make teams, assign structures from Structures or the map, put each team's structures in a driving
-  order, and print a route sheet and a worksheet per structure with a short code the phone form's search accepts. The
-  Assignments page and a Dashboard chart show each team's progress.
+  order, and print a route sheet and a worksheet per structure with a small map and a short code the phone form's
+  search accepts. The Assignments page and a Dashboard chart show each team's progress, and the phone form shows each
+  inspector their team's list.
 - **Work packages**: take assessments to a Mac in the field on a file, work there without a connection, and check the
   work back in at the office with its history. While out, the assessments are read-only at the office.
 
@@ -65,8 +71,15 @@ works on databases from 1.0, 1.5 and 2.0, and a 2.0 app can still open a 2.5 dat
   and can be reverted from Settings; Final and Letter sent assessments stay locked; nothing can be deleted.
 - Settings, AI assistants has the setup to paste into Claude Code or Claude Desktop.
 
+## Settings
+- **Map & GIS**: the background map, whether FEMA's flood zones start on, the saved map pieces, and leaving owner names
+  out of GIS files (on by default).
+- **AI assistants**: whether assistants may change the database, the setup to connect one, and their recent changes.
+
 ## Unchanged on purpose
 - The damage calculation is FEMA's engine, unedited.
+- A 2.0 app can still open a 2.5 database. While assessments are out in a work package, edit them only in 2.5: a
+  change 2.0 makes to one is kept, and the work package's copy of it isn't checked in.
 - Export.json, SDE_n folders and the .mdb import are exactly what FEMA's SDE writes and reads. Events, layers, markup,
   certificates, assignments, review comments and compliance cases live in SDE for Mac's own tables and are never
   exported to FEMA.

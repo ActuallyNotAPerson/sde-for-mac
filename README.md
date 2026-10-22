@@ -4,8 +4,9 @@
 Insurance Program have to decide whether each damaged building is *substantially damaged*: whether repairing it would
 cost 50 percent or more of its value before the damage. FEMA's Substantial Damage Estimator (SDE 3.0) is the standard
 tool for that, and it runs only on Windows. SDE for Mac gives the same results, reads and writes the same files, and
-adds what an office needs during a busy recovery: imports from permit systems and assessor rolls, a map, owner
-letters, a phone form for inspectors, edit history and automatic backups.
+adds what an office needs during a busy recovery: events, a map you can edit, field teams and work packages, review
+and compliance tracking, imports from permit systems and assessor rolls, owner letters, a phone form for inspectors,
+AI assistants that work only as far as you allow, edit history and automatic backups.
 
 > **Not a FEMA product.** SDE for Mac is an independent, unofficial port. It is not produced, endorsed or supported by
 > FEMA. It uses FEMA's calculation, cost tables and validation rules and is tested against FEMA's own engine, but every
@@ -14,7 +15,7 @@ letters, a phone form for inspectors, edit history and automatic backups.
 ![The Structures list](docs/screenshots/01-structures.png)
 
 **[Download the latest release](../../releases/latest)** · [User guide](docs/USER-GUIDE.md) ·
-[What's new in 2.0](docs/WHATS-NEW-2.0.md) · [Report a problem](../../issues/new/choose)
+[What's new in 2.5](docs/WHATS-NEW-2.5.md) · [Report a problem](../../issues/new/choose)
 
 ## Contents
 - [Who it's for](#who-its-for)
@@ -44,8 +45,20 @@ both directions.
 - **Data from the field**: import inspections or parcels from any permit system, assessor roll or spreadsheet (`.csv`,
   `.xlsx`, `.xls`, or a shapefile's `.dbf`); match a folder of photos to structures; look up coordinates and flood data
   online; let inspectors fill in assessments from a phone over the office Wi-Fi.
-- **Results**: a map, an event dashboard and summary PDF, GeoPackage and GeoJSON files for GIS, owner letters from
-  Word templates, substantial improvement determinations, appeals with contractor bids, and optional cumulative damage.
+- **Events**: keep each disaster separate and look at one at a time; Structures, the map, the Dashboard, exports and
+  letters follow the event chosen in the sidebar.
+- **A map you can work in**: layers from Shapefiles, GeoJSON, GeoPackages, CSV and ArcGIS services; styling, an
+  attribute table, selecting, measuring, editing your own layers, copying values onto structures, printing, and FEMA's
+  flood zones as an overlay.
+- **Field work**: teams with routes, worksheets and a phone list; work packages to take assessments to a Mac with no
+  connection and back; maps kept for offline use; flood depth from high-water marks; elevation certificates read from
+  FEMA's form; photo markup.
+- **Office work**: a review queue with quality checks and comments, a compliance and ICC tracker with letters, and web
+  maps to share with partners or the public.
+- **Results**: an event dashboard and summary PDF, GeoPackage and GeoJSON files for GIS, owner letters from Word
+  templates, substantial improvement determinations, appeals with contractor bids, and optional cumulative damage.
+- **AI assistants**: Claude and other assistants can read and check a database and make reports; they change it only
+  when you allow it, and every change can be reverted.
 - **Safety nets**: review statuses that lock finished assessments, edit history, undo, Recently deleted, and automatic
   daily backups.
 
@@ -189,7 +202,8 @@ unedited as the tests' answer key. Those folders are ignored by git and must nev
 - [Importing inspections or parcels](docs/IMPORTING.md): profiles, matching, updates and the submission folder in detail.
 - [Owner letters](docs/LETTERS.md): templates and every placeholder.
 - [Phone form](docs/PHONE-FORM.md): setup, pairing, and what it does and doesn't protect against.
-- [What's new in 2.0](docs/WHATS-NEW-2.0.md).
+- [What's new in 2.5](docs/WHATS-NEW-2.5.md) and [in 2.0](docs/WHATS-NEW-2.0.md).
+- [AI assistants (MCP)](docs/MCP.md): connecting Claude Desktop or Claude Code, and every tool.
 
 **For developers and reviewers**
 - [How FEMA's SDE works](docs/SDE-ARCHITECTURE.md).
