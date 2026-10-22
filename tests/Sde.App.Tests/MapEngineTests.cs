@@ -294,4 +294,28 @@ public class MapEngineTests
 		Assert.True(Ink(17) > 20, "no address label at zoom 17");
 		Assert.Equal(0, Ink(13));
 	}
+
+	[AvaloniaFact]
+	public void Labels_InTwoMapsOrPrints_DontTakeEachOthersPlace()
+	{
+		// Every map and every print has its own engine renderer, each counting frames from 0, but the label renderer is
+		// shared: two maps' first frames (or two worksheet maps in a row) must not see each other's labels as taken.
+		MapLabelStyle style = new MapLabelStyle { Text = _ => "100 River Street" };
+		Mapsui.Layers.MemoryLayer layer = new Mapsui.Layers.MemoryLayer();
+		Mapsui.Viewport viewport = new Mapsui.Viewport(0, 0, 1, 0, 400, 300);
+		using Mapsui.Rendering.RenderService service = new Mapsui.Rendering.RenderService();
+		using SkiaSharp.SKSurface first = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo(400, 300));
+		using SkiaSharp.SKSurface second = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo(400, 300));
+		SkiaSharp.SKCanvas one = first.Canvas;
+		SkiaSharp.SKCanvas two = second.Canvas;
+		MapLabelRenderer labels = new MapLabelRenderer();
+
+		Assert.True(labels.Draw(one, viewport, layer, new Mapsui.Layers.PointFeature(0, 0), style, service, 0));
+		// In the same frame a label that would overlap gives way.
+		Assert.False(labels.Draw(one, viewport, layer, new Mapsui.Layers.PointFeature(5, 0), style, service, 0));
+		// Another map's frame 0 draws its label in the same place.
+		Assert.True(labels.Draw(two, viewport, layer, new Mapsui.Layers.PointFeature(0, 0), style, service, 0));
+		// And the first map's next frame starts empty.
+		Assert.True(labels.Draw(one, viewport, layer, new Mapsui.Layers.PointFeature(5, 0), style, service, 1));
+	}
 }

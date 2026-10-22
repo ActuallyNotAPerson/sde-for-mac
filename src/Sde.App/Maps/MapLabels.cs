@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Avalonia.Platform;
 using Mapsui;
 using Mapsui.Extensions;
@@ -44,9 +45,17 @@ public sealed class MapLabelStyle : BaseStyle
 public sealed class MapLabelRenderer : ISkiaStyleRenderer
 {
 	private static readonly Lazy<SKTypeface> Inter = new Lazy<SKTypeface>(LoadInter);
-	private readonly object _gate = new object();
-	private readonly List<SKRect> _taken = new List<SKRect>();
-	private long _iteration = -1;
+
+	// The space labels have taken, per canvas. The engine registers one label renderer for every map and print, but
+	// each of those has its own renderer counting frames from 0, so a frame is its canvas and its iteration together.
+	private readonly ConditionalWeakTable<SKCanvas, Frame> _frames = new ConditionalWeakTable<SKCanvas, Frame>();
+
+	private sealed class Frame
+	{
+		public long Iteration = -1;
+
+		public readonly List<SKRect> Taken = new List<SKRect>();
+	}
 
 	/// <summary>Registers the renderer with the map engine (once; safe to call often).</summary>
 	public static void Register()
@@ -88,21 +97,22 @@ public sealed class MapLabelRenderer : ISkiaStyleRenderer
 			? (float)(sy - label.Rise) - metrics.Descent
 			: (float)sy - (metrics.Ascent + metrics.Descent) / 2;
 		SKRect box = new SKRect(x - 2, baseline + metrics.Ascent - 1, x + width + 2, baseline + metrics.Descent + 1);
-		lock (_gate)
+		Frame frame = _frames.GetValue(canvas, _ => new Frame());
+		lock (frame)
 		{
-			if (iteration != _iteration)
+			if (iteration != frame.Iteration)
 			{
-				_iteration = iteration;
-				_taken.Clear();
+				frame.Iteration = iteration;
+				frame.Taken.Clear();
 			}
-			foreach (SKRect r in _taken)
+			foreach (SKRect r in frame.Taken)
 			{
 				if (r.IntersectsWith(box))
 				{
 					return false;
 				}
 			}
-			_taken.Add(box);
+			frame.Taken.Add(box);
 		}
 		float opacity = (float)layer.Opacity * label.Opacity;
 		if (label.Halo is Color halo && label.HaloWidth > 0)

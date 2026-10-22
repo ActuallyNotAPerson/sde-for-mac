@@ -12,6 +12,11 @@ using Sde.App.Views;
 
 [assembly: AvaloniaTestApplication(typeof(Sde.App.Tests.TestAppBuilder))]
 [assembly: Avalonia.Headless.XUnit.AvaloniaTestFramework]
+// One headless application for every test. With a new one per test, Avalonia forgets its UI thread between tests and the
+// first thread to ask for it next becomes the UI thread. The map engine asks from a background thread each time a map
+// redraws (Mapsui's MapControl.InvalidateCanvas), so a redraw left over from one test could take it before the next
+// test's setup, which then failed with "a different thread owns it". UiSession sets up what each test needs.
+[assembly: AvaloniaTestIsolation(AvaloniaTestIsolationLevel.PerAssembly)]
 
 namespace Sde.App.Tests;
 
