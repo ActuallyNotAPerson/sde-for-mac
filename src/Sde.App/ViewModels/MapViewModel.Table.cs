@@ -195,7 +195,7 @@ public sealed partial class MapViewModel
 		else
 		{
 			TableLayer.Select(ids, add: false);
-			RaiseLayersChanged();
+			NotifyLayerSelection();
 		}
 	}
 
@@ -260,7 +260,7 @@ public sealed partial class MapViewModel
 			return;
 		}
 		layer.Select(new[] { Identified.Feature.Id }, add: false);
-		RaiseLayersChanged();
+		NotifyLayerSelection();
 		TableLayer = layer;
 		IsTableOpen = true;
 		RefreshTable();

@@ -112,6 +112,7 @@ public sealed partial class MapViewModel
 		LayersLoaded = toRead.Count == 0 ? Task.CompletedTask : ReadFeaturesAsync(toRead);
 		OnPropertyChanged(nameof(StructuresLayer));
 		RaiseLayersChanged();
+		ReadBookmarks();
 	}
 
 	/// <summary>Another database was opened: its own layers and basemap.</summary>
@@ -123,6 +124,8 @@ public sealed partial class MapViewModel
 		LayersWarning = null;
 		Layers.Clear();
 		StructuresLayer = null;
+		SelectTarget = null;
+		Bookmarks.Clear();
 		_basemap = Maps.Basemaps.UsgsTopo;
 		OnBasemapChanged();
 		if (IsActive)
@@ -423,6 +426,15 @@ public sealed partial class MapViewModel
 			return;
 		}
 		Layers.Remove(layer);
+		if (ReferenceEquals(SelectTarget, layer))
+		{
+			SelectTarget = null;
+		}
+		if (ReferenceEquals(TableLayer, layer))
+		{
+			IsTableOpen = false;
+			TableLayer = null;
+		}
 		Message = $"Removed {layer.Name}.";
 		RaiseLayersChanged();
 	}

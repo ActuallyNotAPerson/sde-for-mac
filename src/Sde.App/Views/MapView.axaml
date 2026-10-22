@@ -19,9 +19,42 @@
         <RadioButton GroupName="MapMode" Content="Set location" IsChecked="{Binding IsSetLocation, Mode=OneWay}"
                      Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.SetLocation}"
                      AutomationProperties.Name="Set location mode: click the map to place a structure" />
+        <RadioButton GroupName="MapMode" Content="Measure" IsChecked="{Binding IsMeasure, Mode=OneWay}"
+                     Command="{Binding SetModeCommand}" CommandParameter="{x:Static vm:MapMode.Measure}"
+                     AutomationProperties.Name="Measure mode: click points to measure a distance or an area" />
       </StackPanel>
       <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Hint}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="18,0" />
       <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+        <DropDownButton Name="BookmarksButton" Content="Bookmarks" AutomationProperties.Name="Bookmarks: saved views of the map">
+          <DropDownButton.Flyout>
+            <Flyout Placement="BottomEdgeAlignedRight">
+              <StackPanel Spacing="8" Width="280">
+                <TextBlock Classes="muted" Text="No bookmarks yet. Save the view the map shows now." TextWrapping="Wrap" IsVisible="{Binding !HasBookmarks}" />
+                <ItemsControl ItemsSource="{Binding Bookmarks}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:MapBookmarkViewModel">
+                      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+                        <Button Classes="subtle" Content="{Binding Name}" Command="{Binding GoCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                AutomationProperties.Name="{Binding GoName}" />
+                        <Button Grid.Column="1" Classes="icon sm" Command="{Binding RemoveCommand}" AutomationProperties.Name="{Binding RemoveName}">
+                          <c:Icon Kind="Close" />
+                        </Button>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                  <TextBox Text="{Binding NewBookmarkName}" PlaceholderText="Name this view" AutomationProperties.Name="Name for the new bookmark">
+                    <TextBox.KeyBindings>
+                      <KeyBinding Gesture="Enter" Command="{Binding AddBookmarkCommand}" />
+                    </TextBox.KeyBindings>
+                  </TextBox>
+                  <Button Grid.Column="1" Content="Add" Command="{Binding AddBookmarkCommand}" AutomationProperties.Name="Save the view the map shows now as a bookmark" />
+                </Grid>
+              </StackPanel>
+            </Flyout>
+          </DropDownButton.Flyout>
+        </DropDownButton>
         <ComboBox ItemsSource="{Binding Basemaps}" SelectedItem="{Binding Basemap}" MinWidth="190" AutomationProperties.Name="Basemap">
           <ComboBox.ItemTemplate>
             <DataTemplate x:DataType="maps:Basemap">
@@ -64,6 +97,69 @@
                            Text="A structure appears here once it has a latitude and longitude. Use Set location to click each one on the map, or add coordinates in bulk." />
               </StackPanel>
             </Border>
+
+            <!-- Tools for the mode, and what is selected -->
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Spacing="8" MaxWidth="520">
+              <Border Classes="card compact" IsVisible="{Binding IsSelect}">
+                <WrapPanel ItemSpacing="8" LineSpacing="6">
+                  <TextBlock Classes="secondary" Text="Select in" VerticalAlignment="Center" />
+                  <ComboBox ItemsSource="{Binding SelectableLayers}" SelectedItem="{Binding SelectTarget}" PlaceholderText="Structures" MinWidth="150"
+                            AutomationProperties.Name="Layer that clicks, boxes and areas select in">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="vm:MapLayerViewModel">
+                        <TextBlock Text="{Binding Name}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <ToggleButton Content="Draw an area" IsChecked="{Binding IsPolygonSelect}" AutomationProperties.Name="Select by drawing an area: click its corners" />
+                  <Button Content="By attribute…" Command="{Binding SelectByAttributeCommand}" AutomationProperties.Name="Select by the values of a field" />
+                </WrapPanel>
+              </Border>
+              <Border Classes="card compact" IsVisible="{Binding IsMeasure}" Width="300" HorizontalAlignment="Left">
+                <StackPanel Spacing="6">
+                  <ListBox Classes="segmented" SelectedIndex="{Binding MeasureKindIndex}" AutomationProperties.Name="Measure a distance or an area">
+                    <ListBoxItem Content="Distance" />
+                    <ListBoxItem Content="Area" />
+                  </ListBox>
+                  <TextBlock Name="MeasurementText" Classes="medium" Text="{Binding Measurement}" IsVisible="{Binding HasMeasurement}" TextWrapping="Wrap"
+                             AutomationProperties.LiveSetting="Polite" />
+                  <TextBlock Classes="muted xs" Text="{Binding MeasureMethod}" TextWrapping="Wrap" />
+                  <Button Classes="link" Content="Clear" Command="{Binding ClearMeasurementCommand}" IsVisible="{Binding HasMeasurement}" HorizontalAlignment="Left"
+                          AutomationProperties.Name="Clear the measurement" />
+                </StackPanel>
+              </Border>
+              <Border Classes="card compact" IsVisible="{Binding HasChecked}" HorizontalAlignment="Left">
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="medium" Text="{Binding SelectionText}" AutomationProperties.LiveSetting="Polite" />
+                  <WrapPanel ItemSpacing="6" LineSpacing="6">
+                    <Button Content="Show in Structures" Command="{Binding ShowCheckedCommand}" AutomationProperties.Name="Show the selected structures in the Structures list" />
+                    <Button Content="Set a field…" Command="{Binding SetFieldOnSelectionCommand}" AutomationProperties.Name="Set a field on the selected structures" />
+                    <Button Content="Assign to team…" Command="{Binding AssignSelectionCommand}" AutomationProperties.Name="Assign the selected structures to a team" />
+                    <DropDownButton Content="Reports" AutomationProperties.Name="Reports for the selected structures">
+                      <DropDownButton.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                          <MenuItem Header="Summary report" Command="{Binding PrintSelectionCommand}" CommandParameter="Summary" />
+                          <MenuItem Header="Summary report (no photos)" Command="{Binding PrintSelectionCommand}" CommandParameter="Summary-NoPhotos" />
+                          <MenuItem Header="Detailed report" Command="{Binding PrintSelectionCommand}" CommandParameter="Detail" />
+                          <MenuItem Header="Detailed report (no photos)" Command="{Binding PrintSelectionCommand}" CommandParameter="Detail-NoPhotos" />
+                          <MenuItem Header="Structure &amp; percent damaged list" Command="{Binding PrintSelectionCommand}" CommandParameter="PercentDamaged" />
+                          <MenuItem Header="Community report" Command="{Binding PrintSelectionCommand}" CommandParameter="Community" />
+                        </MenuFlyout>
+                      </DropDownButton.Flyout>
+                    </DropDownButton>
+                    <Button Content="Add to web map…" Command="{Binding WebMapOfSelectionCommand}" AutomationProperties.Name="Make a web map of the selected structures" />
+                    <Button Classes="subtle" Content="Clear" Command="{Binding ClearCheckedCommand}" AutomationProperties.Name="Clear the selected structures" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+              <Border Classes="card compact" IsVisible="{Binding HasLayerSelection}" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Classes="medium" Text="{Binding LayerSelectionText}" VerticalAlignment="Center" AutomationProperties.LiveSetting="Polite" />
+                  <Button Content="Show in the table" Command="{Binding ShowSelectionInTableCommand}" AutomationProperties.Name="Show the selected features in the attribute table" />
+                  <Button Classes="subtle" Content="Clear" Command="{Binding ClearSelectionCommand}" AutomationProperties.Name="Clear the selected features" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
 
             <!-- Identify: the clicked feature's values -->
             <Border Classes="card" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Width="280" MaxHeight="380"
@@ -274,10 +370,6 @@
             <Border Classes="subtle" IsVisible="{Binding HasMessage}">
               <StackPanel Spacing="4">
                 <TextBlock Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
-                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasChecked}">
-                  <Button Content="Show in Structures" Command="{Binding ShowCheckedCommand}" />
-                  <Button Classes="subtle" Content="Clear" Command="{Binding ClearCheckedCommand}" AutomationProperties.Name="Uncheck all structures" />
-                </StackPanel>
               </StackPanel>
             </Border>
             <TextBlock Classes="eyebrow" Text="{Binding CountText, StringFormat='STRUCTURES, {0}'}" Margin="0,6,0,0" />

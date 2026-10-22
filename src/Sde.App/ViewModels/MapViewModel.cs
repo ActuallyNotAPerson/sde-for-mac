@@ -81,6 +81,9 @@ public enum MapMode
 
 	/// <summary>Click the map to give a structure its latitude and longitude.</summary>
 	SetLocation,
+
+	/// <summary>Click points to measure a distance or an area.</summary>
+	Measure,
 }
 
 /// <summary>
@@ -176,7 +179,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	public bool HasBasemapProblem => BasemapProblem != null;
 
 	[ObservableProperty]
-	[NotifyPropertyChangedFor(nameof(IsBrowse), nameof(IsSelect), nameof(IsSetLocation), nameof(Hint))]
+	[NotifyPropertyChangedFor(nameof(IsBrowse), nameof(IsSelect), nameof(IsSetLocation), nameof(IsMeasure), nameof(Hint), nameof(Sketch))]
 	public partial MapMode Mode { get; set; }
 
 	public bool IsBrowse => Mode == MapMode.Browse;
@@ -185,10 +188,16 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	public bool IsSetLocation => Mode == MapMode.SetLocation;
 
+	public bool IsMeasure => Mode == MapMode.Measure;
+
 	/// <summary>One line of help for the current mode.</summary>
 	public string Hint => Mode switch
 	{
-		MapMode.Select => "Drag a box around the structures to check in the Structures list. Hold Command to add to what is already checked.",
+		MapMode.Select when IsPolygonSelect => "Click the corners of an area; double-click or press Return to select what is inside it.",
+		MapMode.Select => SelectTarget?.IsStructures == false
+			? $"Click or drag a box to select in {SelectTarget.Name}. Hold Command to add to the selection."
+			: "Drag a box around the structures to check in the Structures list. Hold Command to add to what is already checked.",
+		MapMode.Measure => "Click to add points; double-click or press Return to finish. Delete removes the last point.",
 		MapMode.SetLocation => PlaceTarget == null
 			? "Choose a structure, then click the map where it is. You can also click a dot to move that structure."
 			: $"Click the map where {PlaceTarget.Address} is.",
@@ -267,6 +276,10 @@ public sealed partial class MapViewModel : ViewModelBase
 		Apply();
 		Selected = selected == null ? null : Visible.FirstOrDefault(p => p.Id == selected);
 		PlaceTarget = (target == null ? null : _all.FirstOrDefault(p => p.Id == target)) ?? Unplaced.FirstOrDefault();
+		// Structures may have been checked or unchecked in the Structures list meanwhile.
+		OnPropertyChanged(nameof(CheckedCount));
+		OnPropertyChanged(nameof(HasChecked));
+		OnPropertyChanged(nameof(SelectionText));
 	}
 
 	/// <summary>Asks the map to zoom to everything (when the page is opened).</summary>
@@ -297,7 +310,12 @@ public sealed partial class MapViewModel : ViewModelBase
 		}
 	}
 
-	partial void OnModeChanged(MapMode value) => Message = null;
+	partial void OnModeChanged(MapMode value)
+	{
+		Message = null;
+		Measurement = null;
+		Identified = null;
+	}
 
 	// ───────────── Commands ─────────────
 
@@ -346,6 +364,22 @@ public sealed partial class MapViewModel : ViewModelBase
 	/// <summary>A dot was clicked: opens it, or in "Set location" picks it as the structure to move.</summary>
 	public void ClickStructure(Guid propertyId, bool add = false)
 	{
+		if (Mode == MapMode.Select)
+		{
+			// Command-click adds a structure, or takes it off again.
+			HashSet<Guid> current = SelectedStructures();
+			if (add && current.Remove(propertyId))
+			{
+				SelectStructures(current, add: false);
+			}
+			else
+			{
+				SelectStructures(new[] { propertyId }, add);
+			}
+			int n = _main.Structures.CheckedCount;
+			Message = n == 0 ? "Nothing is checked in the Structures list." : $"{n} structure{(n == 1 ? " is" : "s are")} checked in the Structures list.";
+			return;
+		}
 		if (Mode != MapMode.SetLocation)
 		{
 			OpenStructure(propertyId);
@@ -361,6 +395,10 @@ public sealed partial class MapViewModel : ViewModelBase
 	/// </summary>
 	public void ClickMap(double latitude, double longitude)
 	{
+		if (Mode == MapMode.Browse)
+		{
+			Identified = null;
+		}
 		if (Mode != MapMode.SetLocation || PlaceTarget == null)
 		{
 			return;
@@ -412,7 +450,11 @@ public sealed partial class MapViewModel : ViewModelBase
 	public bool HasChecked => CheckedCount > 0;
 
 	[RelayCommand]
-	private void ShowChecked() => _main.ShowCommand.Execute(Page.Structures);
+	private void ShowChecked()
+	{
+		_main.Structures.ShowOnly(_main.Structures.CheckedAssessmentIds(), "Selected on the map");
+		_main.ShowCommand.Execute(Page.Structures);
+	}
 
 	[RelayCommand]
 	private void ClearChecked()

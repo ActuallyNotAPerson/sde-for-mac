@@ -64,6 +64,7 @@ public sealed class MapCanvas : Panel, IDisposable
 	private readonly Avalonia.Controls.Shapes.Polygon _sketchArea = new Avalonia.Controls.Shapes.Polygon { StrokeThickness = 2.5, IsVisible = false };
 	private readonly List<LatLon> _sketch = new List<LatLon>();
 	private readonly Dispatcher _ui;
+	private bool _sketchFinished;
 	private readonly Dictionary<string, BuiltFeatureLayer> _built = new Dictionary<string, BuiltFeatureLayer>();
 	private readonly Dictionary<string, (TileLayer Layer, SdeTileSource Source)> _overlays = new Dictionary<string, (TileLayer, SdeTileSource)>();
 	private MapControl _control;
@@ -301,8 +302,8 @@ public sealed class MapCanvas : Panel, IDisposable
 		FitTo(new MapExtent(_markers.Min(m => m.Longitude), _markers.Min(m => m.Latitude), _markers.Max(m => m.Longitude), _markers.Max(m => m.Latitude)), 17);
 	}
 
-	/// <summary>Shows an area (with a margin), no closer than <paramref name="maxZoom"/>.</summary>
-	public void FitTo(MapExtent extent, double maxZoom = 18)
+	/// <summary>Shows an area (with a margin of <paramref name="margin"/> pixels in all), no closer than <paramref name="maxZoom"/>.</summary>
+	public void FitTo(MapExtent extent, double maxZoom = 18, double margin = 80)
 	{
 		if (Bounds.Width < 10 || Bounds.Height < 10)
 		{
@@ -315,8 +316,8 @@ public sealed class MapCanvas : Panel, IDisposable
 		double spanU = Math.Max(maxU - minU, 1e-7);
 		double spanV = Math.Max(maxV - minV, 1e-7);
 		// Leave a margin so the outer dots aren't on the edge.
-		double zoomU = Math.Log2(Math.Max(Bounds.Width - 80, 40) / (WebMercator.TileSize * spanU));
-		double zoomV = Math.Log2(Math.Max(Bounds.Height - 80, 40) / (WebMercator.TileSize * spanV));
+		double zoomU = Math.Log2(Math.Max(Bounds.Width - margin, 40) / (WebMercator.TileSize * spanU));
+		double zoomV = Math.Log2(Math.Max(Bounds.Height - margin, 40) / (WebMercator.TileSize * spanV));
 		double zoom = Math.Clamp(Math.Min(Math.Min(zoomU, zoomV), maxZoom), MinZoom, MaxZoom);
 		SetView(WebMercator.Latitude((minV + maxV) / 2), WebMercator.Longitude((minU + maxU) / 2), zoom);
 	}
@@ -1010,10 +1011,22 @@ public sealed class MapCanvas : Panel, IDisposable
 	{
 		if (_sketchKind != MapSketch.None)
 		{
+			if (_sketchFinished)
+			{
+				// The last shape was finished: this click starts a new one.
+				_sketch.Clear();
+				_sketchFinished = false;
+			}
 			(double lat, double lon) = ToLatLon(at);
 			_sketch.Add(new LatLon(lat, lon));
 			DrawSketch();
 			SketchChanged?.Invoke(_sketch.ToList(), false);
+			return;
+		}
+		if (Drag == MapDrag.Box && SelectLayer != null && FeatureAt(at, SelectLayer) is (string target, Feature picked))
+		{
+			// Selecting in a layer: its features come before the dots over them.
+			FeatureClicked?.Invoke(target, picked, add);
 			return;
 		}
 		if (MarkerAt(at) is Guid id)
@@ -1040,6 +1053,7 @@ public sealed class MapCanvas : Panel, IDisposable
 			return;
 		}
 		List<LatLon> points = _sketch.ToList();
+		_sketchFinished = true;
 		SketchChanged?.Invoke(points, true);
 	}
 
@@ -1047,6 +1061,7 @@ public sealed class MapCanvas : Panel, IDisposable
 	public void ClearSketch()
 	{
 		_sketch.Clear();
+		_sketchFinished = false;
 		DrawSketch();
 	}
 
@@ -1058,6 +1073,7 @@ public sealed class MapCanvas : Panel, IDisposable
 			return;
 		}
 		_sketch.RemoveAt(_sketch.Count - 1);
+		_sketchFinished = false;
 		DrawSketch();
 		SketchChanged?.Invoke(_sketch.ToList(), false);
 	}

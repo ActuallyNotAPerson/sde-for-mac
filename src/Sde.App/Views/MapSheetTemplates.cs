@@ -14,6 +14,9 @@ public sealed class MapSheetTemplates : IDataTemplate
 	{
 		[typeof(OnlineLayerSheetViewModel)] = () => new OnlineLayerSheetView(),
 		[typeof(LayerStyleSheetViewModel)] = () => new LayerStyleSheetView(),
+		[typeof(SelectByAttributeSheetViewModel)] = () => new SelectByAttributeSheetView(),
+		[typeof(AssignTeamSheetViewModel)] = () => new AssignTeamSheetView(),
+		[typeof(WebMapSheetViewModel)] = () => new WebMapSheetView(),
 	};
 
 	public bool Match(object data) => data != null && Views.ContainsKey(data.GetType());

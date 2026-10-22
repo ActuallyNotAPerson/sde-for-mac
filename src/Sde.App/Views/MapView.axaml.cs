@@ -104,6 +104,8 @@ public partial class MapView : UserControl
 		_vm.RetryRequested += Surface.RetryTiles;
 		_vm.SelectionChanged += ShowSelection;
 		_vm.TableColumnsChanged += BuildTableColumns;
+		_vm.ClearSketchRequested += Surface.ClearSketch;
+		_vm.ShowViewRequested += ShowView;
 		_vm.PropertyChanged += VmChanged;
 		Surface.Tiles = _vm.Tiles;
 		Surface.Basemap = _vm.Basemap;
@@ -135,6 +137,8 @@ public partial class MapView : UserControl
 		_vm.RetryRequested -= Surface.RetryTiles;
 		_vm.SelectionChanged -= ShowSelection;
 		_vm.TableColumnsChanged -= BuildTableColumns;
+		_vm.ClearSketchRequested -= Surface.ClearSketch;
+		_vm.ShowViewRequested -= ShowView;
 		_vm.PropertyChanged -= VmChanged;
 		Surface.Tiles = null;
 		_vm = null;
@@ -148,6 +152,8 @@ public partial class MapView : UserControl
 				Surface.Basemap = _vm.Basemap;
 				break;
 			case nameof(MapViewModel.Mode):
+			case nameof(MapViewModel.Sketch):
+			case nameof(MapViewModel.SelectLayerKey):
 				ApplyMode();
 				break;
 			case nameof(MapViewModel.Selected):
@@ -160,8 +166,17 @@ public partial class MapView : UserControl
 	private void ApplyMode()
 	{
 		Surface.Drag = _vm.IsSelect ? MapDrag.Box : MapDrag.Pan;
-		Surface.Cursor = new Avalonia.Input.Cursor(_vm.IsSetLocation ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
+		Surface.SelectLayer = _vm.IsSelect ? _vm.SelectLayerKey : null;
+		if (Surface.Sketch != _vm.Sketch)
+		{
+			Surface.Sketch = _vm.Sketch;
+		}
+		bool cross = _vm.IsSetLocation || _vm.Sketch != MapSketch.None;
+		Surface.Cursor = new Avalonia.Input.Cursor(cross ? Avalonia.Input.StandardCursorType.Cross : Avalonia.Input.StandardCursorType.Arrow);
 	}
+
+	/// <summary>Shows exactly the area of a bookmark.</summary>
+	private void ShowView(MapExtent extent) => Surface.FitTo(extent, MapCanvas.MaxZoom, margin: 0);
 
 	private void Center(MapPointViewModel p) => Surface.CenterOn(p.Latitude, p.Longitude);
 

@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             x:Class="Sde.App.Views.WebMapSheetView"
+             x:DataType="sh:WebMapSheetViewModel">
+  <StackPanel Spacing="14">
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="Makes a folder with a web page of these structures on a map. Open it in any browser, or put the folder on a web server. It works offline except for the background map." />
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Title" />
+      <TextBox Text="{Binding MapTitle}" AutomationProperties.Name="Title of the web map" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Who it is for" />
+      <RadioButton GroupName="WebMapPrivacy" IsChecked="{Binding IsInternal}" AutomationProperties.Name="For the office and partners: a dot for each structure with its address">
+        <TextBlock TextWrapping="Wrap" Text="The office and partners: a dot for each structure, with its address and result." />
+      </RadioButton>
+      <RadioButton GroupName="WebMapPrivacy" IsChecked="{Binding IsPublic}" AutomationProperties.Name="For the public: counts in grid squares, no owners or exact locations">
+        <TextBlock TextWrapping="Wrap" Text="The public: counts in grid squares. No owners, no exact locations." />
+      </RadioButton>
+    </StackPanel>
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding !IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Make web map…" Command="{Binding CreateCommand}" IsEnabled="{Binding !IsBusy}" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

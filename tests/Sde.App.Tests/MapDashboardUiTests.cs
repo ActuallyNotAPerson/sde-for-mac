@@ -78,7 +78,8 @@ public class MapDashboardUiTests
 			Point p = view.Map.ToScreen(m.Latitude, m.Longitude);
 			Assert.True(new Rect(view.Map.Bounds.Size).Contains(p), $"{p} outside {view.Map.Bounds}");
 		}
-		ui.Snapshot("56-map");
+		// Rendered, not saved: the docs' 56-map screenshot is MapToolsTests' (with a layer and the flood zones).
+		MapTestSupport.Capture(ui).Dispose();
 		Assert.True(BindingErrors.Instance.Messages.IsEmpty, string.Join("\n", BindingErrors.Instance.Messages.Distinct().Take(20)));
 	}
 

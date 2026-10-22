@@ -19,7 +19,7 @@ namespace Sde.App.Tests;
 /// <summary>Layer styles (one colour, categories, number ranges, labels, scale range), the structures' colouring, the attribute table and the identify card.</summary>
 public class MapStylesTableTests
 {
-	private static async Task<(UiSession Ui, MapView View, MapLayerViewModel Parcels)> OpenWithParcels()
+	internal static async Task<(UiSession Ui, MapView View, MapLayerViewModel Parcels)> OpenWithParcels()
 	{
 		UiSession ui = new UiSession();
 		MapTestSupport.SetUpPlaces(ui);
@@ -48,7 +48,7 @@ public class MapStylesTableTests
 		ui.Pump();
 	}
 
-	private static Point Middle(MapView view, Feature f)
+	internal static Point Middle(MapView view, Feature f)
 	{
 		Envelope e = f.Geometry.EnvelopeInternal;
 		return view.Map.ToScreen(e.Centre.Y, e.Centre.X);
@@ -251,7 +251,7 @@ public class MapStylesTableTests
 			map.TableSelectedOnly = false;
 			map.SelectTableRows(map.TableRows.Skip(10).Take(2));
 			Assert.Equal(new[] { parcels.Data.Features[10].Id, parcels.Data.Features[11].Id }, parcels.Selected.OrderBy(i => i));
-			ui.Snapshot("88-map-table");
+			ui.Snapshot("56d-map-table");
 		}
 	}
 
