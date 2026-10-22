@@ -118,7 +118,8 @@ public sealed partial class ImportExportViewModel : ViewModelBase
 			return;
 		}
 		_main.Editor?.Save();   // export what's on screen, not the last autosave
-		if (!await ExportWarnings.ConfirmNotFinalAsync(_app, assessmentIds?.ToList()))
+		if (!await ExportWarnings.ConfirmNotFinalAsync(_app, assessmentIds?.ToList())
+			|| !await ExportWarnings.ConfirmQaAsync(_app, assessmentIds?.ToList(), _main.Review.ShowErrorsFor))
 		{
 			return;
 		}

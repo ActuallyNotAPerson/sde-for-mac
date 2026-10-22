@@ -62,6 +62,38 @@
         </Border>
       </UniformGrid>
 
+      <!-- Compliance: shown once a case is open for a structure in scope -->
+      <UniformGrid Columns="4" Margin="-6,-14,-6,0" IsVisible="{Binding HasCompliance}">
+        <Border Classes="card" Margin="6" AutomationProperties.Name="{Binding ComplianceOpen, StringFormat='Open compliance cases: {0}'}">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="kpi" Text="{Binding ComplianceOpen}" />
+            <TextBlock Classes="medium" Text="Open compliance cases" />
+            <TextBlock Classes="muted" Text="{Binding ComplianceOpenNote}" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Margin="6" AutomationProperties.Name="{Binding ComplianceOverdue, StringFormat='Overdue compliance cases: {0}'}">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="kpi" Text="{Binding ComplianceOverdue}" Classes.danger="{Binding HasOverdue}" />
+            <TextBlock Classes="medium" Text="Overdue" />
+            <TextBlock Classes="muted" Text="Deadline passed, still open" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Margin="6">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="kpi" Text="{Binding IccInProgress}" />
+            <TextBlock Classes="medium" Text="ICC claims in progress" />
+            <TextBlock Classes="muted" Text="Filed or approved, not paid" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Margin="6">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="kpi" Text="{Binding IccPaid}" />
+            <TextBlock Classes="medium" Text="ICC paid" />
+            <TextBlock Classes="muted" Text="{Binding IccPaidNote}" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Border>
+      </UniformGrid>
+
       <!-- Reports and GIS files -->
       <Border Classes="card">
         <StackPanel Spacing="10">

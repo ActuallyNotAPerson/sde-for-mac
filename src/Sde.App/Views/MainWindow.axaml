@@ -98,7 +98,12 @@
     <DataTemplate DataType="vm:DashboardViewModel"><v:DashboardView /></DataTemplate>
     <DataTemplate DataType="vm:AssignmentsViewModel"><v:AssignmentsView /></DataTemplate>
     <v:MapSheetTemplates />
-    <DataTemplate DataType="shell:PlaceholderPageViewModel"><v:PlaceholderPageView /></DataTemplate>
+    <DataTemplate DataType="vm:ReviewViewModel"><v:ReviewView /></DataTemplate>
+    <DataTemplate DataType="vm:ComplianceViewModel"><v:ComplianceView /></DataTemplate>
+    <DataTemplate DataType="sh:DismissFindingSheetViewModel"><v:DismissFindingSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:CommentsSheetViewModel"><v:CommentsSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:QaBeforeExportSheetViewModel"><v:QaBeforeExportSheetView /></DataTemplate>
+    <DataTemplate DataType="sh:ComplianceCaseSheetViewModel"><v:ComplianceCaseSheetView /></DataTemplate>
     <DataTemplate DataType="sh:ImprovementsSheetViewModel"><v:ImprovementsSheetView /></DataTemplate>
     <DataTemplate DataType="sh:AppealSheetViewModel"><v:AppealSheetView /></DataTemplate>
     <DataTemplate DataType="sh:EventSheetViewModel"><v:EventSheetView /></DataTemplate>

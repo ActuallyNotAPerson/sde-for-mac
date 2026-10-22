@@ -125,12 +125,14 @@
           <ItemsControl ItemsSource="{Binding Determinations}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="sh:SiDeterminationRowViewModel">
-                <Grid ColumnDefinitions="110,*" Margin="0,2">
+                <Grid ColumnDefinitions="110,*,Auto" Margin="0,2">
                   <TextBlock Classes="secondary sm" Text="{Binding When}" />
                   <StackPanel Grid.Column="1">
                     <TextBlock Classes="sm medium" Text="{Binding Result}" />
                     <TextBlock Classes="muted xs" Text="{Binding Detail}" TextWrapping="Wrap" />
                   </StackPanel>
+                  <Button Grid.Column="2" Classes="link" Content="{Binding CaseText}" IsVisible="{Binding IsSubstantial}" VerticalAlignment="Center"
+                          Command="{Binding OpenCase}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding AccessibleCase}" />
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>

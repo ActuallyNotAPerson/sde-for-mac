@@ -74,32 +74,9 @@ public class ShellTests
 		ui.Main.OpenAssessment(ui.Main.Structures.Rows.First(r => r.AssessmentID != null).AssessmentID!.Value);
 		List<string> kinds = ui.Main.Editor.Sections.Select(s => s.Icon)
 			.Concat(ui.Main.SidebarItems.Select(i => i.Icon))
-			.Concat(new[] { ui.Main.Review.Icon, ui.Main.Compliance.Icon })
 			.ToList();
 		Assert.All(ui.Main.Editor.Sections, s => Assert.False(string.IsNullOrEmpty(s.Icon), s.Title));
 		Assert.All(kinds, k => Assert.True(ui.Window.TryFindResource(Icon.ResourceKey(k), out object g) && g is Avalonia.Media.Geometry, k));
-	}
-
-	[AvaloniaFact]
-	public void PlaceholderPages_SayWhatTheyWillHold()
-	{
-		using UiSession ui = new UiSession();
-		foreach (Page page in new[] { Page.Review, Page.Compliance })
-		{
-			ui.Main.ShowCommand.Execute(page);
-			ui.Pump();
-			PlaceholderPageViewModel vm = Assert.IsType<PlaceholderPageViewModel>(ui.Main.CurrentPage);
-			EmptyState empty = ui.Window.GetVisualDescendants().OfType<EmptyState>().Single(e => e.IsEffectivelyVisible);
-			Assert.Equal(vm.EmptyText, empty.Text);
-			Assert.EndsWith(".", empty.Text);
-			Assert.DoesNotContain("later", empty.Text, StringComparison.OrdinalIgnoreCase);
-			Assert.DoesNotContain("coming", empty.Text, StringComparison.OrdinalIgnoreCase);
-			Assert.DoesNotContain('—', empty.Text);
-			Assert.Equal(vm.Title, ui.Main.PageTitle);
-			Assert.Empty(AccessibilityTests.Unnamed(ui.Window));
-		}
-		ui.Main.ShowCommand.Execute(Page.Review);
-		ui.Snapshot("85-review-placeholder");
 	}
 
 	[AvaloniaFact]

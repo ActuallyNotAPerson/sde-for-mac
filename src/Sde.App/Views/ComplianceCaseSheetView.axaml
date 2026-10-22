@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.ComplianceCaseSheetView"
+             x:DataType="sh:ComplianceCaseSheetViewModel">
+  <!-- A compliance case: its fields and letters on the left, its timeline on the right -->
+  <StackPanel Spacing="12">
+    <StackPanel Spacing="2">
+      <TextBlock Classes="semibold" Text="{Binding Address}" TextWrapping="Wrap" />
+      <TextBlock Classes="muted" Text="{Binding Detail}" TextWrapping="Wrap" />
+      <Button Classes="link" Content="Open the assessment" Command="{Binding OpenAssessmentCommand}" IsVisible="{Binding CanOpenAssessment}" HorizontalAlignment="Left" Margin="0,2,0,0" />
+    </StackPanel>
+    <c:Banner Tone="Danger" IsVisible="{Binding IsOverdue}" Text="{Binding OverdueText}" AutomationProperties.Name="Overdue" />
+
+    <ScrollViewer MaxHeight="540" HorizontalScrollBarVisibility="Disabled">
+      <Grid ColumnDefinitions="*,260" ColumnSpacing="20" Margin="0,0,12,0">
+        <!-- The case -->
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4">
+            <TextBlock Classes="fieldLabel" Text="Path" />
+            <TextBlock Grid.Column="1" Classes="fieldLabel" Text="Case" />
+            <ComboBox Grid.Row="1" ItemsSource="{Binding PathChoices}" SelectedItem="{Binding Path}" HorizontalAlignment="Stretch" AutomationProperties.Name="Path the owner takes" />
+            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{x:Static sh:ComplianceCaseSheetViewModel.StatusChoices}" SelectedItem="{Binding Status}" HorizontalAlignment="Stretch"
+                      AutomationProperties.Name="Open or closed" />
+
+            <TextBlock Grid.Row="2" Classes="fieldLabel" Text="Permit number" Margin="0,6,0,0" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Classes="fieldLabel" Text="Permit issued" Margin="0,6,0,0" />
+            <TextBox Grid.Row="3" Text="{Binding PermitNumber}" AutomationProperties.Name="Permit number" />
+            <CalendarDatePicker Grid.Row="3" Grid.Column="1" SelectedDate="{Binding PermitIssuedOn}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Date the permit was issued" />
+
+            <TextBlock Grid.Row="4" Classes="fieldLabel" Text="Deadline" Margin="0,6,0,0" />
+            <TextBlock Grid.Row="4" Grid.Column="1" Classes="fieldLabel" Text="Why it was closed" Margin="0,6,0,0" IsVisible="{Binding IsCaseClosed}" />
+            <CalendarDatePicker Grid.Row="5" SelectedDate="{Binding Deadline}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Compliance deadline" />
+            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ClosedReason}" IsVisible="{Binding IsCaseClosed}" PlaceholderText="For example: elevated and inspected"
+                     AutomationProperties.Name="Why the case was closed" />
+
+            <TextBlock Grid.Row="6" Classes="fieldLabel" Text="ICC claim number" Margin="0,6,0,0" />
+            <TextBlock Grid.Row="6" Grid.Column="1" Classes="fieldLabel" Text="ICC status" Margin="0,6,0,0" />
+            <TextBox Grid.Row="7" Text="{Binding IccClaimNumber}" AutomationProperties.Name="ICC claim number" />
+            <ComboBox Grid.Row="7" Grid.Column="1" ItemsSource="{x:Static sh:ComplianceCaseSheetViewModel.IccChoices}" SelectedItem="{Binding IccStatus}" HorizontalAlignment="Stretch"
+                      AutomationProperties.Name="ICC claim status" />
+
+            <TextBlock Grid.Row="8" Classes="fieldLabel" Text="ICC amount" Margin="0,6,0,0" />
+            <TextBlock Grid.Row="8" Grid.Column="1" Classes="fieldLabel" Text="Elevation certificate received" Margin="0,6,0,0" />
+            <NumericUpDown Grid.Row="9" Value="{Binding IccAmount}" Minimum="0" FormatString="N2" ShowButtonSpinner="False" Classes="number"
+                           AutomationProperties.Name="ICC amount">
+              <NumericUpDown.InnerLeftContent>
+                <TextBlock Classes="adorn" Text="$" Margin="10,0,0,0" />
+              </NumericUpDown.InnerLeftContent>
+            </NumericUpDown>
+            <CalendarDatePicker Grid.Row="9" Grid.Column="1" SelectedDate="{Binding EcReceivedOn}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Date the elevation certificate was received" />
+
+            <TextBlock Grid.Row="10" Classes="fieldLabel" Text="Final inspection" Margin="0,6,0,0" />
+            <TextBlock Grid.Row="10" Grid.Column="1" Classes="fieldLabel" Text="Certificate of compliance" Margin="0,6,0,0" />
+            <CalendarDatePicker Grid.Row="11" SelectedDate="{Binding FinalInspectionOn}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Date of the final inspection" />
+            <CalendarDatePicker Grid.Row="11" Grid.Column="1" SelectedDate="{Binding ComplianceCertOn}" HorizontalAlignment="Stretch" SelectedDateFormat="Custom"
+                                CustomDateFormatString="MMM d, yyyy" PlaceholderText="Pick a date" AutomationProperties.Name="Date of the certificate of compliance" />
+          </Grid>
+          <StackPanel Spacing="4">
+            <TextBlock Classes="fieldLabel" Text="Notes" />
+            <TextBox Text="{Binding Notes}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48" AutomationProperties.Name="Notes on the case" />
+          </StackPanel>
+          <TextBlock Classes="danger" Text="{Binding Error}" IsVisible="{Binding HasError}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+        </StackPanel>
+
+        <!-- Letters and the timeline -->
+        <StackPanel Grid.Column="1" Spacing="12">
+          <!-- Letters -->
+          <Border Classes="subtle">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="h3" Text="Letters" />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Written from your templates with this case's fields, then added to the timeline." />
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding Letters}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="sh:ComplianceLetterChoice">
+                    <Button Classes="sm" Margin="0,0,0,6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Command="{Binding Write}" CommandParameter="{Binding Kind}" AutomationProperties.Name="{Binding AccessibleName}">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <c:Icon Kind="Letter" Size="12" />
+                        <TextBlock Text="{Binding Label, StringFormat='{}{0}…'}" />
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="medium sm" Text="{Binding LetterText}" TextWrapping="Wrap" IsVisible="{Binding LetterText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              <TextBlock Classes="warning sm" Text="{Binding LetterWarning}" TextWrapping="Wrap" IsVisible="{Binding LetterWarning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock Classes="h3" Text="Timeline" />
+          <Grid ColumnDefinitions="110,*" ColumnSpacing="6" RowDefinitions="Auto,Auto" RowSpacing="6">
+            <ComboBox ItemsSource="{x:Static sh:ComplianceCaseSheetViewModel.NoteKinds}" SelectedItem="{Binding NoteKind}" HorizontalAlignment="Stretch"
+                      AutomationProperties.Name="Kind of timeline entry" />
+            <TextBox Grid.Column="1" Text="{Binding NoteText}" PlaceholderText="What happened" AutomationProperties.Name="Timeline entry" />
+            <Button Grid.Row="1" Grid.Column="1" Content="Add note" Command="{Binding AddNoteCommand}" HorizontalAlignment="Right" />
+          </Grid>
+          <ItemsControl ItemsSource="{Binding Entries}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="sh:ComplianceEntryViewModel">
+                <Border Classes="rule" Padding="0,8,0,8">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <Border Classes="rowIcon" Width="28" Height="28" VerticalAlignment="Top">
+                      <c:Icon Kind="{Binding Icon}" Size="14" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0" Spacing="1">
+                      <TextBlock Classes="medium sm" Text="{Binding Text}" TextWrapping="Wrap" />
+                      <TextBlock Classes="muted xs" Text="{Binding Byline}" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Classes="muted" Text="{Binding SavedText}" VerticalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Save" Command="{Binding SaveCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+        <Button Classes="primary" Content="Done" Command="{Binding DoneCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+      </StackPanel>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

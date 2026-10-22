@@ -61,20 +61,3 @@ public sealed class NavGroupViewModel(string title, IReadOnlyList<NavItemViewMod
 
 	public IReadOnlyList<NavItemViewModel> Items { get; } = items;
 }
-
-/// <summary>
-/// A page whose feature arrives in a later version of v2.5 (Review, Compliance, Assignments): it says what will be
-/// there, so the sidebar can already hold its place.
-/// </summary>
-public sealed class PlaceholderPageViewModel(string title, string subtitle, string icon, string emptyTitle, string emptyText) : ViewModelBase
-{
-	public string Title { get; } = title;
-
-	public string Subtitle { get; } = subtitle;
-
-	public string Icon { get; } = icon;
-
-	public string EmptyTitle { get; } = emptyTitle;
-
-	public string EmptyText { get; } = emptyText;
-}
