@@ -4,8 +4,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
+using Sde.App.Services;
 using Sde.App.ViewModels;
 using Sde.App.ViewModels.Editor;
+using Sde.App.ViewModels.Sheets;
 using Sde.Core.Assessments;
 
 namespace Sde.App.Tests;
@@ -84,6 +86,72 @@ public class AccessibilityTests
 		Check("Import (imported)");
 		acc.ReviewCommand.Execute(null);
 		Check("Structures (import review)");
+
+		Assert.True(problems.Count == 0, string.Join("\n", problems));
+	}
+
+	/// <summary>
+	/// The window's frame: the sidebar's pages and switchers (with their menus open), the title band, the placeholder
+	/// pages, the ⌘K palette, a confirmation sheet, the move-or-copy sheet and a toast.
+	/// </summary>
+	[AvaloniaFact]
+	public async Task TheShellHasAccessibleNames()
+	{
+		using UiSession ui = new UiSession();
+		ScreenTourTests.AddSamples(ui.Store);
+		ui.Services.RaiseDataChanged();
+		List<string> problems = new();
+		void Check(string part)
+		{
+			ui.Pump();
+			problems.AddRange(Unnamed(ui.Window).Distinct().Select(p => part + ": " + p));
+		}
+
+		// Named for VoiceOver: each sidebar page by its title, the switchers by what they show, ⌘K and New.
+		List<string> names = ui.Window.GetVisualDescendants().OfType<Control>().Where(c => c.IsEffectivelyVisible && c is Button)
+			.Select(c => ControlAutomationPeer.CreatePeerForElement(c).GetName()).ToList();
+		foreach (string title in ui.Main.SidebarItems.Select(i => i.Title))
+		{
+			Assert.Contains(title, names);
+		}
+		Assert.Contains("Event: All events. Choose an event", names);
+		Assert.Contains("Database: sde.sqlite. Database actions", names);
+		Assert.Contains("Search structures, pages and commands", names);
+		Assert.Contains("New", names);
+		Check("Shell");
+
+		foreach (ViewModels.Page page in new[] { ViewModels.Page.Review, ViewModels.Page.Compliance, ViewModels.Page.Assignments, ViewModels.Page.Dashboard, ViewModels.Page.Trash })
+		{
+			ui.Main.ShowCommand.Execute(page);
+			Check(page.ToString());
+		}
+
+		foreach (string switcher in new[] { "EventSwitcher", "DatabaseButton" })
+		{
+			Button button = ui.Window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == switcher);
+			PopupFlyoutBase flyout = (PopupFlyoutBase)button.Flyout;
+			flyout.Popup.ShouldUseOverlayLayer = true;
+			flyout.ShowAt(button);
+			Check(switcher + " menu");
+			flyout.Hide();
+		}
+
+		ui.Main.Palette.Open();
+		ui.Main.Palette.Query = "river";
+		Check("Command palette");
+		ui.Main.Palette.Close();
+
+		Task<bool> asking = ((IDialogs)ui.Window).ConfirmAsync("Delete for good?", "This can't be undone.", "Delete", destructive: true);
+		Check("Confirmation");
+		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
+		Assert.False(await asking);
+
+		_ = ui.Main.Sheets.ShowAsync(new MoveOrCopySheetViewModel("sde.sqlite"));
+		Check("Move or copy sheet");
+		ui.Main.Sheets.CancelCurrentCommand.Execute(null);
+
+		((IDialogs)ui.Window).Notify("Moved to Recently deleted", "123 River Street", "Undo", () => { });
+		Check("Toast");
 
 		Assert.True(problems.Count == 0, string.Join("\n", problems));
 	}

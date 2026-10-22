@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:Sde.App.ViewModels.Shell"
+             xmlns:c="using:Sde.App.Controls"
+             x:Class="Sde.App.Views.CommandPaletteView"
+             x:DataType="shell:CommandPaletteViewModel">
+  <!-- ⌘K: a search box over a list of structures, pages and commands. ↑ ↓ move, Return opens, Esc closes. -->
+  <Border Classes="palette" Width="600">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="16,0,12,0">
+        <c:Icon Classes="tertiary" Kind="Search" Size="16" VerticalAlignment="Center" />
+        <TextBox Grid.Column="1" Name="PaletteBox" Classes="bare" Text="{Binding Query}" PlaceholderText="Search structures, pages and commands"
+                 AutomationProperties.Name="Search structures, pages and commands" />
+      </Grid>
+      <Border DockPanel.Dock="Top" Classes="divider" />
+      <Border DockPanel.Dock="Bottom" Classes="paletteFooter">
+        <StackPanel Orientation="Horizontal" Spacing="16">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Classes="kbd"><TextBlock Text="↑↓" /></Border>
+            <TextBlock Classes="muted" Text="to move" VerticalAlignment="Center" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Classes="kbd"><TextBlock Text="↩" /></Border>
+            <TextBlock Classes="muted" Text="to open" VerticalAlignment="Center" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Classes="kbd"><TextBlock Text="esc" /></Border>
+            <TextBlock Classes="muted" Text="to close" VerticalAlignment="Center" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Panel>
+        <ListBox Name="PaletteList" Classes="palette" ItemsSource="{Binding Results}" SelectedItem="{Binding Selected}" MaxHeight="420"
+                 AutomationProperties.Name="Results" IsVisible="{Binding !IsEmpty}">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="shell:PaletteItem">
+              <StackPanel AutomationProperties.Name="{Binding AccessibleName}">
+                <TextBlock Classes="eyebrow" Text="{Binding Group}" IsVisible="{Binding IsFirstInGroup}" Margin="12,10,12,4" />
+                <Border Classes="paletteRow">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <c:Icon Kind="{Binding Icon}" Size="16" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Classes="muted" Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Classes="muted" Text="{Binding Shortcut}" IsVisible="{Binding HasShortcut}" VerticalAlignment="Center" />
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Classes="secondary" Text="Nothing matches. Try an address, an owner's name or a parcel number." IsVisible="{Binding IsEmpty}"
+                   Margin="16,20" TextWrapping="Wrap" />
+      </Panel>
+    </DockPanel>
+  </Border>
+</UserControl>

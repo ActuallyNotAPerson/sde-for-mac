@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sde.App.ViewModels"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.DepthTablesPanel"
              x:DataType="vm:DepthTablesViewModel">
   <Border Classes="card">
@@ -67,7 +68,9 @@
                         </DataTemplate>
                       </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Button Classes="subtle" Content="✕" Command="{Binding Remove}" ToolTip.Tip="Remove this row" AutomationProperties.Name="{Binding RemoveLabel}" />
+                    <Button Classes="icon" Command="{Binding Remove}" ToolTip.Tip="Remove this row" AutomationProperties.Name="{Binding RemoveLabel}">
+                      <c:Icon Kind="Close" Size="14" />
+                    </Button>
                   </StackPanel>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>

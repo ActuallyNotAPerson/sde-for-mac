@@ -42,12 +42,12 @@ public sealed partial class FieldGroupViewModel(string title, string note, IRead
 /// <summary>One step of the assessment (left-hand list). Subclasses add custom content (damage table, result, photos…).</summary>
 public partial class SectionViewModel : ObservableObject
 {
-	public SectionViewModel(AssessmentEditorViewModel editor, string title, string subtitle, string glyph)
+	public SectionViewModel(AssessmentEditorViewModel editor, string title, string subtitle, string icon)
 	{
 		Editor = editor;
 		Title = title;
 		Subtitle = subtitle;
-		Glyph = glyph;
+		Icon = icon;
 	}
 
 	public AssessmentEditorViewModel Editor { get; }
@@ -56,8 +56,8 @@ public partial class SectionViewModel : ObservableObject
 
 	public string Subtitle { get; }
 
-	/// <summary>A short symbol shown in the step list.</summary>
-	public string Glyph { get; }
+	/// <summary>The step's icon in the step list: an icon kind from Styles/Icons.axaml, such as "MapPin" (for the Icon control).</summary>
+	public string Icon { get; }
 
 	public int Number { get; set; }
 
@@ -107,7 +107,7 @@ public partial class SectionViewModel : ObservableObject
 }
 
 /// <summary>Step 5: replacement cost (square footage, base cost, adjustments) and depreciation.</summary>
-public sealed class CostSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Cost & depreciation", "What would it cost to rebuild, and what was it worth?", "$")
+public sealed class CostSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Cost & depreciation", "What would it cost to rebuild, and what was it worth?", "Cost")
 {
 	public FieldGroupViewModel Basics { get; set; }
 
@@ -124,13 +124,13 @@ public sealed class CostSectionViewModel(AssessmentEditorViewModel editor) : Sec
 }
 
 /// <summary>Step 6: % damaged per building element.</summary>
-public sealed class DamageSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Damage by element", "How badly is each part of the building damaged?", "◧")
+public sealed class DamageSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Damage by element", "How badly is each part of the building damaged?", "Sliders")
 {
 	protected override string EmptyStatus => Editor.IsUndetermined ? null : Editor.Elements.All(e => e.UserDamage == 0) ? "No damage entered" : null;
 }
 
 /// <summary>Step 7: value / repair-cost bases and the determination.</summary>
-public sealed class ResultSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Result", "Choose the value and repair-cost bases", "=")
+public sealed class ResultSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Result", "Choose the value and repair-cost bases", "Result")
 {
 	public FieldGroupViewModel ValueInputs { get; set; }
 
@@ -147,7 +147,7 @@ public sealed class ResultSectionViewModel(AssessmentEditorViewModel editor) : S
 }
 
 /// <summary>Step 8: photos and custom fields.</summary>
-public sealed class PhotosSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Photos & notes", "Pictures of the damage and your own fields", "▣")
+public sealed class PhotosSectionViewModel(AssessmentEditorViewModel editor) : SectionViewModel(editor, "Photos & notes", "Pictures of the damage and your own fields", "Camera")
 {
 	protected override string EmptyStatus => Editor.Photos.Count == 0 ? "Optional" : null;
 }

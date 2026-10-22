@@ -261,7 +261,7 @@ public sealed partial class StructuresViewModel : ViewModelBase
 	/// <summary>How many of the extra filters (Filters ▾) are in use.</summary>
 	public int ExtraFilterCount => new object[] { InspectedFrom, InspectedTo, MinPercent, MaxPercent, Blank(StreetFilter), Blank(ZipFilter), Blank(ParcelFilter), StatusFilter == 0 ? null : (object)StatusFilter }.Count(v => v != null);
 
-	public string FiltersButtonText => ExtraFilterCount == 0 ? "Filters ▾" : $"Filters ({ExtraFilterCount}) ▾";
+	public string FiltersButtonText => ExtraFilterCount == 0 ? "Filters" : $"Filters ({ExtraFilterCount})";
 
 	private static string Blank(string s) => string.IsNullOrWhiteSpace(s) ? null : s;
 
@@ -792,6 +792,26 @@ public sealed partial class StructuresViewModel : ViewModelBase
 			_app.Errors.Show("Couldn't delete " + row.Address, ex);
 			return;
 		}
-		_app.Dialogs.Notify("Moved to Recently deleted", $"{row.Address} can be restored from Recently deleted for {SdeStore.KeepDays} days.");
+		DeletedItemRecord deleted = _app.Store.GetDeletedItems().FirstOrDefault(d => row.AssessmentID is Guid aid && d.AssessmentID == aid && d.Value == DeletedKind.Assessment
+			|| d.PropertyID == row.Summary.PropertyID && d.Value == DeletedKind.Structure);
+		_app.Dialogs.Notify("Moved to Recently deleted", $"{row.Address} can be restored from Recently deleted for {SdeStore.KeepDays} days.",
+			"Undo", () => UndoTrash(deleted, row.Address));
+	}
+
+	/// <summary>The toast's Undo after moving a structure or assessment to Recently deleted: puts it back.</summary>
+	private void UndoTrash(DeletedItemRecord deleted, string address)
+	{
+		if (deleted == null)
+		{
+			return;
+		}
+		try
+		{
+			_app.Writes.Write(deleted.AssessmentID is Guid id ? new[] { id } : null, () => _app.Store.Restore(deleted.ItemKey));
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			_app.Errors.Show("Couldn't put back " + address, ex);
+		}
 	}
 }

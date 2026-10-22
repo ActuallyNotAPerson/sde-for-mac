@@ -6,7 +6,7 @@
              x:DataType="sh:ImprovementsSheetViewModel">
   <StackPanel Spacing="12" Width="700">
     <StackPanel Spacing="2">
-      <TextBlock Text="{Binding Address}" FontWeight="SemiBold" />
+      <TextBlock Classes="semibold" Text="{Binding Address}" />
       <TextBlock Classes="muted" Text="{Binding SettingsText}" TextWrapping="Wrap" />
     </StackPanel>
 
@@ -20,8 +20,8 @@
               <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="sh:ImprovementProjectRowViewModel">
                   <StackPanel Margin="2">
-                    <TextBlock Text="{Binding Title}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap" />
+                    <TextBlock Classes="medium" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted xs" Text="{Binding Detail}" TextWrapping="Wrap" />
                   </StackPanel>
                 </DataTemplate>
               </ListBox.ItemTemplate>
@@ -81,18 +81,18 @@
         <Border Classes="card" BorderThickness="0" Padding="16,12" app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}">
           <StackPanel Spacing="6">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-              <TextBlock Text="{Binding PercentText}" FontSize="32" FontWeight="Bold" VerticalAlignment="Center"
+              <TextBlock Classes="display bold" Text="{Binding PercentText}" VerticalAlignment="Center"
                          app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Classes="eyebrow" Text="IMPROVEMENT COST AS A PERCENT OF MARKET VALUE" />
-                <TextBlock Text="{Binding ResultText}" FontSize="15" FontWeight="SemiBold"
+                <TextBlock Classes="lg semibold" Text="{Binding ResultText}"
                            app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
               </StackPanel>
             </Grid>
             <ItemsControl ItemsSource="{Binding Explanation}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
-                  <TextBlock Text="{Binding}" FontSize="12" TextWrapping="Wrap" />
+                  <TextBlock Classes="sm" Text="{Binding}" TextWrapping="Wrap" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -101,17 +101,17 @@
                 <DataTemplate x:DataType="sh:SiLineViewModel">
                   <Grid ColumnDefinitions="*,100" Margin="0,1">
                     <StackPanel>
-                      <TextBlock Text="{Binding Project}" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Text="{Binding Reason}" FontSize="11" Classes="muted" TextWrapping="Wrap" />
+                      <TextBlock Classes="sm medium" Text="{Binding Project}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Reason}" Classes="muted xs" TextWrapping="Wrap" />
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Classes="money" Text="{Binding Cost}" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="1" Classes="money sm" Text="{Binding Cost}" VerticalAlignment="Top" HorizontalAlignment="Right" />
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
           </StackPanel>
         </Border>
-        <TextBlock Classes="muted" FontSize="11.5" TextWrapping="Wrap"
+        <TextBlock Classes="muted xs" TextWrapping="Wrap"
                    Text="Substantial improvement is a separate finding. It doesn't change any damage assessment, its percent damaged or FEMA's determination." />
 
         <StackPanel Spacing="4">
@@ -126,10 +126,10 @@
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="sh:SiDeterminationRowViewModel">
                 <Grid ColumnDefinitions="110,*" Margin="0,2">
-                  <TextBlock Classes="secondary" Text="{Binding When}" FontSize="12" />
+                  <TextBlock Classes="secondary sm" Text="{Binding When}" />
                   <StackPanel Grid.Column="1">
-                    <TextBlock Text="{Binding Result}" FontWeight="Medium" FontSize="12" />
-                    <TextBlock Classes="muted" Text="{Binding Detail}" FontSize="11" TextWrapping="Wrap" />
+                    <TextBlock Classes="sm medium" Text="{Binding Result}" />
+                    <TextBlock Classes="muted xs" Text="{Binding Detail}" TextWrapping="Wrap" />
                   </StackPanel>
                 </Grid>
               </DataTemplate>
@@ -139,7 +139,7 @@
       </StackPanel>
     </ScrollViewer>
 
-    <TextBlock Text="{Binding SavedText}" FontWeight="Medium" TextWrapping="Wrap" IsVisible="{Binding SavedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <TextBlock Classes="medium" Text="{Binding SavedText}" TextWrapping="Wrap" IsVisible="{Binding SavedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
     <DockPanel>
       <Button DockPanel.Dock="Left" Content="SI determination PDF…" Command="{Binding SavePdfCommand}" />
       <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">

@@ -52,7 +52,7 @@
           <maps:MapCanvas Name="Surface" Background="{DynamicResource SubtleBg}"
                           AutomationProperties.Name="Map of the structures. The list beside the map has the same structures." />
           <Border Classes="card" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" Padding="8,3" IsVisible="{Binding HasAttribution}">
-            <TextBlock Classes="muted" Text="{Binding Attribution}" FontSize="11" />
+            <TextBlock Classes="muted xs" Text="{Binding Attribution}" />
           </Border>
           <Border Classes="card" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" Padding="12,6" IsVisible="{Binding HasBasemapProblem}">
             <TextBlock Classes="secondary" Text="{Binding BasemapProblem}" TextWrapping="Wrap" MaxWidth="460" />
@@ -87,7 +87,7 @@
           </ItemsControl>
 
           <StackPanel Spacing="2" IsVisible="{Binding HasUnplaced}">
-            <TextBlock Text="{Binding UnplacedText}" TextWrapping="Wrap" FontWeight="Medium" />
+            <TextBlock Classes="medium" Text="{Binding UnplacedText}" TextWrapping="Wrap" />
             <Button Classes="link" Content="Add coordinates in Import &amp; export" Command="{Binding ShowCoordinateToolsCommand}" HorizontalAlignment="Left"
                     AutomationProperties.Name="Open Import and export to add coordinates in bulk" />
           </StackPanel>
@@ -129,7 +129,7 @@
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="vm:MapPointViewModel">
                 <StackPanel Margin="4,2" AutomationProperties.Name="{Binding SpokenName}">
-                  <TextBlock Text="{Binding Address}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="medium" Text="{Binding Address}" TextTrimming="CharacterEllipsis" />
                   <TextBlock Classes="muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" />
                 </StackPanel>
               </DataTemplate>

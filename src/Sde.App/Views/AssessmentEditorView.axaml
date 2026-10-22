@@ -3,6 +3,7 @@
              xmlns:ed="using:Sde.App.ViewModels.Editor"
              xmlns:core="using:Sde.Core.Assessments"
              xmlns:app="using:Sde.App"
+             xmlns:c="using:Sde.App.Controls"
              x:Class="Sde.App.Views.AssessmentEditorView"
              x:DataType="ed:AssessmentEditorViewModel">
 
@@ -42,7 +43,7 @@
                 <TextBlock Classes="h3" Text="Square footage" />
                 <TextBlock Classes="muted" Text="Add the building's footprint as rectangles (length × width × stories), or type a total." TextWrapping="Wrap" />
               </StackPanel>
-              <TextBlock Grid.Column="1" Text="{Binding Editor.SquareFootage, Converter={x:Static app:Converters.SquareFeet}}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+              <TextBlock Classes="xl semibold" Grid.Column="1" Text="{Binding Editor.SquareFootage, Converter={x:Static app:Converters.SquareFeet}}" VerticalAlignment="Center" />
             </Grid>
             <ItemsControl ItemsSource="{Binding Editor.Shapes}">
               <ItemsControl.ItemTemplate>
@@ -50,7 +51,7 @@
                   <Border Classes="subtle" Margin="0,0,0,6">
                     <Grid ColumnDefinitions="110,*,120,Auto">
                       <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Kind}" FontWeight="Medium" />
+                        <TextBlock Classes="medium" Text="{Binding Kind}" />
                       </StackPanel>
                       <StackPanel Grid.Column="1" Spacing="6">
                         <TextBox Text="{Binding Description}" PlaceholderText="Description (optional)" Width="300" HorizontalAlignment="Left" AutomationProperties.Name="Shape description" />
@@ -84,9 +85,11 @@
                         <NumericUpDown Value="{Binding Total}" AutomationProperties.Name="Total square feet" IsVisible="{Binding IsTotalOnly}" PlaceholderText="Total square feet" Width="200"
                                        HorizontalAlignment="Left" ShowButtonSpinner="False" Minimum="0" FormatString="N0" />
                       </StackPanel>
-                      <TextBlock Grid.Column="2" Text="{Binding Total, Converter={x:Static app:Converters.SquareFeet}}" Classes="money" VerticalAlignment="Center" FontWeight="Medium" />
-                      <Button Grid.Column="3" Classes="subtle" Content="✕" AutomationProperties.Name="Remove shape" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip.Tip="Remove"
-                              Command="{Binding RemoveCommand}" />
+                      <TextBlock Grid.Column="2" Text="{Binding Total, Converter={x:Static app:Converters.SquareFeet}}" Classes="money medium" VerticalAlignment="Center" />
+                      <Button Grid.Column="3" Classes="icon" AutomationProperties.Name="Remove shape" Margin="10,0,0,0" VerticalAlignment="Center" ToolTip.Tip="Remove"
+                              Command="{Binding RemoveCommand}">
+                        <c:Icon Kind="Close" Size="14" />
+                      </Button>
                     </Grid>
                   </Border>
                 </DataTemplate>
@@ -172,12 +175,12 @@
             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Editor.Cost, Converter={x:Static app:Converters.Money}}" Classes="money" />
             <TextBlock Grid.Row="1" Text="+ Adjustments" Classes="secondary" Margin="0,4,0,0" />
             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Editor.Assessment.TotalAdjustments, Converter={x:Static app:Converters.Money}}" Classes="money" Margin="0,4,0,0" />
-            <TextBlock Grid.Row="2" Text="Replacement cost" FontWeight="SemiBold" Margin="0,8,0,0" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Editor.Assessment.TotalReplacementCost, Converter={x:Static app:Converters.Money}}" Classes="money" FontWeight="SemiBold" Margin="0,8,0,0" />
+            <TextBlock Classes="semibold" Grid.Row="2" Text="Replacement cost" Margin="0,8,0,0" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Editor.Assessment.TotalReplacementCost, Converter={x:Static app:Converters.Money}}" Classes="money semibold" Margin="0,8,0,0" />
             <TextBlock Grid.Row="3" Text="− Depreciation" Classes="secondary" Margin="0,4,0,0" />
             <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Editor.Assessment.DepreciationValue, Converter={x:Static app:Converters.Percent}}" Classes="money" Margin="0,4,0,0" />
-            <TextBlock Grid.Row="4" Text="Actual cash value (pre-damage)" FontWeight="SemiBold" Margin="0,8,0,0" />
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Editor.Assessment.ComputedActualCashValue, Converter={x:Static app:Converters.Money}}" Classes="money" FontWeight="SemiBold" Margin="0,8,0,0" />
+            <TextBlock Classes="semibold" Grid.Row="4" Text="Actual cash value (pre-damage)" Margin="0,8,0,0" />
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Editor.Assessment.ComputedActualCashValue, Converter={x:Static app:Converters.Money}}" Classes="money semibold" Margin="0,8,0,0" />
           </Grid>
         </Border>
       </StackPanel>
@@ -235,7 +238,7 @@
                 <DataTemplate x:DataType="ed:ElementRowViewModel">
                   <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="0,10">
                     <Grid ColumnDefinitions="1.25*,64,2.2*,108,108">
-                      <TextBlock Text="{Binding Name}" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
+                      <TextBlock Classes="medium" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0" />
                       <TextBlock Grid.Column="1" Text="{Binding Share, Converter={x:Static app:Converters.Percent}}" Classes="money secondary" VerticalAlignment="Center" Margin="0,0,16,0" />
                       <StackPanel Grid.Column="2" Spacing="4">
                         <Grid ColumnDefinitions="*,92">
@@ -252,14 +255,14 @@
                           <Button Classes="chip" Content="100" Command="{Binding SetDamageCommand}" CommandParameter="100" />
                           <Border Classes="pill" Background="{DynamicResource AccentSoft}" Padding="8,2" Margin="8,0,0,0" IsVisible="{Binding IsSuggested}"
                                   ToolTip.Tip="{Binding SuggestedLabel}">
-                            <TextBlock Text="Suggested" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Classes="xs semibold" Text="Suggested" VerticalAlignment="Center" />
                           </Border>
                           <Button Classes="link" Content="Accept" Command="{Binding AcceptSuggestionCommand}" IsVisible="{Binding IsSuggested}" VerticalAlignment="Center"
                                   Margin="6,0,0,0" AutomationProperties.Name="{Binding AcceptLabel}" />
                         </StackPanel>
                       </StackPanel>
                       <TextBlock Grid.Column="3" Text="{Binding ItemCost, Converter={x:Static app:Converters.Money}}" Classes="money secondary" VerticalAlignment="Center" />
-                      <TextBlock Grid.Column="4" Text="{Binding DamageValue, Converter={x:Static app:Converters.Money}}" Classes="money" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="4" Text="{Binding DamageValue, Converter={x:Static app:Converters.Money}}" Classes="money semibold" VerticalAlignment="Center" />
                     </Grid>
                   </Border>
                 </DataTemplate>
@@ -267,9 +270,9 @@
             </ItemsControl>
             <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
               <Grid ColumnDefinitions="*,120,120">
-                <TextBlock Text="Total" FontWeight="SemiBold" />
+                <TextBlock Classes="semibold" Text="Total" />
                 <TextBlock Grid.Column="1" Text="{Binding Editor.Assessment.TotalReplacementCost, Converter={x:Static app:Converters.Money}}" Classes="money secondary" />
-                <TextBlock Grid.Column="2" Text="{Binding Editor.Assessment.ComputedDamages, Converter={x:Static app:Converters.Money}}" Classes="money" FontWeight="Bold" />
+                <TextBlock Grid.Column="2" Text="{Binding Editor.Assessment.ComputedDamages, Converter={x:Static app:Converters.Money}}" Classes="money bold" />
               </Grid>
             </Border>
           </StackPanel>
@@ -290,19 +293,19 @@
             <TextBlock Classes="h3" Text="Value of the building (before damage)" />
             <RadioButton GroupName="value" IsChecked="{Binding Editor.IsValueAcv, Mode=OneWay}" Command="{Binding Editor.SetValueBasisCommand}" CommandParameter="390">
               <StackPanel>
-                <TextBlock Text="Computed actual cash value" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Computed actual cash value" />
                 <TextBlock Classes="muted" Text="{Binding Editor.Assessment.ComputedActualCashValue, Converter={x:Static app:Converters.Money}, StringFormat='Replacement cost less depreciation: {0}'}" />
               </StackPanel>
             </RadioButton>
             <RadioButton GroupName="value" IsChecked="{Binding Editor.IsValueAppraisal, Mode=OneWay}" Command="{Binding Editor.SetValueBasisCommand}" CommandParameter="391">
               <StackPanel>
-                <TextBlock Text="Professional market appraisal" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Professional market appraisal" />
                 <TextBlock Classes="muted" Text="Value of the structure only, from a licensed appraiser" />
               </StackPanel>
             </RadioButton>
             <RadioButton GroupName="value" IsChecked="{Binding Editor.IsValueTax, Mode=OneWay}" Command="{Binding Editor.SetValueBasisCommand}" CommandParameter="392">
               <StackPanel>
-                <TextBlock Text="Adjusted tax assessed value" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Adjusted tax assessed value" />
                 <TextBlock Classes="muted" Text="{Binding Editor.AdjustedTaxValue, Converter={x:Static app:Converters.Money}, StringFormat='Tax assessed value × factor adjustment: {0}'}" />
               </StackPanel>
             </RadioButton>
@@ -315,15 +318,15 @@
             <TextBlock Classes="h3" Text="Cost of repairs" />
             <RadioButton GroupName="repair" IsChecked="{Binding Editor.IsRepairComputed, Mode=OneWay}" Command="{Binding Editor.SetRepairBasisCommand}" CommandParameter="393">
               <StackPanel>
-                <TextBlock Text="Computed damages" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Computed damages" />
                 <TextBlock Classes="muted" Text="{Binding Editor.Assessment.ComputedDamages, Converter={x:Static app:Converters.Money}, StringFormat='From the damage step: {0}'}" />
               </StackPanel>
             </RadioButton>
             <RadioButton GroupName="repair" IsChecked="{Binding Editor.IsRepairContractor, Mode=OneWay}" Command="{Binding Editor.SetRepairBasisCommand}" CommandParameter="394">
-              <TextBlock Text="Contractor's estimate" FontWeight="Medium" />
+              <TextBlock Classes="medium" Text="Contractor's estimate" />
             </RadioButton>
             <RadioButton GroupName="repair" IsChecked="{Binding Editor.IsRepairCommunity, Mode=OneWay}" Command="{Binding Editor.SetRepairBasisCommand}" CommandParameter="395">
-              <TextBlock Text="Community's estimate" FontWeight="Medium" />
+              <TextBlock Classes="medium" Text="Community's estimate" />
             </RadioButton>
             <ContentControl Content="{Binding RepairInputs}" Margin="0,6,0,0" />
           </StackPanel>
@@ -343,7 +346,7 @@
             <Border Name="DropZone" DragDrop.AllowDrop="True" BorderBrush="{DynamicResource CardBorder}" BorderThickness="2" CornerRadius="10"
                     Padding="20" Background="{DynamicResource SubtleBg}">
               <StackPanel HorizontalAlignment="Center" Spacing="8">
-                <TextBlock Text="Drag photos here" HorizontalAlignment="Center" FontWeight="Medium" />
+                <TextBlock Classes="medium" Text="Drag photos here" HorizontalAlignment="Center" />
                 <Button Content="Choose photos…" HorizontalAlignment="Center" Command="{Binding Editor.ChoosePhotosCommand}" />
                 <TextBlock Classes="muted" Text="Reports show the photos in this order, the starred one first. Drag a photo by its handle, or use the arrows, to change the order." HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
               </StackPanel>
@@ -368,13 +371,17 @@
                     <StackPanel Spacing="6">
                       <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                         <Border Classes="dragHandle" Background="Transparent" Padding="4,0" Cursor="SizeAll" ToolTip.Tip="Drag to change the order" VerticalAlignment="Center">
-                          <TextBlock Text="⠿" FontSize="16" Classes="muted" />
+                          <c:Icon Kind="DragHandle" Size="16" Classes="tertiary" />
                         </Border>
                         <TextBlock Grid.Column="1" Text="{Binding PositionText}" Classes="muted" VerticalAlignment="Center" Margin="4,0,0,0" />
-                        <Button Grid.Column="2" Classes="subtle" Content="‹" Command="{Binding MoveEarlierCommand}" Padding="8,2"
-                                AutomationProperties.Name="{Binding MoveEarlierLabel}" ToolTip.Tip="Move earlier" />
-                        <Button Grid.Column="3" Classes="subtle" Content="›" Command="{Binding MoveLaterCommand}" Padding="8,2"
-                                AutomationProperties.Name="{Binding MoveLaterLabel}" ToolTip.Tip="Move later" />
+                        <Button Grid.Column="2" Classes="icon sm" Command="{Binding MoveEarlierCommand}"
+                                AutomationProperties.Name="{Binding MoveEarlierLabel}" ToolTip.Tip="Move earlier">
+                          <c:Icon Kind="CaretLeft" Size="14" />
+                        </Button>
+                        <Button Grid.Column="3" Classes="icon sm" Command="{Binding MoveLaterCommand}"
+                                AutomationProperties.Name="{Binding MoveLaterLabel}" ToolTip.Tip="Move later">
+                          <c:Icon Kind="CaretRight" Size="14" />
+                        </Button>
                       </Grid>
                       <Button Padding="0" Background="Transparent" Command="{Binding OpenCommand}" ToolTip.Tip="Open">
                         <Panel Height="150" Width="220">
@@ -387,13 +394,12 @@
                         <ToggleButton Classes="star" IsChecked="{Binding IsDefault, Mode=OneWay}" Command="{Binding MakeDefaultCommand}"
                                       AutomationProperties.Name="{Binding DefaultLabel}" ToolTip.Tip="{Binding DefaultLabel}">
                           <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Text="★" IsVisible="{Binding IsDefault}" />
-                            <TextBlock Text="☆" IsVisible="{Binding !IsDefault}" />
+                            <c:Icon Kind="Star" Size="14" VerticalAlignment="Center" Classes.tertiary="{Binding !IsDefault}" />
                             <TextBlock Text="Report photo" IsVisible="{Binding IsDefault}" />
                             <TextBlock Text="Use on reports" IsVisible="{Binding !IsDefault}" />
                           </StackPanel>
                         </ToggleButton>
-                        <Button Grid.Column="1" Classes="link" Content="Remove" Foreground="{DynamicResource RequiredFg}" Command="{Binding RemoveCommand}" />
+                        <Button Grid.Column="1" Classes="link danger" Content="Remove" Command="{Binding RemoveCommand}" />
                       </Grid>
                     </StackPanel>
                   </Border>
@@ -446,16 +452,21 @@
     <!-- Header -->
     <Border DockPanel.Dock="Top" Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1" Padding="20,12">
       <Grid ColumnDefinitions="Auto,*,Auto">
-        <Button Classes="subtle" Content="‹ Structures" Command="{Binding CloseCommand}" VerticalAlignment="Center" Margin="0,0,14,0" />
+        <Button Classes="subtle" Command="{Binding CloseCommand}" VerticalAlignment="Center" Margin="0,0,14,0" AutomationProperties.Name="Back to Structures">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <c:Icon Kind="CaretLeft" Size="14" />
+            <TextBlock Text="Structures" />
+          </StackPanel>
+        </Button>
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
           <TextBlock Classes="h2" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
           <TextBlock Classes="muted" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" />
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
           <TextBlock Classes="muted" Text="{Binding SaveState}" VerticalAlignment="Center" Margin="0,0,6,0" />
-          <Button Classes="chip" Content="{Binding StatusLabel, StringFormat='{}{0} ▾'}" AutomationProperties.Name="{Binding StatusLabel, StringFormat='Status: {0}. Change status'}"
+          <DropDownButton Classes="sm" Content="{Binding StatusLabel}" AutomationProperties.Name="{Binding StatusLabel, StringFormat='Status: {0}. Change status'}"
                   ToolTip.Tip="Where this assessment is in review. Final and Letter sent lock it.">
-            <Button.Flyout>
+            <DropDownButton.Flyout>
               <MenuFlyout Placement="BottomEdgeAlignedRight">
                 <MenuItem Header="Draft" Command="{Binding SetStatusCommand}" CommandParameter="Draft" />
                 <MenuItem Header="Reviewed" Command="{Binding SetStatusCommand}" CommandParameter="Reviewed" />
@@ -463,10 +474,10 @@
                 <MenuItem Header="Letter sent (locks it)" Command="{Binding SetStatusCommand}" CommandParameter="LetterSent" />
                 <MenuItem Header="Appeal" Command="{Binding SetStatusCommand}" CommandParameter="Appeal" />
               </MenuFlyout>
-            </Button.Flyout>
-          </Button>
-          <Button Content="Assessments ▾">
-            <Button.Flyout>
+            </DropDownButton.Flyout>
+          </DropDownButton>
+          <DropDownButton Content="Assessments">
+            <DropDownButton.Flyout>
               <Flyout Placement="BottomEdgeAlignedRight">
                 <StackPanel Spacing="4" MinWidth="240">
                   <TextBlock Classes="eyebrow" Text="ASSESSMENTS OF THIS STRUCTURE" Margin="4,0,0,4" />
@@ -483,19 +494,20 @@
                           Command="{Binding NewAssessmentForStructureCommand}" ToolTip.Tip="For a re-inspection or a new damage event" />
                 </StackPanel>
               </Flyout>
-            </Button.Flyout>
-          </Button>
-          <Button Content="Reports ▾">
-            <Button.Flyout>
+            </DropDownButton.Flyout>
+          </DropDownButton>
+          <DropDownButton Content="Reports">
+            <DropDownButton.Flyout>
               <MenuFlyout Placement="BottomEdgeAlignedRight">
                 <MenuItem Header="Summary report" Command="{Binding PrintCommand}" CommandParameter="Summary" />
                 <MenuItem Header="Summary report (no photos)" Command="{Binding PrintCommand}" CommandParameter="Summary-NoPhotos" />
                 <MenuItem Header="Detailed report" Command="{Binding PrintCommand}" CommandParameter="Detail" />
                 <MenuItem Header="Detailed report (no photos)" Command="{Binding PrintCommand}" CommandParameter="Detail-NoPhotos" />
               </MenuFlyout>
-            </Button.Flyout>
-          </Button>
-          <Button Content="⋯" AutomationProperties.Name="More actions">
+            </DropDownButton.Flyout>
+          </DropDownButton>
+          <Button Classes="icon" AutomationProperties.Name="More actions" ToolTip.Tip="More actions">
+            <c:Icon Kind="More" Size="18" />
             <Button.Flyout>
               <MenuFlyout Placement="BottomEdgeAlignedRight">
                 <MenuItem Header="Save now" Command="{Binding SaveCommand}" InputGesture="Cmd+S" />
@@ -524,13 +536,13 @@
             <DataTemplate x:DataType="ed:SectionViewModel">
               <Grid ColumnDefinitions="30,*">
                 <Border Width="24" Height="24" CornerRadius="12" Background="{DynamicResource SubtleBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding Number}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <TextBlock Classes="xs semibold" Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
-                  <TextBlock Text="{Binding Title}" FontWeight="Medium" />
-                  <TextBlock FontSize="11" Text="{Binding StatusText}" Foreground="{DynamicResource RecommendedFg}" IsVisible="{Binding !IsDone}"
+                  <TextBlock Classes="medium" Text="{Binding Title}" />
+                  <TextBlock Classes="xs" Text="{Binding StatusText}" Foreground="{DynamicResource RecommendedFg}" IsVisible="{Binding !IsDone}"
                              Classes.req="{Binding HasRequiredIssues}" />
-                  <TextBlock FontSize="11" Text="✓ Complete" Foreground="{DynamicResource StatusNotSubstantialFg}" IsVisible="{Binding IsDone}" />
+                  <TextBlock Classes="xs" Text="✓ Complete" Foreground="{DynamicResource StatusNotSubstantialFg}" IsVisible="{Binding IsDone}" />
                 </StackPanel>
               </Grid>
             </DataTemplate>
@@ -546,29 +558,33 @@
       <!-- Current step -->
       <ScrollViewer Grid.Column="1" Name="StepScroller" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="28,22,28,28" MaxWidth="980" HorizontalAlignment="Left">
-          <Border Classes="card" Background="{DynamicResource AccentSoft}" BorderThickness="0" Margin="0,0,0,14" IsVisible="{Binding IsLocked}">
-            <StackPanel Spacing="4">
-              <TextBlock Text="{Binding LockText}" FontWeight="Medium" TextWrapping="Wrap" />
-              <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding ChangedInOlderVersion}"
-                         Text="It was changed in an older version of SDE after it was locked. Check it, then reopen and lock it again." />
+          <c:Banner Classes="stacked" Tone="Accent" Icon="Lock" Margin="0,0,0,14" IsVisible="{Binding IsLocked}" Text="{Binding LockText}"
+                    AutomationProperties.Name="Locked">
+            <TextBlock Classes="secondary" TextWrapping="Wrap" IsVisible="{Binding ChangedInOlderVersion}"
+                       Text="It was changed in an older version of SDE after it was locked. Check it, then reopen and lock it again." />
+          </c:Banner>
+          <c:Banner Classes="stacked" Tone="Warning" Margin="0,0,0,14" IsVisible="{Binding HasConflict}" Text="{Binding ConflictText}"
+                    AutomationProperties.Name="Changed elsewhere">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Content="Use theirs" Command="{Binding UseTheirsCommand}" AutomationProperties.Name="Use their values" />
+              <Button Content="Keep mine" Command="{Binding KeepMineCommand}" AutomationProperties.Name="Keep my values" />
             </StackPanel>
-          </Border>
-          <Border Classes="card" Background="{DynamicResource AccentSoft}" BorderThickness="0" Margin="0,0,0,14"
-                  IsVisible="{Binding HasConflict}"
-                  AutomationProperties.Name="Changed elsewhere">
-            <StackPanel Spacing="8">
-              <TextBlock Text="{Binding ConflictText}" FontWeight="Medium" TextWrapping="Wrap" />
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Use theirs" Command="{Binding UseTheirsCommand}" AutomationProperties.Name="Use their values" />
-                <Button Content="Keep mine" Command="{Binding KeepMineCommand}" AutomationProperties.Name="Keep my values" />
-              </StackPanel>
-            </StackPanel>
-          </Border>
+          </c:Banner>
           <ContentControl Content="{Binding SelectedSection}" IsEnabled="{Binding IsEditable}" />
           <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,0">
-            <Button Content="‹ Back" Command="{Binding BackCommand}" IsVisible="{Binding CanGoBack}" />
+            <Button Command="{Binding BackCommand}" IsVisible="{Binding CanGoBack}" AutomationProperties.Name="Back">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:Icon Kind="CaretLeft" Size="14" />
+                <TextBlock Text="Back" />
+              </StackPanel>
+            </Button>
             <Button Grid.Column="2" Classes="primary" Command="{Binding NextCommand}" IsVisible="{Binding CanGoNext}"
-                    Content="{Binding NextTitle, StringFormat='Next: {0} ›'}" />
+                    AutomationProperties.Name="{Binding NextTitle, StringFormat='Next: {0}'}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="{Binding NextTitle, StringFormat='Next: {0}'}" />
+                <c:Icon Kind="CaretRight" Size="14" />
+              </StackPanel>
+            </Button>
           </Grid>
         </StackPanel>
       </ScrollViewer>
@@ -580,10 +596,10 @@
             <Border Classes="card" app:ThemeBrush.Background="{Binding State, Converter={x:Static app:Converters.StatusBackgroundKey}}" BorderThickness="0">
               <StackPanel Spacing="4">
                 <TextBlock Classes="eyebrow" Text="PERCENT DAMAGED" />
-                <TextBlock Text="{Binding PercentText}" FontSize="44" FontWeight="Bold" app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
-                <TextBlock Text="{Binding Determination}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap"
+                <TextBlock Classes="display bold" Text="{Binding PercentText}" app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
+                <TextBlock Classes="lg semibold" Text="{Binding Determination}" TextWrapping="Wrap"
                            app:ThemeBrush.Foreground="{Binding State, Converter={x:Static app:Converters.StatusForegroundKey}}" />
-                <TextBlock Text="{Binding StateHint}" FontSize="12" TextWrapping="Wrap" Classes="secondary" Margin="0,4,0,0" />
+                <TextBlock Text="{Binding StateHint}" TextWrapping="Wrap" Classes="secondary sm" Margin="0,4,0,0" />
               </StackPanel>
             </Border>
 
@@ -592,16 +608,16 @@
                     app:ThemeBrush.Background="{Binding CumulativeState, Converter={x:Static app:Converters.StatusBackgroundKey}}">
               <StackPanel Spacing="4">
                 <TextBlock Classes="eyebrow" Text="CUMULATIVE DAMAGE" />
-                <TextBlock Text="{Binding CumulativeTitle}" FontWeight="SemiBold" TextWrapping="Wrap"
+                <TextBlock Classes="semibold" Text="{Binding CumulativeTitle}" TextWrapping="Wrap"
                            app:ThemeBrush.Foreground="{Binding CumulativeState, Converter={x:Static app:Converters.StatusForegroundKey}}"
                            ToolTip.Tip="Damage from the events in the look-back period added together, as set in Settings. FEMA's reports and exports keep FEMA's own result." />
-                <TextBlock Text="{Binding CumulativeVerdict}" FontSize="12" TextWrapping="Wrap" />
-                <TextBlock Classes="muted" FontSize="11" TextWrapping="Wrap" Text="A separate finding: the percent damaged and determination above don't change." />
+                <TextBlock Classes="sm" Text="{Binding CumulativeVerdict}" TextWrapping="Wrap" />
+                <TextBlock Classes="muted xs" TextWrapping="Wrap" Text="A separate finding: the percent damaged and determination above don't change." />
                 <Expander Header="How this was worked out" HorizontalAlignment="Stretch" Margin="0,4,0,0" AutomationProperties.Name="How cumulative damage was worked out">
                   <ItemsControl ItemsSource="{Binding CumulativeLines}">
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="x:String">
-                        <TextBlock Text="{Binding}" FontSize="11.5" TextWrapping="Wrap" Margin="0,0,0,4" />
+                        <TextBlock Classes="xs" Text="{Binding}" TextWrapping="Wrap" Margin="0,0,0,4" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
@@ -631,15 +647,15 @@
                 <StackPanel Spacing="1">
                   <TextBlock Classes="muted" Text="Repair cost used" />
                   <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="{Binding RepairBasisName}" FontSize="12" TextWrapping="Wrap" />
-                    <TextBlock Grid.Column="1" Classes="money" FontWeight="SemiBold" Text="{Binding RepairBasisAmount, Converter={x:Static app:Converters.MoneyWhole}}" />
+                    <TextBlock Classes="sm" Text="{Binding RepairBasisName}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Classes="money semibold" Text="{Binding RepairBasisAmount, Converter={x:Static app:Converters.MoneyWhole}}" />
                   </Grid>
                 </StackPanel>
                 <StackPanel Spacing="1">
                   <TextBlock Classes="muted" Text="Building value used" />
                   <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="{Binding ValueBasisName}" FontSize="12" TextWrapping="Wrap" />
-                    <TextBlock Grid.Column="1" Classes="money" FontWeight="SemiBold" Text="{Binding ValueBasisAmount, Converter={x:Static app:Converters.MoneyWhole}}" />
+                    <TextBlock Classes="sm" Text="{Binding ValueBasisName}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Classes="money semibold" Text="{Binding ValueBasisAmount, Converter={x:Static app:Converters.MoneyWhole}}" />
                   </Grid>
                 </StackPanel>
               </StackPanel>
@@ -661,8 +677,8 @@
                         <Grid ColumnDefinitions="14,*">
                           <Ellipse Width="7" Height="7" app:ThemeBrush.Fill="{Binding Severity, Converter={x:Static app:Converters.IssueBrushKey}}" VerticalAlignment="Top" Margin="0,5,0,0" />
                           <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding FieldName}" FontSize="12" FontWeight="Medium" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding Message}" FontSize="11" Classes="muted" TextWrapping="Wrap" />
+                            <TextBlock Classes="sm medium" Text="{Binding FieldName}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Message}" Classes="muted xs" TextWrapping="Wrap" />
                           </StackPanel>
                         </Grid>
                       </Button>

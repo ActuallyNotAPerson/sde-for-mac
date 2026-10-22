@@ -9,7 +9,7 @@
         <StackPanel Spacing="2">
           <TextBlock Classes="h2" Text="Substantial improvement" />
           <TextBlock Classes="muted" TextWrapping="Wrap"
-                     Text="How improvement projects are counted for this database (in an assessment, ⋯ then Improvements and SI). The NFIP minimum is 50 percent of market value, counting each project on its own. Your ordinance may be stricter." />
+                     Text="How improvement projects are counted for this database (in an assessment, More actions, then Improvements and SI). The NFIP minimum is 50 percent of market value, counting each project on its own. Your ordinance may be stricter." />
         </StackPanel>
         <WrapPanel>
           <StackPanel Classes="field">
@@ -69,7 +69,7 @@
         </StackPanel>
         <ToggleSwitch IsChecked="{Binding CumulativeEnabled}" OnContent="" OffContent="" AutomationProperties.Name="Count damage cumulatively">
           <ToggleSwitch.Content>
-            <TextBlock Text="Count damage from several events together" FontWeight="Medium" />
+            <TextBlock Classes="medium" Text="Count damage from several events together" />
           </ToggleSwitch.Content>
         </ToggleSwitch>
         <WrapPanel IsEnabled="{Binding CumulativeEnabled}">

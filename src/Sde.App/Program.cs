@@ -31,6 +31,7 @@ internal sealed class Program
 	public static AppBuilder BuildAvaloniaApp()
 		=> AppBuilder.Configure<App>()
 			.UsePlatformDetect()
+			.WithInterFont()
 #if DEBUG
 			.WithDeveloperTools()
 #endif

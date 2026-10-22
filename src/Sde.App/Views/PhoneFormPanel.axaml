@@ -20,15 +20,15 @@
 
       <!-- Running -->
       <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsRunning}">
-        <Border Background="White" CornerRadius="8" Padding="8" VerticalAlignment="Top" Margin="0,0,20,0">
+        <Border Background="{DynamicResource QrBackground}" CornerRadius="8" Padding="8" VerticalAlignment="Top" Margin="0,0,20,0">
           <Image Source="{Binding QrCode}" Width="200" Height="200" RenderOptions.BitmapInterpolationMode="None"
                  AutomationProperties.Name="QR code to pair a phone" />
         </Border>
         <StackPanel Grid.Column="1" Spacing="4">
           <TextBlock Classes="fieldLabel" Text="Scan the QR code with the phone's camera, or open this address and type the PIN" TextWrapping="Wrap" />
-          <SelectableTextBlock Text="{Binding Address}" FontSize="18" FontWeight="SemiBold" AutomationProperties.Name="Phone form address" />
+          <SelectableTextBlock Classes="xl semibold" Text="{Binding Address}" AutomationProperties.Name="Phone form address" />
           <TextBlock Classes="fieldLabel" Text="PIN" Margin="0,8,0,0" />
-          <SelectableTextBlock Text="{Binding Pin}" FontSize="28" FontWeight="Bold" FontFamily="Menlo, Consolas, monospace" AutomationProperties.Name="Pairing PIN" />
+          <SelectableTextBlock Classes="display bold" Text="{Binding Pin}" FontFamily="Menlo, Consolas, monospace" AutomationProperties.Name="Pairing PIN" />
           <TextBlock Classes="muted" TextWrapping="Wrap" Text="The QR code and PIN work once, for 10 minutes; a new one appears after each phone pairs." />
           <TextBlock Classes="issue required" TextWrapping="Wrap" Text="{Binding PinWarning}" IsVisible="{Binding HasPinWarning}" />
           <TextBlock Classes="secondary" Text="{Binding TimeLeft}" Margin="0,6,0,0" />
@@ -48,7 +48,7 @@
               <DockPanel Margin="0,2">
                 <Button DockPanel.Dock="Right" Content="Revoke" Command="{Binding RevokeCommand}" AutomationProperties.Name="{Binding RevokeLabel}" />
                 <StackPanel VerticalAlignment="Center">
-                  <TextBlock Text="{Binding Name}" FontWeight="Medium" />
+                  <TextBlock Classes="medium" Text="{Binding Name}" />
                   <TextBlock Classes="muted" Text="{Binding Details}" />
                 </StackPanel>
               </DockPanel>
