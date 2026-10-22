@@ -25,9 +25,10 @@ File menu and choose New Database. ⌘ is the Command key, ⇧ is Shift and ⌥ 
 13. [Appeals and contractor bids](#13-appeals-and-contractor-bids)
 14. [Cumulative damage](#14-cumulative-damage)
 15. [The phone form](#15-the-phone-form)
-16. [Backups, moving and sharing](#16-backups-moving-and-sharing)
-17. [Troubleshooting](#17-troubleshooting)
-18. [Keyboard shortcuts](#18-keyboard-shortcuts)
+16. [AI assistants](#16-ai-assistants)
+17. [Backups, moving and sharing](#17-backups-moving-and-sharing)
+18. [Troubleshooting](#18-troubleshooting)
+19. [Keyboard shortcuts](#19-keyboard-shortcuts)
 
 ---
 
@@ -118,8 +119,9 @@ These are in **Settings > General**.
 | Count damage from several events together | Settings > Reports & letters | [Chapter 14](#14-cumulative-damage) |
 | Use your community's depth-damage table | Settings > Depth tables | [Step 6 in chapter 4](#step-6-damage-by-element) |
 | Let inspectors use phones | Settings > Phone form | [Chapter 15](#15-the-phone-form) |
+| Let an AI assistant such as Claude work with the database | Settings > AI assistants | [Chapter 16](#16-ai-assistants) |
 
-**Sharing the setup with colleagues:** see [Share your setup](#share-your-setup) in chapter 16.
+**Sharing the setup with colleagues:** see [Share your setup](#share-your-setup) in chapter 17.
 
 ### 2.6 Events
 When one database holds more than one disaster, give each an event, so you can see one at a time.
@@ -965,7 +967,42 @@ Click **Stop phone form**. It also stops when you quit SDE, and by itself after 
 
 ---
 
-## 16. Backups, moving and sharing
+## 16. AI assistants
+An AI assistant such as Claude Desktop or Claude Code can work with an SDE database: find structures, read and explain
+assessments, run the quality checks, summarise an event, and make reports, GeoJSON files and web maps. SDE includes the
+server the assistant talks to (it uses the Model Context Protocol, MCP). The assistant runs SDE in the background; no
+window opens. The developer notes, with every tool, are [MCP.md](MCP.md).
+
+### Connecting an assistant
+1. Put SDE in the **Applications** folder, and open the database in SDE once.
+2. Open **Settings > AI assistants**.
+3. For **Claude Code**, click **Copy command**, paste it into Terminal and press Return. For **Claude Desktop**, click
+   **Copy setup**, then in Claude Desktop choose **Settings, Developer, Edit Config**, add it to the file and restart
+   Claude Desktop.
+
+The setup names this database. After switching to another database, copy it again.
+
+### What an assistant may do
+- **Always:** read the database, run the quality checks, list events, compliance cases and map layers, and write
+  reports, GeoJSON files and web maps into an **AI outputs** folder beside the database.
+- **Only after you turn on Let AI assistants change this database:** fill in fields, set Draft, Reviewed or Appeal,
+  add structures, events and review comments, and assign structures to teams.
+- **Never:** change a Final or Letter sent assessment, delete anything, import, export to FEMA, mark a letter sent, or
+  change settings.
+
+Every change is recorded in History under the assistant's name. Under **Recent changes by AI assistants**, **Revert**
+puts back what one request changed (hold the pointer over it to see exactly what it does); anything changed again
+since is left as it is.
+
+> Treat an assistant's work like a new colleague's: check its changes before an assessment is Final. SDE tells the
+> assistant that notes and other free text in the database are data, not instructions, but check its work all the
+> same.
+
+![Settings, AI assistants](screenshots/31f-settings-ai-changes.png)
+
+---
+
+## 17. Backups, moving and sharing
 
 ### Automatic backups
 SDE backs up the database and its photos into a `Backups` folder next to the database: once on the first opening each
@@ -1011,7 +1048,7 @@ adds one.
 
 ---
 
-## 17. Troubleshooting
+## 18. Troubleshooting
 
 | Problem | What to do |
 |---|---|
@@ -1029,7 +1066,7 @@ adds one.
 
 ---
 
-## 18. Keyboard shortcuts
+## 19. Keyboard shortcuts
 **Help > Keyboard Shortcuts** shows these in the app.
 
 | Shortcut | Action |

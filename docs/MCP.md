@@ -1,6 +1,6 @@
 # SDE for AI assistants (MCP): developer notes
 
-> Draft for developers. The user guide chapter comes with the Settings › AI assistants panel.
+> For developers. People using SDE will find the steps in the user guide's [AI assistants](USER-GUIDE.md#16-ai-assistants) chapter.
 
 SDE includes a [Model Context Protocol](https://modelcontextprotocol.io/) server, so an AI assistant such as Claude
 Desktop or Claude Code can read an SDE database and, when allowed, edit it. It is the app itself run with a verb:

@@ -139,9 +139,10 @@ The **[user guide](docs/USER-GUIDE.md)** explains every task step by step:
 13. [Appeals and contractor bids](docs/USER-GUIDE.md#13-appeals-and-contractor-bids)
 14. [Cumulative damage](docs/USER-GUIDE.md#14-cumulative-damage)
 15. [The phone form](docs/USER-GUIDE.md#15-the-phone-form)
-16. [Backups, moving and sharing](docs/USER-GUIDE.md#16-backups-moving-and-sharing)
-17. [Troubleshooting](docs/USER-GUIDE.md#17-troubleshooting)
-18. [Keyboard shortcuts](docs/USER-GUIDE.md#18-keyboard-shortcuts)
+16. [AI assistants](docs/USER-GUIDE.md#16-ai-assistants)
+17. [Backups, moving and sharing](docs/USER-GUIDE.md#17-backups-moving-and-sharing)
+18. [Troubleshooting](docs/USER-GUIDE.md#18-troubleshooting)
+19. [Keyboard shortcuts](docs/USER-GUIDE.md#19-keyboard-shortcuts)
 
 ## Getting help
 - **In the app**: the **?** next to any field says what to enter and which page of FEMA's SDE User Manual covers it.
