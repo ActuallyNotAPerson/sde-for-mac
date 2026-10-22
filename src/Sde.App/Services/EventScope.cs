@@ -65,6 +65,15 @@ public sealed class EventScope
 		return before != EventId || count != (_members?.Count ?? -1);
 	}
 
+	/// <summary>
+	/// The active assessments an "all" export should cover: null (every one) for all events, else the chosen event's.
+	/// </summary>
+	public IReadOnlyList<Guid> ExportIds(SdeStore store) => IsAll ? null
+		: store.ListStructures().Where(s => s.AssessmentID != null && Includes(s.AssessmentID)).Select(s => s.AssessmentID!.Value).ToList();
+
+	/// <summary>"" for all events; otherwise a sentence saying exports cover only the chosen event.</summary>
+	public string ExportNote => IsAll ? "" : $"Only {Event.Label} is exported, because it is chosen in the sidebar. Choose All events to export everything.";
+
 	private void Load(SdeStore store, Guid? eventId)
 	{
 		Event = eventId is Guid id ? store.GetEvent(id) : null;

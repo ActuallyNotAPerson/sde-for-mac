@@ -69,7 +69,7 @@ public sealed partial class ImportExportViewModel
 	// ───────────── Excel ─────────────
 
 	[RelayCommand]
-	private Task ExportExcel() => ExportExcelAsync(null);
+	private Task ExportExcel() => ExportExcelAsync(_app.Scope.ExportIds(_app.Store));
 
 	/// <summary>FEMA's "Export to Excel": one row per assessment, 218 columns, as SDE showed them.</summary>
 	public async Task ExportExcelAsync(IReadOnlyList<Guid> assessmentIds)
@@ -108,7 +108,7 @@ public sealed partial class ImportExportViewModel
 		}
 		_main.Editor?.Save();
 		GeoFileResult result = null;
-		if (await RunFileJob("Couldn't create the map", () => result = GeoFileExport.WriteKmz(_app.Store.LoadAllAssessments(), _app.Store.Reference, path)))
+		if (await RunFileJob("Couldn't create the map", () => result = GeoFileExport.WriteKmz(_app.Scope.ExportIds(_app.Store) is IReadOnlyList<Guid> ids ? _app.Store.LoadAssessments(ids) : _app.Store.LoadAllAssessments(), _app.Store.Reference, path)))
 		{
 			LastResult = $"Map saved with {result.Placemarks} pin{(result.Placemarks == 1 ? "" : "s")}." +
 				(result.Skipped.Count > 0 ? $" {result.Skipped.Count} assessment{(result.Skipped.Count == 1 ? " has" : "s have")} no latitude/longitude and {(result.Skipped.Count == 1 ? "was" : "were")} left out." : "");

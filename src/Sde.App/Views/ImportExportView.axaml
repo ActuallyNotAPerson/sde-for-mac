@@ -10,6 +10,9 @@
       <!-- The title band says "Import & export"; the header says what it is for -->
       <c:PageHeader Margin="0" Subtitle="Exchange data with FEMA's SDE (Windows), your state, and other tools. Exports in SDE format can be imported by FEMA's SDE 3.0." />
 
+      <!-- The event chosen in the sidebar limits the exports -->
+      <c:Banner Tone="Accent" Icon="Event" Text="{Binding ScopeNote}" IsVisible="{Binding HasScopeNote}" AutomationProperties.Name="Exports cover one event" />
+
       <!-- What the last action did -->
       <c:Banner Tone="Info" Text="{Binding LastResult}" IsVisible="{Binding LastResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 AutomationProperties.LiveSetting="Polite">
@@ -25,7 +28,7 @@
             <Border Classes="subtle" Margin="0,0,6,0" Padding="14">
               <StackPanel Spacing="8">
                 <TextBlock Classes="h3" Text="Export" />
-                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Everything in this database. To export only some structures, check them on the Structures page and use Export." />
+                <TextBlock Classes="muted" TextWrapping="Wrap" Text="Everything in this database (or in the chosen event). To export only some structures, check them on the Structures page and use Export." />
                 <Button Classes="primary" Content="Export all to an SDE folder…" Command="{Binding ExportAllCommand}" HorizontalAlignment="Left" />
               </StackPanel>
             </Border>

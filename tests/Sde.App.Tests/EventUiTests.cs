@@ -50,6 +50,23 @@ public class EventUiTests
 	}
 
 	[AvaloniaFact]
+	public async Task ExportAll_InAnEvent_ExportsOnlyThatEvent()
+	{
+		using UiSession ui = WithSamples();
+		EventRecord e = September(ui, Row(ui, "123"), Row(ui, "48"));
+		ui.Main.Events.ChooseCommand.Execute(ui.Main.Events.Events.Single(c => c.Id == e.EventID));
+		ui.Pump();
+		Assert.True(ui.Main.ImportExport.HasScopeNote);
+		Assert.Contains("September flood", ui.Main.ImportExport.ScopeNote);
+
+		string exports = Path.Combine(ui.Folder, "exports");
+		Directory.CreateDirectory(exports);
+		ui.Dialogs.Answers.Enqueue(exports);
+		await ui.Main.ImportExport.ExportAllCommand.ExecuteAsync(null);
+		Assert.StartsWith("Exported 2 structures and 2 assessments", ui.Main.ImportExport.LastResult);
+	}
+
+	[AvaloniaFact]
 	public void ChoosingAnEvent_ScopesStructuresAndTheDashboard_AndIsRemembered()
 	{
 		using UiSession ui = WithSamples();

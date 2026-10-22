@@ -49,9 +49,19 @@ public sealed partial class ImportExportViewModel : ViewModelBase
 			_app.RaiseDataChanged();
 			_main.RefreshStatus();
 		});
+		app.Scope.Changed += () =>
+		{
+			OnPropertyChanged(nameof(ScopeNote));
+			OnPropertyChanged(nameof(HasScopeNote));
+		};
 	}
 
 	public EnterpriseImportViewModel Enterprise { get; }
+
+	/// <summary>Says that exports cover only the event chosen in the sidebar ("" for all events).</summary>
+	public string ScopeNote => _app.Scope.ExportNote;
+
+	public bool HasScopeNote => !_app.Scope.IsAll;
 
 	public ObservableCollection<ImportRowViewModel> PendingRows { get; } = new();
 
@@ -84,7 +94,16 @@ public sealed partial class ImportExportViewModel : ViewModelBase
 	// ───────────── Export ─────────────
 
 	[RelayCommand]
-	private Task ExportAll() => ExportAsync(null);
+	private Task ExportAll()
+	{
+		IReadOnlyList<Guid> ids = _app.Scope.ExportIds(_app.Store);
+		if (ids is { Count: 0 })
+		{
+			_app.Dialogs.Notify("Nothing to export", $"{_app.Scope.Event.Label} has no assessments yet.");
+			return Task.CompletedTask;
+		}
+		return ExportAsync(ids);
+	}
 
 	/// <summary>Writes an SDE_n folder (Export.json + photos) that FEMA's SDE can import.</summary>
 	public async Task ExportAsync(IReadOnlyList<Guid> assessmentIds)
