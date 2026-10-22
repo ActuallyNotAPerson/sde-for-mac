@@ -134,7 +134,12 @@ which is the three-clause BSD license; LibTiff.NET is based in part on LibTIFF (
 
 SDE converts coordinates with its own code (EPSG Guidance Note 7-2's formulas), not a projection library. The parameters of
 the State Plane, UTM and Albers coordinate systems it knows by EPSG code (`src/Sde.Gis/Projections/EpsgUs.csv`) are taken
-from the EPSG Dataset (https://epsg.org), © IOGP, used under the EPSG Dataset terms of use.
+from the EPSG Geodetic Parameter Dataset, version v12.029 (2025-10-02), as copied into PROJ's proj.db. The EPSG Dataset is
+owned by the International Association of Oil and Gas Producers (IOGP) and is used, copied and distributed here under the
+EPSG Dataset Terms of Use (https://epsg.org/terms-of-use.html), which apply to anyone you pass it on to. Its data is
+provided "as is", without warranty of any kind, and neither IOGP nor its members accept liability for any use of it. The
+only changes made are those the terms permit: angles are written in decimal degrees and false eastings and northings in
+metres. SDE is free; nothing is charged for the dataset.
 
 ### Microsoft libraries pulled in by the packages above
 
