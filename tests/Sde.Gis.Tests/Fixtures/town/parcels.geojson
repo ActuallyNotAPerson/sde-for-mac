@@ -1,0 +1,1314 @@
+{
+ "type": "FeatureCollection",
+ "name": "parcels",
+ "features": [
+  {
+   "type": "Feature",
+   "id": 1,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.05,
+       39.62
+      ],
+      [
+       -84.0496,
+       39.62
+      ],
+      [
+       -84.0496,
+       39.6203
+      ],
+      [
+       -84.05,
+       39.6203
+      ],
+      [
+       -84.05,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0001",
+    "house_no": 100,
+    "street": "Mill Race Road",
+    "zone_code": "R-1",
+    "flood_zone": "AE",
+    "land_value": 21500.25,
+    "year_built": 1951,
+    "has_garage": false,
+    "survey_date": "2024-03-02"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 2,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0496,
+       39.62
+      ],
+      [
+       -84.0492,
+       39.62
+      ],
+      [
+       -84.0492,
+       39.6203
+      ],
+      [
+       -84.0496,
+       39.6203
+      ],
+      [
+       -84.0496,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0002",
+    "house_no": 102,
+    "street": "Mill Race Road",
+    "zone_code": "R-2",
+    "flood_zone": "AE",
+    "land_value": 23000.25,
+    "year_built": 1952,
+    "has_garage": true,
+    "survey_date": "2024-03-03"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 3,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0492,
+       39.62
+      ],
+      [
+       -84.0488,
+       39.62
+      ],
+      [
+       -84.0488,
+       39.6203
+      ],
+      [
+       -84.0492,
+       39.6203
+      ],
+      [
+       -84.0492,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0003",
+    "house_no": 104,
+    "street": "Mill Race Road",
+    "zone_code": "C-1",
+    "flood_zone": "AE",
+    "land_value": 24500.25,
+    "year_built": 1953,
+    "has_garage": false,
+    "survey_date": "2024-03-04"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 4,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0488,
+       39.62
+      ],
+      [
+       -84.0484,
+       39.62
+      ],
+      [
+       -84.0484,
+       39.6203
+      ],
+      [
+       -84.0488,
+       39.6203
+      ],
+      [
+       -84.0488,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0004",
+    "house_no": 106,
+    "street": "Mill Race Road",
+    "zone_code": "R-1",
+    "flood_zone": "AE",
+    "land_value": 26000.25,
+    "year_built": 1954,
+    "has_garage": true,
+    "survey_date": "2024-03-05"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 5,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0484,
+       39.62
+      ],
+      [
+       -84.048,
+       39.62
+      ],
+      [
+       -84.048,
+       39.6203
+      ],
+      [
+       -84.0484,
+       39.6203
+      ],
+      [
+       -84.0484,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0005",
+    "house_no": 108,
+    "street": "Mill Race Road",
+    "zone_code": "R-2",
+    "flood_zone": "AE",
+    "land_value": 27500.25,
+    "year_built": 1955,
+    "has_garage": false,
+    "survey_date": "2024-03-06"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 6,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.048,
+       39.62
+      ],
+      [
+       -84.0476,
+       39.62
+      ],
+      [
+       -84.0476,
+       39.6203
+      ],
+      [
+       -84.048,
+       39.6203
+      ],
+      [
+       -84.048,
+       39.62
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0006",
+    "house_no": 110,
+    "street": "Mill Race Road",
+    "zone_code": "C-1",
+    "flood_zone": "AE",
+    "land_value": 29000.25,
+    "year_built": 1956,
+    "has_garage": true,
+    "survey_date": "2024-03-07"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 7,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.05,
+       39.6203
+      ],
+      [
+       -84.0496,
+       39.6203
+      ],
+      [
+       -84.0496,
+       39.6206
+      ],
+      [
+       -84.05,
+       39.6206
+      ],
+      [
+       -84.05,
+       39.6203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0007",
+    "house_no": 100,
+    "street": "Rue Élan",
+    "zone_code": "R-1",
+    "flood_zone": "AE",
+    "land_value": 30500.25,
+    "year_built": null,
+    "has_garage": false,
+    "survey_date": "2024-03-08"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 8,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0496,
+       39.6203
+      ],
+      [
+       -84.0492,
+       39.6203
+      ],
+      [
+       -84.0492,
+       39.6206
+      ],
+      [
+       -84.0496,
+       39.6206
+      ],
+      [
+       -84.0496,
+       39.6203
+      ]
+     ],
+     [
+      [
+       -84.04948,
+       39.62039
+      ],
+      [
+       -84.04948,
+       39.62051
+      ],
+      [
+       -84.04932,
+       39.62051
+      ],
+      [
+       -84.04932,
+       39.62039
+      ],
+      [
+       -84.04948,
+       39.62039
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0008",
+    "house_no": 102,
+    "street": "Rue Élan",
+    "zone_code": "R-2",
+    "flood_zone": "AE",
+    "land_value": 32000.25,
+    "year_built": 1958,
+    "has_garage": true,
+    "survey_date": "2024-03-09"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 9,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0492,
+       39.6203
+      ],
+      [
+       -84.0488,
+       39.6203
+      ],
+      [
+       -84.0488,
+       39.6206
+      ],
+      [
+       -84.0492,
+       39.6206
+      ],
+      [
+       -84.0492,
+       39.6203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0009",
+    "house_no": 104,
+    "street": "Rue Élan",
+    "zone_code": "C-1",
+    "flood_zone": "AE",
+    "land_value": 33500.25,
+    "year_built": 1959,
+    "has_garage": false,
+    "survey_date": "2024-03-10"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 10,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0488,
+       39.6203
+      ],
+      [
+       -84.0484,
+       39.6203
+      ],
+      [
+       -84.0484,
+       39.6206
+      ],
+      [
+       -84.0488,
+       39.6206
+      ],
+      [
+       -84.0488,
+       39.6203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0010",
+    "house_no": 106,
+    "street": "Rue Élan",
+    "zone_code": "R-1",
+    "flood_zone": "AE",
+    "land_value": 35000.25,
+    "year_built": 1960,
+    "has_garage": true,
+    "survey_date": "2024-03-11"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 11,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0484,
+       39.6203
+      ],
+      [
+       -84.048,
+       39.6203
+      ],
+      [
+       -84.048,
+       39.6206
+      ],
+      [
+       -84.0484,
+       39.6206
+      ],
+      [
+       -84.0484,
+       39.6203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0011",
+    "house_no": 108,
+    "street": "Rue Élan",
+    "zone_code": "R-2",
+    "flood_zone": "AE",
+    "land_value": 36500.25,
+    "year_built": 1961,
+    "has_garage": false,
+    "survey_date": "2024-03-12"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 12,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.048,
+       39.6203
+      ],
+      [
+       -84.0476,
+       39.6203
+      ],
+      [
+       -84.0476,
+       39.6206
+      ],
+      [
+       -84.048,
+       39.6206
+      ],
+      [
+       -84.048,
+       39.6203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0012",
+    "house_no": 110,
+    "street": "Rue Élan",
+    "zone_code": "C-1",
+    "flood_zone": "AE",
+    "land_value": 38000.25,
+    "year_built": 1962,
+    "has_garage": true,
+    "survey_date": "2024-03-13"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 13,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.05,
+       39.6206
+      ],
+      [
+       -84.0496,
+       39.6206
+      ],
+      [
+       -84.0496,
+       39.6209
+      ],
+      [
+       -84.05,
+       39.6209
+      ],
+      [
+       -84.05,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0013",
+    "house_no": 100,
+    "street": "Cedar Ford Lane",
+    "zone_code": "R-1",
+    "flood_zone": "A",
+    "land_value": 39500.25,
+    "year_built": 1963,
+    "has_garage": false,
+    "survey_date": "2024-03-14"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 14,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0496,
+       39.6206
+      ],
+      [
+       -84.0492,
+       39.6206
+      ],
+      [
+       -84.0492,
+       39.6209
+      ],
+      [
+       -84.0496,
+       39.6209
+      ],
+      [
+       -84.0496,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0014",
+    "house_no": 102,
+    "street": "Cedar Ford Lane",
+    "zone_code": "R-2",
+    "flood_zone": "A",
+    "land_value": 41000.25,
+    "year_built": null,
+    "has_garage": true,
+    "survey_date": "2024-03-15"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 15,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0492,
+       39.6206
+      ],
+      [
+       -84.0488,
+       39.6206
+      ],
+      [
+       -84.0488,
+       39.6209
+      ],
+      [
+       -84.0492,
+       39.6209
+      ],
+      [
+       -84.0492,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0015",
+    "house_no": 104,
+    "street": "Cedar Ford Lane",
+    "zone_code": "C-1",
+    "flood_zone": "A",
+    "land_value": 42500.25,
+    "year_built": 1965,
+    "has_garage": false,
+    "survey_date": "2024-03-16"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 16,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0488,
+       39.6206
+      ],
+      [
+       -84.0484,
+       39.6206
+      ],
+      [
+       -84.0484,
+       39.6209
+      ],
+      [
+       -84.0488,
+       39.6209
+      ],
+      [
+       -84.0488,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0016",
+    "house_no": 106,
+    "street": "Cedar Ford Lane",
+    "zone_code": "R-1",
+    "flood_zone": "A",
+    "land_value": 44000.25,
+    "year_built": 1966,
+    "has_garage": true,
+    "survey_date": "2024-03-17"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 17,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0484,
+       39.6206
+      ],
+      [
+       -84.048,
+       39.6206
+      ],
+      [
+       -84.048,
+       39.6209
+      ],
+      [
+       -84.0484,
+       39.6209
+      ],
+      [
+       -84.0484,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0017",
+    "house_no": 108,
+    "street": "Cedar Ford Lane",
+    "zone_code": "R-2",
+    "flood_zone": "A",
+    "land_value": 45500.25,
+    "year_built": 1967,
+    "has_garage": false,
+    "survey_date": "2024-03-18"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 18,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.048,
+       39.6206
+      ],
+      [
+       -84.0476,
+       39.6206
+      ],
+      [
+       -84.0476,
+       39.6209
+      ],
+      [
+       -84.048,
+       39.6209
+      ],
+      [
+       -84.048,
+       39.6206
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0018",
+    "house_no": 110,
+    "street": "Cedar Ford Lane",
+    "zone_code": "C-1",
+    "flood_zone": "A",
+    "land_value": 47000.25,
+    "year_built": 1968,
+    "has_garage": true,
+    "survey_date": "2024-03-19"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 19,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.05,
+       39.6209
+      ],
+      [
+       -84.0496,
+       39.6209
+      ],
+      [
+       -84.0496,
+       39.6212
+      ],
+      [
+       -84.05,
+       39.6212
+      ],
+      [
+       -84.05,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0019",
+    "house_no": 100,
+    "street": "Sycamore Bend",
+    "zone_code": "R-1",
+    "flood_zone": "X",
+    "land_value": 48500.25,
+    "year_built": 1969,
+    "has_garage": false,
+    "survey_date": "2024-03-20"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 20,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0496,
+       39.6209
+      ],
+      [
+       -84.0492,
+       39.6209
+      ],
+      [
+       -84.0492,
+       39.6212
+      ],
+      [
+       -84.0496,
+       39.6212
+      ],
+      [
+       -84.0496,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0020",
+    "house_no": 102,
+    "street": "Sycamore Bend",
+    "zone_code": "R-2",
+    "flood_zone": "X",
+    "land_value": 50000.25,
+    "year_built": 1970,
+    "has_garage": true,
+    "survey_date": "2024-03-21"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 21,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0492,
+       39.6209
+      ],
+      [
+       -84.0488,
+       39.6209
+      ],
+      [
+       -84.0488,
+       39.6212
+      ],
+      [
+       -84.0492,
+       39.6212
+      ],
+      [
+       -84.0492,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0021",
+    "house_no": 104,
+    "street": "Sycamore Bend",
+    "zone_code": "C-1",
+    "flood_zone": "X",
+    "land_value": 51500.25,
+    "year_built": null,
+    "has_garage": false,
+    "survey_date": "2024-03-22"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 22,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0488,
+       39.6209
+      ],
+      [
+       -84.0484,
+       39.6209
+      ],
+      [
+       -84.0484,
+       39.6212
+      ],
+      [
+       -84.0488,
+       39.6212
+      ],
+      [
+       -84.0488,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0022",
+    "house_no": 106,
+    "street": "Sycamore Bend",
+    "zone_code": "R-1",
+    "flood_zone": "X",
+    "land_value": 53000.25,
+    "year_built": 1972,
+    "has_garage": true,
+    "survey_date": "2024-03-23"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 23,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0484,
+       39.6209
+      ],
+      [
+       -84.048,
+       39.6209
+      ],
+      [
+       -84.048,
+       39.6212
+      ],
+      [
+       -84.0484,
+       39.6212
+      ],
+      [
+       -84.0484,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0023",
+    "house_no": 108,
+    "street": "Sycamore Bend",
+    "zone_code": "R-2",
+    "flood_zone": "X",
+    "land_value": 54500.25,
+    "year_built": 1973,
+    "has_garage": false,
+    "survey_date": "2024-03-24"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 24,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.048,
+       39.6209
+      ],
+      [
+       -84.0476,
+       39.6209
+      ],
+      [
+       -84.0476,
+       39.6212
+      ],
+      [
+       -84.048,
+       39.6212
+      ],
+      [
+       -84.048,
+       39.6209
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0024",
+    "house_no": 110,
+    "street": "Sycamore Bend",
+    "zone_code": "C-1",
+    "flood_zone": "X",
+    "land_value": 56000.25,
+    "year_built": 1974,
+    "has_garage": true,
+    "survey_date": "2024-03-25"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 25,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.05,
+       39.6212
+      ],
+      [
+       -84.0496,
+       39.6212
+      ],
+      [
+       -84.0496,
+       39.6215
+      ],
+      [
+       -84.05,
+       39.6215
+      ],
+      [
+       -84.05,
+       39.6212
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0025",
+    "house_no": 100,
+    "street": "Old Ferry Road",
+    "zone_code": "R-1",
+    "flood_zone": "X",
+    "land_value": 57500.25,
+    "year_built": 1975,
+    "has_garage": false,
+    "survey_date": "2024-03-26"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 26,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0496,
+       39.6212
+      ],
+      [
+       -84.0492,
+       39.6212
+      ],
+      [
+       -84.0492,
+       39.6215
+      ],
+      [
+       -84.0496,
+       39.6215
+      ],
+      [
+       -84.0496,
+       39.6212
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0026",
+    "house_no": 102,
+    "street": "Old Ferry Road",
+    "zone_code": "R-2",
+    "flood_zone": "X",
+    "land_value": 59000.25,
+    "year_built": 1976,
+    "has_garage": true,
+    "survey_date": "2024-03-27"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 27,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0492,
+       39.6212
+      ],
+      [
+       -84.0488,
+       39.6212
+      ],
+      [
+       -84.0488,
+       39.6215
+      ],
+      [
+       -84.0492,
+       39.6215
+      ],
+      [
+       -84.0492,
+       39.6212
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0027",
+    "house_no": 104,
+    "street": "Old Ferry Road",
+    "zone_code": "C-1",
+    "flood_zone": "X",
+    "land_value": 60500.25,
+    "year_built": 1977,
+    "has_garage": false,
+    "survey_date": "2024-03-28"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 28,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0488,
+       39.6212
+      ],
+      [
+       -84.0484,
+       39.6212
+      ],
+      [
+       -84.0484,
+       39.6215
+      ],
+      [
+       -84.0488,
+       39.6215
+      ],
+      [
+       -84.0488,
+       39.6212
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0028",
+    "house_no": 106,
+    "street": "Old Ferry Road",
+    "zone_code": "R-1",
+    "flood_zone": "X",
+    "land_value": 62000.25,
+    "year_built": null,
+    "has_garage": true,
+    "survey_date": "2024-03-01"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 29,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -84.0484,
+       39.6212
+      ],
+      [
+       -84.048,
+       39.6212
+      ],
+      [
+       -84.048,
+       39.6215
+      ],
+      [
+       -84.0484,
+       39.6215
+      ],
+      [
+       -84.0484,
+       39.6212
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0029",
+    "house_no": 108,
+    "street": "Old Ferry Road",
+    "zone_code": "R-2",
+    "flood_zone": "X",
+    "land_value": 63500.25,
+    "year_built": 1979,
+    "has_garage": false,
+    "survey_date": "2024-03-02"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 30,
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        -84.048,
+        39.6212
+       ],
+       [
+        -84.0476,
+        39.6212
+       ],
+       [
+        -84.0476,
+        39.6215
+       ],
+       [
+        -84.048,
+        39.6215
+       ],
+       [
+        -84.048,
+        39.6212
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        -84.04756,
+        39.6212
+       ],
+       [
+        -84.04748,
+        39.6212
+       ],
+       [
+        -84.04748,
+        39.6215
+       ],
+       [
+        -84.04756,
+        39.6215
+       ],
+       [
+        -84.04756,
+        39.6212
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "parcel_id": "CF-0030",
+    "house_no": 110,
+    "street": "Old Ferry Road",
+    "zone_code": "C-1",
+    "flood_zone": "X",
+    "land_value": 65000.25,
+    "year_built": 1980,
+    "has_garage": true,
+    "survey_date": "2024-03-03"
+   }
+  }
+ ]
+}

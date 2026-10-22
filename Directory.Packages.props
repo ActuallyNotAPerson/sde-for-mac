@@ -37,6 +37,12 @@
     <PackageVersion Include="QRCoder" Version="1.6.0" />
     <!-- Pinned where it comes in indirectly (through PDFsharp): 8.0.1 has known vulnerabilities (fixed in 8.0.2). -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
+    <!-- GIS (Sde.Gis): geometry, Shapefile, GeoJSON and GeoTIFF. All BSD-3-Clause. Not NetTopologySuite.IO.ShapeFile (LGPL). -->
+    <PackageVersion Include="NetTopologySuite" Version="2.6.0" />
+    <PackageVersion Include="NetTopologySuite.Features" Version="2.2.0" />
+    <PackageVersion Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" />
+    <PackageVersion Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
+    <PackageVersion Include="BitMiracle.LibTiff.NET" Version="2.4.660" />
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
