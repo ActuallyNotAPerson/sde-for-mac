@@ -17,6 +17,12 @@ public sealed class MapSheetTemplates : IDataTemplate
 		[typeof(SelectByAttributeSheetViewModel)] = () => new SelectByAttributeSheetView(),
 		[typeof(AssignTeamSheetViewModel)] = () => new AssignTeamSheetView(),
 		[typeof(WebMapSheetViewModel)] = () => new WebMapSheetView(),
+		[typeof(SaveEditsSheetViewModel)] = () => new SaveEditsSheetView(),
+		[typeof(NewLayerSheetViewModel)] = () => new NewLayerSheetView(),
+		[typeof(MoveStructureSheetViewModel)] = () => new MoveStructureSheetView(),
+		[typeof(SelectByLocationSheetViewModel)] = () => new SelectByLocationSheetView(),
+		[typeof(CopyValuesSheetViewModel)] = () => new CopyValuesSheetView(),
+		[typeof(PrintMapSheetViewModel)] = () => new PrintMapSheetView(),
 	};
 
 	public bool Match(object data) => data != null && Views.ContainsKey(data.GetType());

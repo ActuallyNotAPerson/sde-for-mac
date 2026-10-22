@@ -111,13 +111,72 @@ public sealed partial class MapViewModel
 		List<MapLayerViewModel> toRead = Layers.Where(l => l.IsFeatures).ToList();
 		LayersLoaded = toRead.Count == 0 ? Task.CompletedTask : ReadFeaturesAsync(toRead);
 		OnPropertyChanged(nameof(StructuresLayer));
+		_floodZonesAtStart = false;
+		FollowSettings();
 		RaiseLayersChanged();
 		ReadBookmarks();
+	}
+
+	/// <summary>Whether the "start with FEMA flood zones on" setting was on when last looked at (it acts as it turns on).</summary>
+	private bool _floodZonesAtStart;
+
+	/// <summary>
+	/// Settings, then Map and GIS, changes the database's map settings while this page isn't showing: the background
+	/// chosen there, and FEMA's flood zones turned on when that setting is (or turns) on.
+	/// </summary>
+	private void FollowSettings()
+	{
+		try
+		{
+			string id = _app.Store.GetMapBasemapId();
+			if (id != null && id != Basemap.Id)
+			{
+				SetProperty(ref _basemap, Maps.Basemaps.WithId(id), nameof(Basemap));
+				BasemapProblem = null;
+				OnBasemapChanged();
+			}
+			bool floodZones = _app.Store.GetMapFloodZonesAtStart();
+			if (floodZones && !_floodZonesAtStart)
+			{
+				// Quietly: the panel stays on the tab it was on.
+				int panel = PanelIndex;
+				TurnOnFloodZones();
+				PanelIndex = panel;
+			}
+			_floodZonesAtStart = floodZones;
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			AppLog.Write("Couldn't read the map settings", ex);
+		}
+	}
+
+	/// <summary>FEMA's flood zones on, added first if the map doesn't have them.</summary>
+	private void TurnOnFloodZones()
+	{
+		if (Layers.FirstOrDefault(l => l.IsTiles) is MapLayerViewModel existing)
+		{
+			existing.IsVisible = true;
+			return;
+		}
+		MapLayerRecord row = _app.Store.SaveMapLayer(new MapLayerRecord
+		{
+			Name = TileOverlays.FloodZones.Name,
+			SourceKind = MapLayerKinds.Nfhl,
+			Source = TileOverlays.FloodZones.UrlTemplate,
+			GeometryType = "Polygon",
+			Opacity = 0.7,
+		});
+		Show(row, null, null);
 	}
 
 	/// <summary>Another database was opened: its own layers and basemap.</summary>
 	private void ResetLayers()
 	{
+		SaveEditsBeforeSwitching();
+		EndSession();
+		_editLayer = null;
+		EditFeature = null;
 		_layersRead = false;
 		_layersStore = null;
 		_basemapRow = null;
@@ -200,6 +259,8 @@ public sealed partial class MapViewModel
 		OnPropertyChanged(nameof(Attribution));
 		OnPropertyChanged(nameof(HasAttribution));
 		OnPropertyChanged(nameof(SelectableLayers));
+		OnPropertyChanged(nameof(EditableLayers));
+		OnPropertyChanged(nameof(HasEditableLayers));
 		LayersChanged?.Invoke();
 	}
 
@@ -364,21 +425,13 @@ public sealed partial class MapViewModel
 	private void AddFloodZones()
 	{
 		ReadLayers();
-		if (Layers.FirstOrDefault(l => l.IsTiles) is MapLayerViewModel existing)
+		if (Layers.Any(l => l.IsTiles))
 		{
-			existing.IsVisible = true;
+			TurnOnFloodZones();
 			PanelIndex = 1;
 			return;
 		}
-		MapLayerRecord row = _app.Store.SaveMapLayer(new MapLayerRecord
-		{
-			Name = TileOverlays.FloodZones.Name,
-			SourceKind = MapLayerKinds.Nfhl,
-			Source = TileOverlays.FloodZones.UrlTemplate,
-			GeometryType = "Polygon",
-			Opacity = 0.7,
-		});
-		Show(row, null, null);
+		TurnOnFloodZones();
 		Message = "Added FEMA flood zones. They show once the map is zoomed in to a town.";
 	}
 
@@ -424,6 +477,15 @@ public sealed partial class MapViewModel
 		{
 			_app.Errors.Show("Couldn't remove the layer", ex);
 			return;
+		}
+		if (ReferenceEquals(layer, _editLayer))
+		{
+			// Its edits went with it.
+			EndSession();
+			_editLayer = null;
+			EditFeature = null;
+			EditStateChanged();
+			OnPropertyChanged(nameof(EditLayer));
 		}
 		Layers.Remove(layer);
 		if (ReferenceEquals(SelectTarget, layer))
@@ -510,9 +572,7 @@ public sealed partial class MapViewModel
 		}
 		try
 		{
-			_basemapRow ??= new MapLayerRecord { Name = "Basemap", SourceKind = MapLayerKinds.Basemap, SortOrder = -1 };
-			_basemapRow.Source = Basemap.Id;
-			_app.Store.SaveMapLayer(_basemapRow);
+			_basemapRow = _app.Store.SetMapBasemapId(Basemap.Id);
 		}
 		catch (Exception ex) when (ex is not OutOfMemoryException)
 		{

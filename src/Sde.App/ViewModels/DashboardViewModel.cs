@@ -54,8 +54,24 @@ public sealed partial class DashboardViewModel : ViewModelBase
 		};
 	}
 
-	/// <summary>Set by the window while this is the page showing.</summary>
-	public bool IsActive { get; set; }
+	private bool _isActive;
+
+	/// <summary>
+	/// Set by the window while this is the page showing. Each time the page opens, Include owner names starts as
+	/// Settings, then Map and GIS, says (off unless the person chose otherwise there).
+	/// </summary>
+	public bool IsActive
+	{
+		get => _isActive;
+		set
+		{
+			if (value && !_isActive)
+			{
+				IncludeOwnerNames = !_app.Store.GetGisLeaveOutOwnerNames();
+			}
+			_isActive = value;
+		}
+	}
 
 	/// <summary>The numbers behind everything on the page; null until the first <see cref="Reload"/>.</summary>
 	public EventSummary Summary { get; private set; }

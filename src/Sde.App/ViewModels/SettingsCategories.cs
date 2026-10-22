@@ -75,5 +75,9 @@ public sealed partial class SettingsViewModel
 		{
 			AiAssistants.Refresh(); // an assistant may have changed something since the panel was last shown
 		}
+		else if (value.Category == SettingsCategory.MapAndGis)
+		{
+			_ = MapGis.Refresh(); // the Map page may have changed the background, or saved more pieces
+		}
 	}
 }

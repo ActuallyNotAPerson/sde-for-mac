@@ -435,6 +435,12 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	[RelayCommand]
 	private void Show(Page page)
 	{
+		if (ActivePage == Page.Map && page != Page.Map && Map.HasUnsavedEdits)
+		{
+			// Unsaved map edits: the map asks first (save, throw away, or stay on the map).
+			_ = LeaveMapThenShowAsync(page);
+			return;
+		}
 		if (page != Page.Editor && Editor != null)
 		{
 			Editor.Save();
@@ -535,13 +541,25 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 	[RelayCommand]
 	private void Save() => Editor?.Save();
 
-	/// <summary>Edit, then Undo when the cursor isn't in a text box (which undoes its own typing).</summary>
+	private async Task LeaveMapThenShowAsync(Page page)
+	{
+		if (await Map.ConfirmLeaveEditsAsync())
+		{
+			Show(page);
+		}
+	}
+
+	/// <summary>Edit, then Undo when the cursor isn't in a text box (which undoes its own typing): the editor's, or the map's edits.</summary>
 	[RelayCommand]
 	private void Undo()
 	{
 		if (CurrentPage == Editor && Editor != null)
 		{
 			Editor.Undo();
+		}
+		else if (CurrentPage == Map && Map.IsEdit)
+		{
+			Map.UndoEditCommand.Execute(null);
 		}
 	}
 
@@ -551,6 +569,10 @@ public sealed partial class MainViewModel : ViewModelBase, IEditorHost
 		if (CurrentPage == Editor && Editor != null)
 		{
 			Editor.Redo();
+		}
+		else if (CurrentPage == Map && Map.IsEdit)
+		{
+			Map.RedoEditCommand.Execute(null);
 		}
 	}
 

@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sh="using:Sde.App.ViewModels.Sheets"
+             xmlns:vm="using:Sde.App.ViewModels"
+             x:Class="Sde.App.Views.SelectByLocationSheetView"
+             x:DataType="sh:SelectByLocationSheetViewModel">
+  <StackPanel Spacing="14">
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Select" />
+      <ComboBox ItemsSource="{Binding Targets}" SelectedItem="{Binding Target}" MinWidth="260" AutomationProperties.Name="Layer to select in">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:MapLayerViewModel">
+            <TextBlock Text="{Binding Name}" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="That" />
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <ComboBox ItemsSource="{Binding Relations}" SelectedItem="{Binding Relation}" HorizontalAlignment="Stretch" AutomationProperties.Name="How they relate" />
+        <TextBox Grid.Column="1" Text="{Binding DistanceText}" Width="90" IsVisible="{Binding NeedsDistance}" AutomationProperties.Name="Distance" />
+        <ListBox Grid.Column="2" Classes="segmented" SelectedIndex="{Binding UnitIndex}" IsVisible="{Binding NeedsDistance}" AutomationProperties.Name="Unit of the distance">
+          <ListBoxItem Content="ft" />
+          <ListBoxItem Content="mi" />
+          <ListBoxItem Content="m" />
+        </ListBox>
+      </Grid>
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Of" />
+      <ComboBox ItemsSource="{Binding Sources}" SelectedItem="{Binding Source}" HorizontalAlignment="Stretch" AutomationProperties.Name="What to compare with" />
+    </StackPanel>
+    <StackPanel Spacing="4">
+      <TextBlock Classes="fieldLabel" Text="Selection" />
+      <ListBox Classes="segmented" SelectedIndex="{Binding MethodIndex}" HorizontalAlignment="Left" AutomationProperties.Name="Make a new selection, add to it, or select within it">
+        <ListBoxItem Content="New selection" />
+        <ListBoxItem Content="Add to it" />
+        <ListBoxItem Content="Select within it" />
+      </ListBox>
+    </StackPanel>
+
+    <TextBlock Classes="medium" Text="{Binding CountText}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+    <Border Classes="subtle" IsVisible="{Binding HasProblem}">
+      <TextBlock Classes="issue required" Text="{Binding Problem}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+    </Border>
+
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" MinWidth="90" HorizontalContentAlignment="Center" />
+      <Button Classes="primary" Content="Select" Command="{Binding SelectCommand}" IsDefault="True" MinWidth="90" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

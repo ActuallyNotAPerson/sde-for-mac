@@ -206,6 +206,71 @@ public sealed class TileCache
 	/// <summary>Stops downloads that are still running (when the page is closed).</summary>
 	public void Stop() => _stop.Cancel();
 
+	/// <summary>How much room the tiles kept in <paramref name="folder"/> take, in bytes, and how many there are.</summary>
+	public static (long Bytes, int Count) SizeOf(string folder)
+	{
+		long bytes = 0;
+		int count = 0;
+		if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))
+		{
+			return (0, 0);
+		}
+		foreach (FileInfo file in new DirectoryInfo(folder).EnumerateFiles("*.tile", SearchOption.AllDirectories))
+		{
+			try
+			{
+				bytes += file.Length;
+				count++;
+			}
+			catch (IOException)
+			{
+				// Replaced or removed while counting.
+			}
+		}
+		return (bytes, count);
+	}
+
+	/// <summary>
+	/// Deletes the tiles kept in <paramref name="folder"/> (only tile files, and the folders they leave empty); they are
+	/// downloaded again when a map needs them. Returns the bytes freed. A tile being written at that moment is skipped.
+	/// </summary>
+	public static long ClearFolder(string folder)
+	{
+		long freed = 0;
+		if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))
+		{
+			return 0;
+		}
+		foreach (FileInfo file in new DirectoryInfo(folder).EnumerateFiles("*.tile", SearchOption.AllDirectories).ToList())
+		{
+			try
+			{
+				long length = file.Length;
+				file.Delete();
+				freed += length;
+			}
+			catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+			{
+				// In use: it stays.
+			}
+		}
+		foreach (string dir in Directory.EnumerateDirectories(folder, "*", SearchOption.AllDirectories).OrderByDescending(d => d.Length).ToList())
+		{
+			try
+			{
+				if (!Directory.EnumerateFileSystemEntries(dir).Any())
+				{
+					Directory.Delete(dir);
+				}
+			}
+			catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+			{
+				// Something was written there meanwhile.
+			}
+		}
+		return freed;
+	}
+
 	private static string Key(Basemap b, int z, int x, int y) => $"{b.Id}/{z}/{x}/{y}";
 
 	private string PathOf(string key) => System.IO.Path.Combine(_folder, key.Replace('/', System.IO.Path.DirectorySeparatorChar) + ".tile");

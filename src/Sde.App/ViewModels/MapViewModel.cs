@@ -84,6 +84,9 @@ public enum MapMode
 
 	/// <summary>Click points to measure a distance or an area.</summary>
 	Measure,
+
+	/// <summary>Draw and change the shapes of a layer added from a file or made here.</summary>
+	Edit,
 }
 
 /// <summary>
@@ -130,7 +133,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	}
 
 	/// <summary>Where downloaded tiles are kept: next to the app's other files (or the test database's folder).</summary>
-	private static string TileFolder(AppServices app)
+	internal static string TileFolder(AppServices app)
 	{
 		string forced = Environment.GetEnvironmentVariable("SDE_DATABASE");
 		string root = string.IsNullOrEmpty(forced) ? Path.GetDirectoryName(SdeDatabase.DefaultPath)! : Path.GetDirectoryName(app.Store.Database.FilePath)!;
@@ -149,6 +152,12 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	/// <summary>Structures without coordinates, for "Set location".</summary>
 	public ObservableCollection<MapPointViewModel> Unplaced { get; } = new();
+
+	/// <summary>
+	/// What the "Structure to place" list offers: the structures without coordinates, and the one picked by clicking its
+	/// dot (so the list can show it; a list can't show an item it doesn't hold, and would clear the choice).
+	/// </summary>
+	public ObservableCollection<MapPointViewModel> PlaceChoices { get; } = new();
 
 	public IReadOnlyList<Basemap> Basemaps => Maps.Basemaps.All;
 
@@ -186,7 +195,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	public bool HasBasemapProblem => BasemapProblem != null;
 
 	[ObservableProperty]
-	[NotifyPropertyChangedFor(nameof(IsBrowse), nameof(IsSelect), nameof(IsSetLocation), nameof(IsMeasure), nameof(Hint), nameof(Sketch))]
+	[NotifyPropertyChangedFor(nameof(IsBrowse), nameof(IsSelect), nameof(IsSetLocation), nameof(IsMeasure), nameof(IsEdit), nameof(Hint), nameof(Sketch))]
 	public partial MapMode Mode { get; set; }
 
 	public bool IsBrowse => Mode == MapMode.Browse;
@@ -197,17 +206,20 @@ public sealed partial class MapViewModel : ViewModelBase
 
 	public bool IsMeasure => Mode == MapMode.Measure;
 
+	public bool IsEdit => Mode == MapMode.Edit;
+
 	/// <summary>One line of help for the current mode.</summary>
 	public string Hint => Mode switch
 	{
-		MapMode.Select when IsPolygonSelect => "Click the corners of an area; double-click or press Return to select what is inside it.",
+		MapMode.Select when IsPolygonSelect => PendingLocationHint ?? "Click the corners of an area; double-click or press Return to select what is inside it.",
 		MapMode.Select => SelectTarget?.IsStructures == false
 			? $"Click or drag a box to select in {SelectTarget.Name}. Hold Command to add to the selection."
 			: "Drag a box around the structures to check in the Structures list. Hold Command to add to what is already checked.",
 		MapMode.Measure => "Click to add points; double-click or press Return to finish. Delete removes the last point.",
+		MapMode.Edit => EditHint,
 		MapMode.SetLocation => PlaceTarget == null
-			? "Choose a structure, then click the map where it is. You can also click a dot to move that structure."
-			: $"Click the map where {PlaceTarget.Address} is.",
+			? "Choose a structure, then click the map where it is. Or drag any dot to where the structure really is."
+			: $"Click the map where {PlaceTarget.Address} is. Or drag any dot to where the structure really is.",
 		_ => "Click a dot to open its assessment. Drag to move the map, scroll to zoom. Command-drag selects structures.",
 	};
 
@@ -220,6 +232,37 @@ public sealed partial class MapViewModel : ViewModelBase
 	public partial MapPointViewModel PlaceTarget { get; set; }
 
 	public bool HasPlaceTarget => PlaceTarget != null;
+
+	partial void OnPlaceTargetChanged(MapPointViewModel value) => UpdatePlaceChoices(prune: false);
+
+	/// <summary>
+	/// Puts the chosen structure and those without coordinates in the list. Others go only with <paramref name="prune"/>
+	/// (after reading the structures again), never while the list is changing its choice.
+	/// </summary>
+	private void UpdatePlaceChoices(bool prune)
+	{
+		if (prune)
+		{
+			for (int i = PlaceChoices.Count - 1; i >= 0; i--)
+			{
+				if (!ReferenceEquals(PlaceChoices[i], PlaceTarget) && !Unplaced.Contains(PlaceChoices[i]))
+				{
+					PlaceChoices.RemoveAt(i);
+				}
+			}
+		}
+		if (PlaceTarget != null && !PlaceChoices.Contains(PlaceTarget))
+		{
+			PlaceChoices.Insert(0, PlaceTarget);
+		}
+		foreach (MapPointViewModel p in Unplaced)
+		{
+			if (!PlaceChoices.Contains(p))
+			{
+				PlaceChoices.Add(p);
+			}
+		}
+	}
 
 	/// <summary>What happened last ("Placed 12 Oak Street."), read out and shown under the controls.</summary>
 	[ObservableProperty]
@@ -262,6 +305,7 @@ public sealed partial class MapViewModel : ViewModelBase
 	public void Reload()
 	{
 		ReadLayers();
+		FollowSettings();
 		Guid? selected = Selected?.Id;
 		Guid? target = PlaceTarget?.Id;
 		// The event chosen in the sidebar limits the dots to its assessments.
@@ -284,6 +328,7 @@ public sealed partial class MapViewModel : ViewModelBase
 		Apply();
 		Selected = selected == null ? null : Visible.FirstOrDefault(p => p.Id == selected);
 		PlaceTarget = (target == null ? null : _all.FirstOrDefault(p => p.Id == target)) ?? Unplaced.FirstOrDefault();
+		UpdatePlaceChoices(prune: true);
 		// Structures may have been checked or unchecked in the Structures list meanwhile.
 		OnPropertyChanged(nameof(CheckedCount));
 		OnPropertyChanged(nameof(HasChecked));
@@ -318,17 +363,36 @@ public sealed partial class MapViewModel : ViewModelBase
 		}
 	}
 
-	partial void OnModeChanged(MapMode value)
+	partial void OnModeChanged(MapMode oldValue, MapMode newValue)
 	{
+		_pendingLocation = null;
 		Message = null;
 		Measurement = null;
 		Identified = null;
+		if (oldValue == MapMode.Edit || newValue == MapMode.Edit)
+		{
+			EditModeChanged(newValue == MapMode.Edit);
+		}
 	}
 
 	// ───────────── Commands ─────────────
 
+	/// <summary>Switches the mode; leaving Edit with unsaved edits first asks whether to save them.</summary>
 	[RelayCommand]
-	private void SetMode(MapMode mode) => Mode = mode;
+	private async Task SetMode(MapMode mode)
+	{
+		if (Mode == MapMode.Edit && mode != MapMode.Edit && HasUnsavedEdits && !await ConfirmLeaveEditsAsync())
+		{
+			// Stay in Edit: the mode buttons go back to showing it.
+			OnPropertyChanged(nameof(IsBrowse));
+			OnPropertyChanged(nameof(IsSelect));
+			OnPropertyChanged(nameof(IsSetLocation));
+			OnPropertyChanged(nameof(IsMeasure));
+			OnPropertyChanged(nameof(IsEdit));
+			return;
+		}
+		Mode = mode;
+	}
 
 	[RelayCommand]
 	private void ShowAll()
@@ -412,24 +476,13 @@ public sealed partial class MapViewModel : ViewModelBase
 			return;
 		}
 		MapPointViewModel target = PlaceTarget;
-		decimal lat = Math.Round((decimal)latitude, 6);
-		decimal lon = Math.Round((decimal)longitude, 6);
-		try
+		if (WhyCantMove(target) is string reason)
 		{
-			PropertyRecord p = _app.Store.GetProperty(target.Id);
-			if (p == null)
-			{
-				Message = "That structure no longer exists.";
-				return;
-			}
-			p.Latitude = lat;
-			p.Longitude = lon;
-			// Matched by structure: an editor showing any assessment of it (not only the newest) catches up.
-			_app.Writes.WriteForStructures(new[] { p.PropertyID }, () => _app.Store.SaveProperty(p, new SaveContext { Via = SaveVia.Map }));
+			Message = reason;
+			return;
 		}
-		catch (Exception ex) when (ex is not OutOfMemoryException)
+		if (SaveLocation(target, latitude, longitude) is not (decimal lat, decimal lon))
 		{
-			_app.Errors.Show("Couldn't save the location", ex);
 			return;
 		}
 		// The write reloaded the page. Move on to the next structure that still needs a location.

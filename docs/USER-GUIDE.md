@@ -633,6 +633,98 @@ rows selects them on the map.
 The background map, the flood zones and ArcGIS layers need an internet connection. The dots and layers from files work
 offline.
 
+#### Drawing and changing shapes
+Choose **Edit** above the map to draw on a layer or change its shapes. Layers from files and layers you make in SDE can
+be edited; ArcGIS layers and FEMA's flood zones can't.
+
+1. Pick the layer next to **Edit**. To start a layer of your own, click **New layer…**, give it a name and choose
+   whether it holds **Points**, **Lines** or **Areas**. Each shape has a name and notes.
+2. Choose a tool:
+   - **Change**: click a shape to pick it. Drag a corner to move it, or drag the small dot between two corners to add
+     one. Option-click a corner to take it away. Drag inside the shape to move all of it. Delete removes the picked
+     corner, or the whole shape. Esc lets go of it.
+   - **Add points**, **Add lines** or **Add areas**: click the corners, then double-click or press Return to finish.
+     Delete takes away the last corner while you draw.
+3. With **Snap** ticked, new corners and moved corners land exactly on nearby corners, edges and structures.
+4. ⌘Z and ⇧⌘Z (or the arrows in the Edit bar) undo and redo each change.
+5. Click **Save** to keep the edits in the map layers file next to the database. **Discard…** throws them away.
+
+Nothing is written until you click **Save**. If you leave the Map page, choose another layer or quit with edits not
+saved, SDE asks whether to save them. Opening another database saves them first.
+
+While a layer is being edited, its attribute table can be typed in. A value that doesn't fit the field, such as
+letters in a number field, isn't taken, and SDE says why.
+
+![Editing a parcel layer](screenshots/56f-map-edit.png)
+
+#### Moving a structure
+If a dot is in the wrong place, choose **Set location** and drag the dot to where the structure really is. SDE asks
+before saving, for example *Move 123 River Street about 40 ft north-east?*, and shows the old and new latitude and
+longitude. **Move** saves the new coordinates, and the change is listed in the assessment's history.
+
+A structure whose assessment is Final or Letter sent, or checked out in a work package, can't be moved or given a
+location. SDE says which, and why.
+
+![Moving a structure](screenshots/56g-map-move.png)
+
+#### Selecting by location
+In **Select** mode, **By location…** selects what lies in, near or around other shapes:
+1. **Select**: the structures, or the shapes of a layer.
+2. **That**: *touch or overlap*, *are completely inside*, *completely contain*, or *are within a distance of* (in feet,
+   miles or metres).
+3. **Of**: the selected shapes of another layer, or an area you draw on the map.
+4. **Selection**: **New selection**, **Add to it** (keep what is selected and add these), or **Select within it** (keep
+   only the selected ones that also match).
+
+The sheet counts what matches as you change it. Click **Select**. For a drawn area, click its corners on the map and
+double-click or press Return to finish.
+
+![Select by location](screenshots/56h-map-select-by-location.png)
+
+#### Copying values onto structures
+A layer of areas, such as parcels or flood zones, can fill in a field of the structures that sit inside each area.
+Choose **Copy values onto structures…** from the layer's **⋯** menu, or select structures and click **Copy values…** in
+the bar on the map.
+
+1. Choose **From the areas of** (the layer), **Their field**, and **Into the structure field**. SDE suggests the
+   structure field from the layer's field name: a FEMA *FLD_ZONE* goes into the FIRM zone, a parcel number into Parcel
+   number, an NFIP community ID or name into the community fields.
+2. Choose the selected structures, or all the structures in the event.
+3. Check the preview. Each structure shows its value **NOW**, the **NEW** value, and **HOW IT WAS MATCHED**: inside one
+   area, inside several (the smallest is used), or inside none. Untick any you don't want changed.
+4. Click **Copy** (the button counts the values, for example **Copy 12 values**).
+
+Each value goes in through the same checks as typing it in the editor. FIRM zones are matched to the choices on FEMA's
+form, and a zone the form has no choice for is listed and left alone. The copy is one change in each structure's
+history: **Undo** in the message that follows, or **Revert** in History, puts the old values back. Final, Letter sent
+and checked-out assessments are left as they are and counted.
+
+![Copy values preview](screenshots/56i-map-copy-values.png)
+
+#### Printing the map
+**Print…** at the top of the Map page makes a Letter-size PDF of the area the map shows now.
+
+1. Type a **Title** (it starts as the event's name, or *Structures*) and choose **Portrait** or **Landscape**.
+2. Click **Save as PDF…** and choose where to save it. SDE opens the PDF when it is done.
+
+The page has the map, a legend of the structures and every layer shown, a scale bar, a north arrow, the scale (for
+example *1:4,800 (1 inch = 400 feet)*), the sources the map uses, and the date. The map is drawn sharper than on
+screen, so SDE downloads the background at more detail. It waits up to 30 seconds for those pieces. Any that don't
+arrive are left blank, and the page says how many.
+
+![A printed map](screenshots/56j-map-print.png)
+
+#### Map and GIS settings
+**Settings > Map & GIS** has:
+- **Background map**: the same choice as the basemap menu on the Map page.
+- **Start the map with FEMA flood zones on**: each time this database's map opens, the flood zones show.
+- **Saved map pieces**: how much room the background map pieces kept on this Mac take. **Clear** deletes them; the
+  map downloads them again as it needs them.
+- **Leave owner names out of GIS files**: on by default. Turn it off to have **Include owner names** on the dashboard
+  start ticked.
+
+![Map and GIS settings](screenshots/31g-settings-map-gis.png)
+
 ### The event dashboard
 **Event dashboard** shows the numbers for the whole database: how many structures, how many substantially damaged,
 the total building value and repair cost, and bars by result, by street (top ten), by community and by inspector.
@@ -640,7 +732,8 @@ the total building value and repair cost, and bars by result, by street (top ten
 Under **Share this event**:
 - **Event summary PDF…**: the same numbers as a report (type an **Event name** to show on it).
 - **GeoPackage for GIS…** and **GeoJSON…**: one point per assessed structure, in latitude and longitude (WGS 84), with
-  a QGIS style beside it. Owner names are left out unless you tick **Include owner names**.
+  a QGIS style beside it. Owner names are left out unless you tick **Include owner names** (Settings > Map & GIS
+  can have it start ticked).
 
 ![The event dashboard](screenshots/57-dashboard.png)
 

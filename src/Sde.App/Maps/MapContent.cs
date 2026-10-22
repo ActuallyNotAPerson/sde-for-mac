@@ -30,6 +30,38 @@ public enum MapSketch
 	Polygon,
 }
 
+/// <summary>What clicks and drags do to the layer being edited.</summary>
+public enum MapEditTool
+{
+	/// <summary>Click a shape to pick it; drag its corners, its midpoints (to add a corner) or the shape itself.</summary>
+	Change,
+
+	/// <summary>Each click adds a point.</summary>
+	AddPoint,
+
+	/// <summary>Clicks add the corners of a line; a double click or Return finishes it.</summary>
+	AddLine,
+
+	/// <summary>Clicks add the corners of an area; a double click or Return finishes it.</summary>
+	AddArea,
+}
+
+/// <summary>
+/// The unsaved edits to a layer, as the map draws them: the layer's own copies of changed and deleted features are
+/// hidden, and the features as they are now are drawn over it. A full rebuild of a large layer only happens on save.
+/// </summary>
+public sealed class MapLayerEdits
+{
+	/// <summary>Ids of the layer's features not to draw from the layer itself (changed, deleted, or being changed).</summary>
+	public IReadOnlyCollection<long> Hidden { get; init; } = Array.Empty<long>();
+
+	/// <summary>The changed and new features as they are now (WGS 84), drawn over the layer in its style.</summary>
+	public IReadOnlyList<Feature> Drawn { get; init; } = Array.Empty<Feature>();
+
+	/// <summary>Changes whenever the edits change, so the map draws them again.</summary>
+	public int Revision { get; init; }
+}
+
 /// <summary>
 /// A layer of features for the map, independent of the map engine: the data (WGS 84), how to draw it and label it,
 /// its opacity and scale range, and which features are selected. The map rebuilds what it draws when
@@ -62,6 +94,9 @@ public sealed class MapFeatureLayer
 
 	/// <summary>Changes whenever <see cref="Selected"/> changes.</summary>
 	public int SelectionRevision { get; init; }
+
+	/// <summary>Unsaved edits drawn over the layer while it is being edited, or null.</summary>
+	public MapLayerEdits Edits { get; init; }
 }
 
 /// <summary>A tile overlay for the map (such as FEMA's flood zones), drawn over the basemap.</summary>
