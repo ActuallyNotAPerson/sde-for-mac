@@ -254,6 +254,8 @@ public class MapEngineTests
 		ui.Pump();
 		Assert.True(map.IsDisposed);
 		Assert.Null(map.EngineMap);
+		// The engine's redraw loop was unhooked first, so it can't reach for the UI thread after the page has gone.
+		Assert.True(map.RedrawLoopUnhooked);
 
 		MapView again = MapTestSupport.ShowMap(ui);
 		Assert.NotSame(map, again.Map);

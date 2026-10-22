@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
@@ -62,6 +63,7 @@ public sealed class MapCanvas : Panel, IDisposable
 	private readonly Polyline _sketchLine = new Polyline { StrokeThickness = 2.5, IsVisible = false };
 	private readonly Avalonia.Controls.Shapes.Polygon _sketchArea = new Avalonia.Controls.Shapes.Polygon { StrokeThickness = 2.5, IsVisible = false };
 	private readonly List<LatLon> _sketch = new List<LatLon>();
+	private readonly Dispatcher _ui;
 	private readonly Dictionary<string, BuiltFeatureLayer> _built = new Dictionary<string, BuiltFeatureLayer>();
 	private readonly Dictionary<string, (TileLayer Layer, SdeTileSource Source)> _overlays = new Dictionary<string, (TileLayer, SdeTileSource)>();
 	private MapControl _control;
@@ -97,6 +99,7 @@ public sealed class MapCanvas : Panel, IDisposable
 
 	public MapCanvas()
 	{
+		_ui = Dispatcher.UIThread;
 		_overlay.Children.Add(_sketchArea);
 		_overlay.Children.Add(_sketchLine);
 		_overlay.Children.Add(_box);
@@ -790,9 +793,10 @@ public sealed class MapCanvas : Panel, IDisposable
 
 	private void OnViewportChanged(object sender, EventArgs e)
 	{
-		if (!Dispatcher.UIThread.CheckAccess())
+		if (!_ui.CheckAccess())
 		{
-			Dispatcher.UIThread.Post(() => OnViewportChanged(sender, e));
+			// The dispatcher this control was made on: a pool thread must not ask for "the" UI dispatcher (see UnhookRedrawLoop).
+			_ui.Post(() => OnViewportChanged(sender, e));
 			return;
 		}
 		UpdateScaleVisibility();
@@ -852,6 +856,7 @@ public sealed class MapCanvas : Panel, IDisposable
 			_parked = _control.Map.Navigator.Viewport;
 			_control.Map.Navigator.ViewportChanged -= OnViewportChanged;
 			Children.Remove(_control);
+			RedrawLoopUnhooked = UnhookRedrawLoop(_control);
 			_control.Dispose();
 			_control = null;
 		}
@@ -874,6 +879,29 @@ public sealed class MapCanvas : Panel, IDisposable
 
 	/// <summary>True once <see cref="Dispose"/> has run (and until the page shows the map again).</summary>
 	public bool IsDisposed => _disposed;
+
+	/// <summary>True when the last <see cref="Dispose"/> could unhook the engine's redraw loop (see <see cref="UnhookRedrawLoop"/>).</summary>
+	internal bool RedrawLoopUnhooked { get; private set; }
+
+	/// <summary>
+	/// Mapsui 5.1's redraw loop (its RenderController) asks the control for one more redraw after the control is
+	/// disposed, from a pool thread, and that reaches for Avalonia's UI dispatcher after the page has gone. In the app
+	/// this is harmless. In the headless tests it can land after a test has ended and claim the next test's dispatcher
+	/// for the wrong thread. So the loop's redraw callback is unhooked before the control is disposed. Returns false if a
+	/// later Mapsui renames the fields; MapEngineTests then fails, so an upgrade can't drop this quietly.
+	/// </summary>
+	internal static bool UnhookRedrawLoop(MapControl control)
+	{
+		FieldInfo controllerField = typeof(MapControl).GetField("_renderController", BindingFlags.Instance | BindingFlags.NonPublic);
+		object controller = controllerField?.GetValue(control);
+		FieldInfo callback = controller?.GetType().GetField("_invalidateCanvas", BindingFlags.Instance | BindingFlags.NonPublic);
+		if (callback == null || callback.FieldType != typeof(Action))
+		{
+			return false;
+		}
+		callback.SetValue(controller, null);
+		return true;
+	}
 
 	// ───────────── Mouse ─────────────
 

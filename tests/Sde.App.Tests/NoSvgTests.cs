@@ -53,6 +53,6 @@ public class NoSvgTests
 
 		string[] loaded = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
 		Assert.Contains("Mapsui.Rendering.Skia", loaded);
-		Assert.Empty(loaded.Where(n => SvgAssemblies.Contains(n, StringComparer.OrdinalIgnoreCase)));
+		Assert.DoesNotContain(loaded, n => SvgAssemblies.Contains(n, StringComparer.OrdinalIgnoreCase));
 	}
 }

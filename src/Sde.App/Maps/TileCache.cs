@@ -44,7 +44,12 @@ public sealed class TileCache
 	{
 		_folder = folder;
 		_download = download ?? DefaultDownload ?? ((url, cancel) => DownloadAsync(Http.Client, url, cancel));
+		// Made on the screen's thread; background downloads report back to this dispatcher, never to whatever
+		// Dispatcher.UIThread is when they finish (in the headless tests that can be the next test's).
+		_ui = Dispatcher.UIThread;
 	}
+
+	private readonly Dispatcher _ui;
 
 	/// <summary>
 	/// The downloader a cache made without one uses. Null (the app) means the network; the UI tests set one that
@@ -163,7 +168,7 @@ public sealed class TileCache
 		{
 			return;
 		}
-		Dispatcher.UIThread.Post(() =>
+		_ui.Post(() =>
 		{
 			FailureCount++;
 			DownloadFailed?.Invoke(problem);
@@ -232,7 +237,7 @@ public sealed class TileCache
 		{
 			return;
 		}
-		await Dispatcher.UIThread.InvokeAsync(() =>
+		await _ui.InvokeAsync(() =>
 		{
 			_loading.Remove(key);
 			if (bitmap != null)
